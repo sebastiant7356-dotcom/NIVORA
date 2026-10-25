@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123f33">
+  <meta name="description" content="NIVORA — Kerala-inspired, meaningful life-partner matching.">
+  <title>NIVORA — Oru naal mathi</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="portal.css">
+  <script>
+    // Applied before first paint so there is no flash of the wrong theme. A saved choice
+    // (from the toggle button) wins; otherwise the device's own light/dark setting is used.
+    (function () {
+      try {
+        var saved = localStorage.getItem("nv_theme");
+        if (saved === "dark" || saved === "light") document.documentElement.setAttribute("data-theme", saved);
+      } catch (_) { /* ignore */ }
+    })();
+  </script>
+</head>
+<body>
+  <div class="announcement"><span class="dot"></span><span data-i18n="announcement">ബന്ധങ്ങൾ വേഗത്തിൽ അല്ല, മനസ്സിലാക്കി തുടങ്ങാം.</span></div>
+  <header class="nav">
+    <a class="brand" href="#home" aria-label="NIVORA home">
+      <span class="brand-mark">n<span>♡</span></span>
+      <span class="brand-copy"><b>nivora</b><small>ORU NAAL MATHI</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#why" data-i18n="navWhy">എന്തുകൊണ്ട് NIVORA?</a>
+      <a href="#how" data-i18n="navHow">എങ്ങനെ പ്രവർത്തിക്കുന്നു</a>
+      <a href="#safety" data-i18n="navSafety">സുരക്ഷ</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="lang-btn" id="themeBtn" type="button" aria-label="Toggle dark mode" title="Dark / light mode">🌙</button>
+      <button class="lang-btn" id="langBtn" type="button">EN ↗</button>
+      <button class="lang-btn" id="openPortal" type="button" data-i18n="myspace">എന്റെ ഇടം ↗</button>
+      <button class="login-btn" id="openProfile" type="button" data-i18n="login">പ്രൊഫൈൽ തുടങ്ങാം ↗</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu" type="button">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-bg-shape shape-one"></div><div class="hero-bg-shape shape-two"></div>
+      <div class="hero-copy reveal">
+        <div class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="eyebrow">KERALA'S MEANINGFUL MATCHING SPACE</span></div>
+        <h1><span data-i18n="heroLine1">ഒരാൾ പോരേ?</span><br><em data-i18n="heroLine2">നിങ്ങൾക്കായി ഒരാൾ.</em></h1>
+        <p class="hero-sub" data-i18n="heroDesc">വലിയ വാഗ്ദാനങ്ങളല്ല. പരസ്പരം മനസ്സിലാക്കാൻ ഒരവസരം. ഗൗരവമുള്ള ബന്ധങ്ങൾക്കായി, കേരളത്തിന്റെ സ്വന്തം ഇടം.</p>
+        <div class="hero-buttons">
+          <button class="primary-btn" id="heroStart" type="button"><span data-i18n="heroCta">എന്റെ പ്രൊഫൈൽ തുടങ്ങാം</span><span class="arrow">↗</span></button>
+          <a class="text-link" href="#how"><span data-i18n="seeHow">എങ്ങനെ പ്രവർത്തിക്കുന്നു</span> <span>↓</span></a>
+        </div>
+        <div class="hero-note"><div class="avatar-stack"><span>♡</span><span>✦</span><span>✿</span></div><div><b data-i18n="intentional">കുറച്ച്, പക്ഷേ ഉദ്ദേശ്യത്തോടെ.</b><small data-i18n="intentionalSub">ഒരു സമയം ഒരു match. പരസ്പര താൽപര്യത്തിന് പ്രാധാന്യം.</small></div></div>
+      </div>
+      <div class="hero-art reveal">
+        <div class="sun-disc"></div>
+        <div class="leaf leaf-a">✳</div><div class="leaf leaf-b">✧</div>
+        <div class="portrait-frame woman-frame">
+          <div class="portrait-img woman-img"></div><div class="portrait-caption"><span class="caption-dot"></span><span data-i18n="characterA">ഒരു പുതിയ തുടക്കം</span></div>
+        </div>
+        <div class="portrait-frame man-frame">
+          <div class="portrait-img man-img"></div><div class="portrait-caption"><span class="caption-dot"></span><span data-i18n="characterB">ഒരേ മൂല്യങ്ങൾ</span></div>
+        </div>
+        <div class="float-note note-left">“<span data-i18n="noteLeft">മനസ്സിലാക്കലിൽ നിന്ന് തുടങ്ങാം</span>”</div>
+        <div class="float-note note-right"><span class="tiny-heart">♡</span><span data-i18n="noteRight">Better together</span></div>
+        <div class="hero-landscape"><span>☼</span><div class="landscape-hills"></div><div class="palm palm-one">♧</div><div class="palm palm-two">♧</div></div>
+      </div>
+      <div class="hero-bottom-label"><span>01 / 04</span><span class="label-line"></span><span data-i18n="heroFoot">നല്ല ബന്ധങ്ങൾ തുടങ്ങുന്നത് ഒരു സംഭാഷണത്തിൽ നിന്ന്.</span></div>
+    </section>
+
+    <section class="trust-strip" id="why">
+      <div class="trust-intro"><span class="section-kicker" data-i18n="whyKicker">WHY NIVORA</span><h2 data-i18n="whyTitle">ഇവിടെ ശ്രദ്ധ <em>എണ്ണത്തിലല്ല.</em><br>ബന്ധത്തിന്റെ അർത്ഥത്തിലാണ്.</h2><p data-i18n="whyDesc">വേഗത്തിൽ swipe ചെയ്യുന്നതിന് പകരം, നിങ്ങളെ മനസ്സിലാക്കാൻ സമയം നൽകുന്നൊരു അനുഭവം.</p></div>
+      <div class="trust-item"><div class="trust-icon">⌁</div><b data-i18n="trust1Title">മനസ്സോടെ തുടങ്ങാം</b><p data-i18n="trust1Desc">നിങ്ങളുടെ ജീവിതവും പ്രതീക്ഷകളും ആദ്യം അറിയാം.</p></div>
+      <div class="trust-item"><div class="trust-icon">♡</div><b data-i18n="trust2Title">പരസ്പര താൽപര്യം</b><p data-i18n="trust2Desc">ഇരുവർക്കും യോജിക്കുന്ന അവസരങ്ങൾക്കാണ് മുൻഗണന.</p></div>
+      <div class="trust-item"><div class="trust-icon">◷</div><b data-i18n="trust3Title">സമയം എടുത്ത് അറിയാം</b><p data-i18n="trust3Desc">72 മണിക്കൂർ സംസാരിച്ച് തീരുമാനിക്കാം.</p></div>
+      <div class="trust-item" id="safety"><div class="trust-icon">⬡</div><b data-i18n="trust4Title">സുരക്ഷയ്ക്ക് പ്രാധാന്യം</b><p data-i18n="trust4Desc">റിപ്പോർട്ട് ചെയ്യാനും സഹായം തേടാനും സൗകര്യം.</p></div>
+    </section>
+
+    <section class="how-section" id="how">
+      <div class="how-heading reveal"><span class="section-kicker" data-i18n="howKicker">A LITTLE LESS SWIPING</span><h2 data-i18n="howTitle">നിങ്ങളുടെ രീതിയിൽ,<br><em>നിങ്ങളുടെ സമയത്ത്.</em></h2><p data-i18n="howDesc">ഒരു ചെറിയ പ്രക്രിയ. കൂടുതൽ അർത്ഥവത്തായ പരിചയപ്പെടൽ.</p></div>
+      <div class="steps">
+        <article class="step-card reveal"><span class="step-num">01</span><div class="step-symbol">✎</div><h3 data-i18n="step1Title">നിങ്ങളെ പരിചയപ്പെടുത്തൂ</h3><p data-i18n="step1Desc">പ്രൊഫൈലും നിങ്ങളുടെ പ്രതീക്ഷകളും പൂരിപ്പിക്കുക.</p><span class="step-tail">↘</span></article>
+        <article class="step-card reveal"><span class="step-num">02</span><div class="step-symbol">⌕</div><h3 data-i18n="step2Title">അനുയോജ്യത പരിശോധിക്കാം</h3><p data-i18n="step2Desc">മുൻഗണനകൾ പരിശോധിച്ച് ടീം പ്രൊഫൈൽ review ചെയ്യും.</p><span class="step-tail">↘</span></article>
+        <article class="step-card reveal"><span class="step-num">03</span><div class="step-symbol">☏</div><h3 data-i18n="step3Title">സംസാരിച്ച് അറിയാം</h3><p data-i18n="step3Desc">Match ലഭിച്ചാൽ നിശ്ചിത സമയത്തിനുള്ളിൽ chat / call ചെയ്യാം.</p><span class="step-tail">↘</span></article>
+        <article class="step-card reveal"><span class="step-num">04</span><div class="step-symbol">♡</div><h3 data-i18n="step4Title">അടുത്ത തീരുമാനം നിങ്ങളുടേത്</h3><p data-i18n="step4Desc">രണ്ടുപേരുടെയും സമ്മതവും feedback-ഉം അടിസ്ഥാനമാക്കി മുന്നോട്ട് പോകാം.</p><span class="step-tail">↗</span></article>
+      </div>
+      <div class="process-note"><span class="note-star">✳</span><p data-i18n="processNote">NIVORA അനുയോജ്യമായ പരിചയപ്പെടലിന് സഹായിക്കുന്നു — എന്നാൽ യഥാർത്ഥ ബന്ധം വളരുന്നത് രണ്ടുപേരുടെയും തീരുമാനത്തിലാണ്.</p></div>
+    </section>
+
+    <section class="match-preview">
+      <div class="preview-copy reveal"><span class="section-kicker" data-i18n="previewKicker">MADE FOR MEANINGFUL CONNECTIONS</span><h2 data-i18n="previewTitle">ഒരു match.<br><em>ഒരു നല്ല സംഭാഷണം.</em></h2><p data-i18n="previewDesc">Profile details, shared values, and simple conversation tools — എല്ലാം ഒരിടത്ത്. സമ്മർദ്ദമില്ലാതെ, നിങ്ങളുടെ വേഗത്തിൽ.</p><button class="outline-btn" id="previewStart" type="button"><span data-i18n="previewCta">ആരംഭിക്കാം</span> ↗</button><div class="preview-foot"><span class="mini-line"></span><span data-i18n="previewFoot">Designed with Kerala in mind</span></div></div>
+      <div class="phone-scene reveal"><div class="phone"><div class="phone-top"><span>9:41</span><span>•••</span></div><div class="phone-brand"><span class="mini-brand">n</span> nivora <span class="phone-menu">···</span></div><div class="phone-photo"></div><div class="profile-details"><div class="profile-name"><b>Ananya, 26</b><span class="verified">✓</span></div><p>Kochi · Values: family, kindness</p><div class="profile-tags"><span>Family-minded</span><span>Creative</span></div><div class="compat-label"><span data-i18n="sharedValues">Shared values</span><b>Good start <span>♡</span></b></div><div class="compat-bars"><i></i><i></i><i></i></div><button class="phone-action" id="phoneAction" type="button" data-i18n="phoneAction">പരിചയപ്പെടാം ↗</button><small class="phone-disclaimer" data-i18n="phoneDisclaimer">Sample preview · AI-created illustration, not a real member</small></div></div><div class="orbit orbit-one">♡</div><div class="orbit orbit-two">✳</div><div class="scribble">made with care <span>♡</span></div></div>
+    </section>
+
+  </main>
+
+  <footer class="footer"><a class="brand footer-brand" href="#home"><span class="brand-mark">n<span>♡</span></span><span class="brand-copy"><b>nivora</b><small>ORU NAAL MATHI</small></span></a><p data-i18n="footerLine">അർത്ഥമുള്ള ബന്ധങ്ങൾക്കായി, കേരളത്തിന്റെ സ്വന്തം ഇടം.</p><div class="footer-links"><a href="#safety" data-i18n="footerSafety">സുരക്ഷ</a><a href="#how" data-i18n="footerHow">എങ്ങനെ പ്രവർത്തിക്കുന്നു</a><a href="#" id="privacyLink" data-i18n="footerPrivacy">സ്വകാര്യത</a></div><small>© <span id="year"></span> NIVORA · <span data-i18n="footerDemo">For adults aged 21–40.</span></small></footer>
+
+  <div class="modal-backdrop" id="profileModal" aria-hidden="true">
+    <section class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="closeModal" type="button" aria-label="Close">×</button>
+      <div class="modal-topline"><span class="section-kicker" data-i18n="modalKicker">YOUR FIRST STEP</span><span class="modal-step" id="stepCounter">01 / 04</span></div>
+      <div class="progress"><span id="progressBar"></span></div>
+      <div id="wizardContent"></div>
+      <div class="wizard-error" id="wizardError" role="status"></div>
+      <div class="wizard-actions"><button class="back-btn" id="backStep" type="button" disabled>← <span data-i18n="back">Back</span></button><button class="primary-btn wizard-next" id="nextStep" type="button"><span data-i18n="continue">Continue</span> <span class="arrow">→</span></button></div>
+      <p class="modal-disclaimer" data-i18n="modalDisclaimer">Your details are saved only after you verify your phone with an OTP at the end.</p>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__sbPrimaryFailed=true"></script>
+  <script>
+    // Some mobile networks/DNS filters block one CDN but not another. If the first one
+    // failed (or silently didn't set window.supabase), fall back to a second CDN.
+    if (window.__sbPrimaryFailed || !window.supabase) {
+      document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
+    }
+  </script>
+  <script src="supabase-config.js"></script>
+  <script src="common.js"></script>
+  <script src="app.js"></script>
+  <script src="portal.js"></script>
+</body>
+</html>

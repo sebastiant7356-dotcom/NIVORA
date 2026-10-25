@@ -1,0 +1,44 @@
+/* NIVORA portal + admin styles — reuse the existing brand tokens from styles.css */
+.portal-modal{max-width:560px;max-height:92vh;overflow:auto}
+.nv-h{font:700 13px 'DM Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#698575;margin:26px 0 10px;border-top:1px solid var(--line);padding-top:16px}
+.nv-msg{min-height:18px;font-size:12px;color:#a2503f;margin:8px 0}.nv-msg.ok{color:#2f6b4f}
+.nv-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.nv-links{margin-top:4px}
+.nv-link{background:none;border:0;color:var(--green2);text-decoration:underline;font-size:12px;padding:4px 2px;cursor:pointer}
+.nv-link:disabled{color:var(--muted);text-decoration:none;cursor:default}
+.nv-list{list-style:none;margin:0;padding:0;font-size:12px}.nv-list li{padding:7px 0;border-bottom:1px dashed var(--line)}
+.hint{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.outline-btn.danger{border-color:#c98b7e;color:#9a4332}
+a.outline-btn{display:inline-flex;align-items:center}
+.badge{display:inline-block;font:600 11px 'DM Sans',sans-serif;padding:5px 12px;border-radius:30px;margin-bottom:8px;background:#e9edde;color:var(--green)}
+.badge-approved{background:#d9ecd8;color:#1f5d3b}.badge-pending{background:#f5ecd0;color:#7a5b16}
+.badge-rejected{background:#f3dcd6;color:#8f3a2a}.badge-changes_requested{background:#f7e6d0;color:#8a5212}
+.countdown{font-size:12px;margin:10px 0;color:var(--green)}
+.chat{border:1px solid var(--line);border-radius:12px;background:#fffdf6;overflow:hidden;margin:10px 0}
+.chat-status{font-size:10px;padding:6px 12px;background:#eef1e4;color:#5b7566}
+.chat-log{height:230px;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:6px}
+.bubble{max-width:80%;padding:8px 12px;border-radius:14px;font-size:13px;line-height:1.5;word-wrap:break-word;white-space:pre-wrap}
+.bubble.mine{align-self:flex-end;background:var(--green);color:#fff9eb;border-bottom-right-radius:4px}
+.bubble.theirs{align-self:flex-start;background:#e9eddc;border-bottom-left-radius:4px}
+.chat-input{display:flex;gap:8px;padding:8px;border-top:1px solid var(--line)}
+.chat-input input{flex:1;border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit;font-size:13px;background:#fff}
+.chat-input .primary-btn{padding:10px 16px}
+.callbox{font-size:12px;min-height:20px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.nv-msg+.nv-row .primary-btn{min-width:140px}
+/* admin */
+.admin-wrap{max-width:980px;margin:0 auto;padding:24px 5% 60px}
+.admin-wrap h1{font-size:28px;margin:6px 0 16px;letter-spacing:-.5px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}
+.tab{border:1px solid var(--line);background:transparent;border-radius:30px;padding:8px 16px;font-size:12px;color:var(--green)}
+.tab.active{background:var(--green);color:#fffdf6;border-color:var(--green)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0}
+.card h3{margin:0 0 4px;font-size:16px}.card small{color:var(--muted)}
+.flag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;margin:3px 4px 0 0;background:#f5ecd0;color:#7a5b16}
+.flag.high{background:#f3dcd6;color:#8f3a2a}.flag.low{background:#e9edde;color:#456}
+.advisory{font-size:11px;color:var(--muted);font-style:italic;margin-top:6px}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.admin-actions textarea,.admin-actions input{flex:1 1 100%;border:1px solid var(--line);border-radius:8px;padding:9px;font:inherit;font-size:13px}
+.admin-actions button{padding:9px 16px;border-radius:7px;border:1px solid var(--green);background:var(--green);color:#fffdf6;font-size:12px}
+.admin-actions button.alt{background:transparent;color:var(--green)}.admin-actions button.bad{background:#9a4332;border-color:#9a4332}
+table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,table.audit th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+@media(max-width:700px){.portal-modal{padding:24px 16px}.chat-log{height:200px}}
