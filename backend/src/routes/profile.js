@@ -36,7 +36,15 @@ async function storeAiReview(id, profile) {
 
 router.get("/", async (req, res) => {
   const { data, error } = await serviceClient().from("profiles").select(OWN_COLUMNS).eq("id", req.user.id).maybeSingle();
-  if (error) return res.status(500).json({ success: false, message: "Could not load profile." });
+  if (error) {
+  console.error("PROFILE_LOAD_ERROR:", error);
+  return res.status(500).json({
+    success: false,
+    message: "Could not load profile.",
+    code: error.code,
+    details: error.message
+  });
+}
   res.json({ success: true, profile: present(data) });
 });
 
