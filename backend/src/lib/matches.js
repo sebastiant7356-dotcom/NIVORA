@@ -46,6 +46,12 @@ async function assertLiveMatch(matchId, userId) {
     return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
+  const { data: accountStates, error: stateError } = await serviceClient().from("profiles")
+    .select("id, is_active, suspended_at").in("id", [userId, partnerId]);
+  if (stateError) return { status: 503, code: "safety_check_unavailable", message: "Conversation safety could not be verified." };
+  if (!accountStates || accountStates.length !== 2 || accountStates.some((p) => !p.is_active || p.suspended_at)) {
+    return { status: 403, code: "account_unavailable", message: "This conversation is unavailable." };
+  }
   const { data: blocked } = await serviceClient().from("blocks").select("blocker_id")
     .or(`and(blocker_id.eq.${userId},blocked_id.eq.${partnerId}),and(blocker_id.eq.${partnerId},blocked_id.eq.${userId})`).limit(1);
   if (blocked && blocked.length) return { status: 403, code: "blocked", message: "This conversation is closed." };
@@ -105,8 +111,8 @@ async function matchView(match, userId) {
   if (live) {
     const db = serviceClient();
     const [{ data: partner }, { data: me }, { data: photos }] = await Promise.all([
-      db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values").eq("id", partnerId).maybeSingle(),
-      db.from("profiles").select("core_values").eq("id", userId).maybeSingle(),
+      db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values, is_active, suspended_at").eq("id", partnerId).maybeSingle(),
+      db.from("profiles").select("core_values, is_active, suspended_at").eq("id", userId).maybeSingle(),
       db.from("profile_photos").select("id, object_path, sort_order").eq("user_id", partnerId).eq("approval_status", "approved").order("sort_order")
     ]);
     const visiblePhotos = [];
@@ -114,7 +120,10 @@ async function matchView(match, userId) {
       const { data: signed } = await db.storage.from("profile-photos").createSignedUrl(photo.object_path, 600);
       if (signed?.signedUrl) visiblePhotos.push({ id: photo.id, url: signed.signedUrl, sort_order: photo.sort_order });
     }
-    view.partner = partner ? partnerView(partner, me?.core_values || [], visiblePhotos) : null;
+    const accountsActive = Boolean(partner?.is_active && !partner.suspended_at && me?.is_active && !me.suspended_at);
+    view.chat_open = Boolean(view.chat_open && accountsActive);
+    view.can_voice_message = Boolean(view.can_voice_message && accountsActive);
+    view.partner = partner && accountsActive ? partnerView(partner, me?.core_values || [], visiblePhotos) : null;
   }
   return view;
 }
