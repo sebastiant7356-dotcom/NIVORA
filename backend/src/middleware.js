@@ -23,7 +23,7 @@ function corsMiddleware() {
       return cb(null, false);
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Authorization", "Content-Type"],
+    allowedHeaders: ["Authorization", "Content-Type", "X-Voice-Duration"],
     maxAge: 600
   });
 }
