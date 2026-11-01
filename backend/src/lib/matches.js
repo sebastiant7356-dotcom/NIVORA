@@ -68,6 +68,12 @@ async function assertChatMatch(matchId, userId) {
     return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
+  const { data: accountStates, error: stateError } = await serviceClient().from("profiles")
+    .select("id, is_active, suspended_at").in("id", [userId, partnerId]);
+  if (stateError) return { status: 503, code: "safety_check_unavailable", message: "Conversation safety could not be verified." };
+  if (!accountStates || accountStates.length !== 2 || accountStates.some((p) => !p.is_active || p.suspended_at)) {
+    return { status: 403, code: "account_unavailable", message: "This conversation is unavailable." }
+  }
   const { data: blocked } = await serviceClient().from("blocks").select("blocker_id")
     .or(`and(blocker_id.eq.${userId},blocked_id.eq.${partnerId}),and(blocker_id.eq.${partnerId},blocked_id.eq.${userId})`).limit(1);
   if (blocked && blocked.length) return { status: 403, code: "blocked", message: "This conversation is closed." };
