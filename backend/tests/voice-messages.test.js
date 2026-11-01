@@ -8,7 +8,7 @@ test("accepts WebM, Ogg, MP4, WAV and MPEG audio signatures", () => {
   assert.equal(validAudio(Buffer.from("OggS00000000"), "audio/ogg"), true);
   assert.equal(validAudio(Buffer.from("0000ftypM4A 0000"), "audio/mp4"), true);
   assert.equal(validAudio(Buffer.from("RIFF0000WAVE"), "audio/wav"), true);
-  assert.equal(validAudio(Buffer.from("ID300000000"), "audio/mpeg"), true);
+  assert.equal(validAudio(Buffer.from("ID3000000000"), "audio/mpeg"), true);
 });
 
 test("rejects unknown, malformed and oversized audio", () => {
