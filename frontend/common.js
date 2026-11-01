@@ -11,14 +11,14 @@
       network: "Could not reach the server. Check your connection and try again.",
       generic: "Something went wrong. Please try again.",
       sessionExpired: "Your session expired. Please sign in again.",
-      cancel: "Cancel"
+      signInTitle: "Sign in", cancel: "Cancel"
     },
     ml: {
       noApi: "Server address configure cheythittilla. supabase-config.js-ൽ apiBase നൽകുക.",
       network: "Server-ലേക്ക് എത്താൻ കഴിഞ്ഞില്ല. Connection പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.",
       generic: "എന്തോ പിശക് സംഭവിച്ചു. വീണ്ടും ശ്രമിക്കുക.",
       sessionExpired: "Session കഴിഞ്ഞു. വീണ്ടും sign in ചെയ്യുക.",
-      cancel: "റദ്ദാക്കുക"
+      signInTitle: "Sign in", cancel: "റദ്ദാക്കുക"
     }
   };
   const lang = () => (typeof language !== "undefined" ? language : "en");
