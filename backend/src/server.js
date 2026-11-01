@@ -24,8 +24,9 @@ function createApp() {
 
   app.use("/api", createLimiter({ windowMs: 15 * 60_000, max: 600 }));
 
-  // Private profile photos use a raw image body; apply the global API limiter first.
+  // Private uploads use raw bodies and must be parsed before the JSON middleware.
   app.use("/api/profile/photos", express.raw({ type: "*/*", limit: "5mb" }), require("./routes/profile-photos"));
+  app.use("/api/chat/:matchId/voice", express.raw({ type: "*/*", limit: "2mb" }));
 
   app.use(express.json({ limit: "20kb" }));
 
