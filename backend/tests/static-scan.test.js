@@ -75,3 +75,16 @@ test("voice messages are private, match-gated and bounded", () => {
   assert.ok(route.includes('max: 8'), "voice upload rate limit exists");
   assert.ok(route.includes('MAX_VOICE_BYTES = 2 * 1024 * 1024'), "voice API size limit exists");
 });
+
+test("multiple live conversations are represented as a member-to-match join", () => {
+  const sql = text(path.join(ROOT, "backend", "migrations", "20261101203000_multiple_live_matches.sql"));
+  const route = text(path.join(ROOT, "backend", "src", "routes", "match.js"));
+  const portal = text(path.join(ROOT, "frontend", "portal.js"));
+  assert.ok(/primary key \(user_id, match_id\)/i.test(sql), "membership is unique per user+match, not per user");
+  assert.ok(!/exists \(select 1 from public\.match_members where user_id = p_user\)/i.test(sql), "initiator is not limited to one live match");
+  assert.ok(!/not exists \(select 1 from public\.match_members m where m\.user_id = c\.id\)/i.test(sql), "candidate may have multiple live matches");
+  assert.ok(route.includes('select("match_id").eq("user_id", req.user.id)'), "current endpoint loads all memberships");
+  assert.ok(route.includes("matches, match: matches[0] || null"), "current endpoint returns a conversations list");
+  assert.ok(portal.includes("data-match-id"), "portal renders switchable conversations");
+  assert.ok(portal.includes("selectedMatchId"), "selected conversation survives refresh");
+});
