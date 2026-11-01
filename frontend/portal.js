@@ -27,7 +27,7 @@
       pastMatches: "Past matches", none: "None yet.", from: "Started",
       payment: "Match credit (₹50)", payOff: "Payments are not enabled on this server yet.", pay: "Pay ₹50", hasCredit: "You have a paid credit ready.", payVerifying: "Confirming payment…", paid: "Payment confirmed.", payFail: "Payment could not be confirmed.",
       account: "Account & privacy", export: "Download my data", del: "Delete my account", delWarn: "This permanently deletes your profile, matches and chats. Type DELETE to confirm.", delDone: "Your account was deleted.",
-      adminLink: "Staff review screen", photos: "Profile photos", photoHelp: "Upload up to 4 clear photos (JPEG, PNG or WebP, max 5 MB each). Staff must approve each photo before it is shown to others.", addPhoto: "Choose photo", photoPending: "Awaiting review", photoApproved: "Approved", photoRejected: "Not approved", photoDelete: "Remove", photoLimit: "You have reached the 4-photo limit.", photoUpload: "Uploading…", photoError: "Photo upload failed.", values: "Values", intention: "Intention", sharedValues: "Shared values",
+      photos: "Profile photos", photoHelp: "Upload up to 4 clear photos (JPEG, PNG or WebP, max 5 MB each). Staff must approve each photo before it is shown to others.", addPhoto: "Choose photo", photoPending: "Awaiting review", photoApproved: "Approved", photoRejected: "Not approved", photoDelete: "Remove", photoLimit: "You have reached the 4-photo limit.", photoUpload: "Uploading…", photoError: "Photo upload failed.", values: "Values", intention: "Intention", sharedValues: "Shared values",
       v_family: "Family", v_kindness: "Kindness & respect", v_career: "Career", v_faith: "Faith / culture", v_communication: "Open communication", v_lifestyle: "Lifestyle",
       marriage: "Marriage", longterm: "Long-term relationship", woman: "Woman", man: "Man", other: "Other", any: "Open to possibilities",
       name: "Name", age: "Age", place: "Location", job: "Work / study", about: "About you", lookingFor: "I'm looking for", relationship: "Relationship intention", minAge: "Partner min age", maxAge: "Partner max age"
@@ -54,7 +54,7 @@
       pastMatches: "മുൻ match-കൾ", none: "ഇതുവരെ ഇല്ല.", from: "തുടങ്ങിയത്",
       payment: "Match credit (₹50)", payOff: "ഈ server-ൽ payment ഇതുവരെ enable ചെയ്തിട്ടില്ല.", pay: "₹50 അടയ്ക്കുക", hasCredit: "Paid credit തയ്യാറാണ്.", payVerifying: "Payment സ്ഥിരീകരിക്കുന്നു…", paid: "Payment സ്ഥിരീകരിച്ചു.", payFail: "Payment സ്ഥിരീകരിക്കാനായില്ല.",
       account: "Account & സ്വകാര്യത", export: "എന്റെ data download ചെയ്യുക", del: "എന്റെ account delete ചെയ്യുക", delWarn: "Profile, match, chat എല്ലാം സ്ഥിരമായി മായും. സ്ഥിരീകരിക്കാൻ DELETE എന്ന് ടൈപ്പ് ചെയ്യുക.", delDone: "നിങ്ങളുടെ account delete ചെയ്തു.",
-      adminLink: "Staff review screen", photos: "Profile photos", photoHelp: "പരമാവധി 4 വ്യക്തമായ ഫോട്ടോകൾ ചേർക്കാം (JPEG, PNG, WebP; ഓരോന്നും 5 MB വരെ). മറ്റുള്ളവർക്ക് കാണുന്നതിന് മുമ്പ് Staff അംഗീകരിക്കണം.", addPhoto: "ഫോട്ടോ തിരഞ്ഞെടുക്കുക", photoPending: "Review കാത്തിരിക്കുന്നു", photoApproved: "അംഗീകരിച്ചു", photoRejected: "അംഗീകരിച്ചില്ല", photoDelete: "നീക്കം ചെയ്യുക", photoLimit: "4 ഫോട്ടോ പരിധി കഴിഞ്ഞു.", photoUpload: "Upload ചെയ്യുന്നു…", photoError: "ഫോട്ടോ upload ചെയ്യാനായില്ല.", values: "മൂല്യങ്ങൾ", intention: "ലക്ഷ്യം", sharedValues: "പൊതുവായ മൂല്യങ്ങൾ",
+      photos: "Profile photos", photoHelp: "പരമാവധി 4 വ്യക്തമായ ഫോട്ടോകൾ ചേർക്കാം (JPEG, PNG, WebP; ഓരോന്നും 5 MB വരെ). മറ്റുള്ളവർക്ക് കാണുന്നതിന് മുമ്പ് Staff അംഗീകരിക്കണം.", addPhoto: "ഫോട്ടോ തിരഞ്ഞെടുക്കുക", photoPending: "Review കാത്തിരിക്കുന്നു", photoApproved: "അംഗീകരിച്ചു", photoRejected: "അംഗീകരിച്ചില്ല", photoDelete: "നീക്കം ചെയ്യുക", photoLimit: "4 ഫോട്ടോ പരിധി കഴിഞ്ഞു.", photoUpload: "Upload ചെയ്യുന്നു…", photoError: "ഫോട്ടോ upload ചെയ്യാനായില്ല.", values: "മൂല്യങ്ങൾ", intention: "ലക്ഷ്യം", sharedValues: "പൊതുവായ മൂല്യങ്ങൾ",
       v_family: "കുടുംബം", v_kindness: "ദയയും ബഹുമാനവും", v_career: "കരിയർ", v_faith: "വിശ്വാസം / സംസ്കാരം", v_communication: "തുറന്ന സംഭാഷണം", v_lifestyle: "ജീവിതശൈലി",
       marriage: "വിവാഹം", longterm: "ദീർഘകാല ബന്ധം", woman: "സ്ത്രീ", man: "പുരുഷൻ", other: "മറ്റൊന്ന്", any: "തുറന്ന മനസ്സോടെ",
       name: "പേര്", age: "വയസ്സ്", place: "സ്ഥലം", job: "ജോലി / പഠനം", about: "നിങ്ങളെക്കുറിച്ച്", lookingFor: "ഞാൻ അന്വേഷിക്കുന്നത്", relationship: "ബന്ധത്തിന്റെ ലക്ഷ്യം", minAge: "പങ്കാളിയുടെ കുറഞ്ഞ വയസ്സ്", maxAge: "പങ്കാളിയുടെ കൂടിയ വയസ്സ്"
@@ -205,7 +205,7 @@
       <button class="outline-btn" id="pExport" type="button">${p("export")}</button>
       <button class="outline-btn danger" id="pDelete" type="button">${p("del")}</button>
       <button class="outline-btn" id="pSignOut" type="button">${p("signOut")}</button>
-      ${isStaff ? `<a class="outline-btn" href="admin.html">${p("adminLink")}</a>` : ""}</div><div class="nv-msg" id="pMsg" role="status"></div>`;
+    </div><div class="nv-msg" id="pMsg" role="status"></div>`;
     body.innerHTML = h;
 
     const $ = (s) => body.querySelector(s);
