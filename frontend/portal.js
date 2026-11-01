@@ -90,7 +90,7 @@
   async function loadAll() {
     const s = await session(); me = s?.user || null;
     const [pr, m, pay, h] = await Promise.all([
-      api("/api/profile"), api("/api/match/current").catch(() => ({ match: null })),
+      api("/api/profile"), api("/api/match/current"),
       api("/api/payments/status").catch(() => null), api("/api/match/history").catch(() => ({ history: [] }))
     ]);
     profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; payInfo = pay; history = h.history || [];
