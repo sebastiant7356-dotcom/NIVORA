@@ -51,3 +51,40 @@ test("SQL: RLS enabled and matching functions not callable by browser roles", ()
   assert.ok(/revoke all on function public\.nivora_find_partner\(uuid, boolean\)\s+from public, anon, authenticated/.test(sql));
   assert.ok(!/grant (insert|update|delete)[^;]*to (anon|authenticated)/i.test(sql));
 });
+
+test("daily match quota is enforced in the database using Kerala local dates", () => {
+  const sql = text(path.join(ROOT, "backend", "migrations", "20261101190000_daily_five_matches.sql"));
+  assert.ok(sql.includes("match_daily_usage"));
+  assert.ok(sql.includes("Asia/Kolkata"));
+  assert.ok(sql.includes("used_today >= 5"));
+  assert.ok(sql.includes("daily_match_limit_reached"));
+  assert.ok(sql.includes("du.matches_count >= 5"), "do not recommend to members who used their daily quota");
+  assert.ok(sql.includes("values (p_user, today_kerala, 1, now()), (cand.id, today_kerala, 1, now())"), "count recommendations for both participants");
+  assert.ok(sql.includes("enable row level security"));
+  assert.ok(/revoke all on public\.match_daily_usage from anon, authenticated/i.test(sql));
+  assert.ok(/grant execute on function public\.nivora_find_partner\(uuid, boolean\) to service_role/i.test(sql));
+});
+
+test("voice messages are private, match-gated and bounded", () => {
+  const sql = text(path.join(ROOT, "backend", "migrations", "20261101193000_voice_messages.sql"));
+  const route = text(path.join(ROOT, "backend", "src", "routes", "chat.js"));
+  assert.ok(sql.includes("public = false"), "voice bucket must be private");
+  assert.ok(sql.includes("2097152"), "voice bucket size limit must be 2 MB");
+  assert.ok(route.includes('assertChatMatch(req.params.matchId, req.user.id)'), "voice uploads and reads must check match membership");
+  assert.ok(route.includes('createSignedUrl(m.voice_object_path, 600)'), "voice reads use short-lived signed URLs");
+  assert.ok(route.includes('max: 8'), "voice upload rate limit exists");
+  assert.ok(route.includes('MAX_VOICE_BYTES = 2 * 1024 * 1024'), "voice API size limit exists");
+});
+
+test("multiple live conversations are represented as a member-to-match join", () => {
+  const sql = text(path.join(ROOT, "backend", "migrations", "20261101203000_multiple_live_matches.sql"));
+  const route = text(path.join(ROOT, "backend", "src", "routes", "match.js"));
+  const portal = text(path.join(ROOT, "frontend", "portal.js"));
+  assert.ok(/primary key \(user_id, match_id\)/i.test(sql), "membership is unique per user+match, not per user");
+  assert.ok(!/exists \(select 1 from public\.match_members where user_id = p_user\)/i.test(sql), "initiator is not limited to one live match");
+  assert.ok(!/not exists \(select 1 from public\.match_members m where m\.user_id = c\.id\)/i.test(sql), "candidate may have multiple live matches");
+  assert.ok(route.includes('select("match_id").eq("user_id", req.user.id)'), "current endpoint loads all memberships");
+  assert.ok(route.includes("matches, match: matches[0] || null"), "current endpoint returns a conversations list");
+  assert.ok(portal.includes("data-match-id"), "portal renders switchable conversations");
+  assert.ok(portal.includes("selectedMatchId"), "selected conversation survives refresh");
+});
