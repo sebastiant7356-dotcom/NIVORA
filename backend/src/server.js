@@ -22,6 +22,9 @@ function createApp() {
   const payments = require("./routes/payments");
   app.post("/api/payments/webhook", express.raw({ type: "*/*", limit: "100kb" }), payments.webhookHandler);
 
+  // Private profile photos use a raw image body; keep JSON API limits small.
+  app.use("/api/profile/photos", express.raw({ type: "*/*", limit: "5mb" }), require("./routes/profile-photos"));
+
   app.use(express.json({ limit: "20kb" }));
   app.use("/api", createLimiter({ windowMs: 15 * 60_000, max: 600 }));
 
