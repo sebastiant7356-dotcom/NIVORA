@@ -67,8 +67,9 @@ async function assertChatMatch(matchId, userId) {
 }
 
 /** Only fields a matched user may see. Never phone, email, last name or ids. */
-function partnerView(p, myValues = []) {
+function partnerView(p, myValues = [], photos = []) {
   return {
+    photos,
     first_name: firstName(p.full_name),
     age: p.age,
     district: p.district,
@@ -101,11 +102,17 @@ async function matchView(match, userId) {
   };
   if (live) {
     const db = serviceClient();
-    const [{ data: partner }, { data: me }] = await Promise.all([
+    const [{ data: partner }, { data: me }, { data: photos }] = await Promise.all([
       db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values").eq("id", partnerId).maybeSingle(),
-      db.from("profiles").select("core_values").eq("id", userId).maybeSingle()
+      db.from("profiles").select("core_values").eq("id", userId).maybeSingle(),
+      db.from("profile_photos").select("id, object_path, sort_order").eq("user_id", partnerId).eq("approval_status", "approved").order("sort_order")
     ]);
-    view.partner = partner ? partnerView(partner, me?.core_values || []) : null;
+    const visiblePhotos = [];
+    for (const photo of photos || []) {
+      const { data: signed } = await db.storage.from("profile-photos").createSignedUrl(photo.object_path, 600);
+      if (signed?.signedUrl) visiblePhotos.push({ id: photo.id, url: signed.signedUrl, sort_order: photo.sort_order });
+    }
+    view.partner = partner ? partnerView(partner, me?.core_values || [], visiblePhotos) : null;
   }
   return view;
 }
