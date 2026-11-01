@@ -32,7 +32,7 @@ function validAudio(buffer, mime) {
 }
 
 async function voiceView(db, row) {
-  const { data, error } = await db.storage.from(VOICE_BUCKET).createSignedUrl(row.object_path, 600);
+  const { data, error } = await db.storage.from(VOICE_BUCKET).createSignedUrl(row.object_path, 3600);
   if (error) throw error;
   return {
     id: row.id, mine: false, sender_id: row.sender_id, duration_seconds: row.duration_seconds,
@@ -104,6 +104,10 @@ router.post("/:matchId/voice", voiceLimit, async (req, res) => {
   const gate = await assertChatMatch(req.params.matchId, req.user.id);
   if (gate.status) return res.status(gate.status).json({ success: false, code: gate.code, message: gate.message });
   const db = serviceClient();
+  const { count, error: usageError } = await db.from("voice_messages").select("id", { count: "exact", head: true })
+    .eq("sender_id", req.user.id).gte("created_at", new Date(Date.now() - 24 * 60 * 60_000).toISOString());
+  if (usageError) return res.status(500).json({ success: false, message: "Could not check voice message limit." });
+  if (count >= 20) return res.status(429).json({ success: false, message: "You have reached the daily voice message limit. Try again later." });
   const objectPath = req.params.matchId + "/" + req.user.id + "/" + randomUUID() + "." + VOICE_TYPES[mime];
   const { error: uploadError } = await db.storage.from(VOICE_BUCKET).upload(objectPath, req.body, {
     contentType: mime, upsert: false, cacheControl: "3600"
