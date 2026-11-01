@@ -229,4 +229,28 @@ router.post("/profiles/:id/photos/:photoId/decision", async (req, res) => {
   res.json({ success: true, approval_status: decision });
 });
 
+
+router.get("/reports/:id/voice", async (req, res) => {
+  if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid report id." });
+  const db = serviceClient();
+  const { data: report, error: reportError } = await db.from("reports")
+    .select("id, match_id").eq("id", req.params.id).maybeSingle();
+  if (reportError) return res.status(500).json({ success: false, message: "Could not load report." });
+  if (!report || !report.match_id) return res.status(404).json({ success: false, message: "No conversation attached to this report." });
+  const { data, error } = await db.from("voice_messages")
+    .select("id, sender_id, object_path, duration_seconds, created_at")
+    .eq("match_id", report.match_id).order("created_at").limit(100);
+  if (error) return res.status(500).json({ success: false, message: "Could not load reported voice messages." });
+  try {
+    const voiceMessages = await Promise.all((data || []).map(async (v) => {
+      const { data: signed, error: signError } = await db.storage.from("voice-messages").createSignedUrl(v.object_path, 600);
+      return signError ? null : { id: v.id, sender_id: v.sender_id, duration_seconds: v.duration_seconds, created_at: v.created_at, url: signed.signedUrl };
+    }));
+    await audit(req.user.id, "viewed_reported_voice", "report", report.id);
+    res.json({ success: true, voice_messages: voiceMessages.filter(Boolean) });
+  } catch {
+    res.status(500).json({ success: false, message: "Voice previews could not be prepared." });
+  }
+});
+
 module.exports = router;
