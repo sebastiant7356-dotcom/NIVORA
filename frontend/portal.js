@@ -286,6 +286,7 @@
     if (!match) {
       const needPay = payInfo?.required && !payInfo?.has_credit;
       box.innerHTML = `${needPay ? `<p class="modal-description">${p("payNeeded")}</p>` : ""}<div class="nv-row"><button class="primary-btn" id="mFind" type="button" ${needPay || !profile.profile_complete || profile.suspended ? "disabled" : ""}>${p("findMatch")}</button></div><div class="nv-msg" id="mMsg"></div>`;
+      box.insertAdjacentHTML("afterbegin", '<p class="modal-description">Daily matches used: ' + dailyQuota.daily_used + '/' + dailyQuota.daily_limit + ' (Kerala time)</p>');
       box.querySelector("#mFind").onclick = async (ev) => {
         ev.target.disabled = true; ev.target.textContent = p("finding");
         try {
@@ -297,7 +298,7 @@
       return;
     }
     const m = match;
-    let h = partnerHtml(m.partner);
+    let h = '<p class="modal-description">Daily matches used: ' + dailyQuota.daily_used + '/' + dailyQuota.daily_limit + ' (Kerala time)</p>' + partnerHtml(m.partner);
     if (["proposed", "active"].includes(m.status)) {
       h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
         <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
