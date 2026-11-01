@@ -51,3 +51,6 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
 .photo-review{display:inline-flex;vertical-align:top;width:min(220px,100%);margin:8px}
 .photo-review button{padding:7px 10px;border-radius:7px;border:1px solid var(--green);background:var(--green);color:#fffdf6;font-size:11px}
 .photo-review button.bad{background:#9a4332;border-color:#9a4332}
+
+.partner-photos{display:flex;gap:8px;overflow-x:auto;margin:10px 0;padding-bottom:4px}
+.partner-photos img{width:min(46%,180px);aspect-ratio:4/5;object-fit:cover;border-radius:9px;background:var(--line);flex:0 0 auto}
