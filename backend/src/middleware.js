@@ -38,7 +38,7 @@ function requestLogger(req, res, next) {
   next();
 }
 
-/** Verifies the Supabase access token with Supabase Auth and requires a phone-verified account. */
+/** Verifies the Supabase access token and permits Google OAuth accounts only. */
 async function requireAuth(req, res, next) {
   const h = req.headers.authorization || "";
   const token = h.startsWith("Bearer ") ? h.slice(7).trim() : "";
@@ -49,7 +49,15 @@ async function requireAuth(req, res, next) {
       return res.status(401).json({ success: false, message: "Invalid or expired login session." });
     }
     const u = data.user;
-    req.user = { id: u.id }; // immutable id only; phone is never copied into request logs
+    const providers = [
+      ...(Array.isArray(u.app_metadata?.providers) ? u.app_metadata.providers : []),
+      u.app_metadata?.provider,
+      ...(Array.isArray(u.identities) ? u.identities.map((identity) => identity.provider) : [])
+    ].filter(Boolean);
+    if (!providers.includes("google")) {
+      return res.status(403).json({ success: false, message: "Google login required." });
+    }
+    req.user = { id: u.id }; // immutable id only
     return next();
   } catch {
     return res.status(401).json({ success: false, message: "Unable to verify login." });
