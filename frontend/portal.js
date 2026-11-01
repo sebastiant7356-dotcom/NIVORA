@@ -80,7 +80,7 @@
   function close() { stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
-  let me = null, profile = null, match = null, payInfo = null, history = [], photos = [], isStaff = false;
+  let me = null, profile = null, match = null, payInfo = null, history = [], photos = [], isStaff = false, dailyQuota = { daily_used: 0, daily_limit: 5 };
   let tickTimer = null, chatChannel = null, signalChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
   let pc = null, localStream = null, pendingIce = [], incomingOffer = null, callState = "idle";
   const val = (k) => (k in (profile || {}) ? profile[k] : "");
@@ -91,7 +91,7 @@
       api("/api/profile"), api("/api/match/current").catch(() => ({ match: null })),
       api("/api/payments/status").catch(() => null), api("/api/match/history").catch(() => ({ history: [] }))
     ]);
-    profile = pr.profile; match = m.match; payInfo = pay; history = h.history || [];
+    profile = pr.profile; match = m.match; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; payInfo = pay; history = h.history || [];
     photos = profile ? ((await api("/api/profile/photos").catch(() => ({ photos: [] }))).photos || []) : [];
     isStaff = await api("/api/admin/me").then(() => true).catch(() => false);
   }
