@@ -7,6 +7,7 @@ const ERROR_MAP = {
   not_approved: [403, "Your profile must be approved by staff first."],
   inactive: [403, "Your account is not active."],
   profile_incomplete: [409, "Please complete your profile (gender, preferences, values) first."],
+  staff_not_customer: [403, "Staff accounts do not use customer matching."],
   daily_match_limit_reached: [429, "You have used all five match recommendations for today. Come back tomorrow."],
   active_match_exists: [409, "You already have an active match."],
   payment_required: [402, "A paid match credit is required."],
@@ -45,6 +46,12 @@ async function assertLiveMatch(matchId, userId) {
     return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
+  const { data: accountStates, error: stateError } = await serviceClient().from("profiles")
+    .select("id, is_active, suspended_at").in("id", [userId, partnerId]);
+  if (stateError) return { status: 503, code: "safety_check_unavailable", message: "Conversation safety could not be verified." };
+  if (!accountStates || accountStates.length !== 2 || accountStates.some((p) => !p.is_active || p.suspended_at)) {
+    return { status: 403, code: "account_unavailable", message: "This conversation is unavailable." };
+  }
   const { data: blocked } = await serviceClient().from("blocks").select("blocker_id")
     .or(`and(blocker_id.eq.${userId},blocked_id.eq.${partnerId}),and(blocker_id.eq.${partnerId},blocked_id.eq.${userId})`).limit(1);
   if (blocked && blocked.length) return { status: 403, code: "blocked", message: "This conversation is closed." };
@@ -61,6 +68,12 @@ async function assertChatMatch(matchId, userId) {
     return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
+  const { data: accountStates, error: stateError } = await serviceClient().from("profiles")
+    .select("id, is_active, suspended_at").in("id", [userId, partnerId]);
+  if (stateError) return { status: 503, code: "safety_check_unavailable", message: "Conversation safety could not be verified." };
+  if (!accountStates || accountStates.length !== 2 || accountStates.some((p) => !p.is_active || p.suspended_at)) {
+    return { status: 403, code: "account_unavailable", message: "This conversation is unavailable." }
+  }
   const { data: blocked } = await serviceClient().from("blocks").select("blocker_id")
     .or(`and(blocker_id.eq.${userId},blocked_id.eq.${partnerId}),and(blocker_id.eq.${partnerId},blocked_id.eq.${userId})`).limit(1);
   if (blocked && blocked.length) return { status: 403, code: "blocked", message: "This conversation is closed." };
@@ -97,15 +110,15 @@ async function matchView(match, userId) {
     expires_at: match.expires_at,
     ended_reason: match.ended_reason,
     chat_open: live && match.expires_at && new Date(match.expires_at) > new Date(),
-    can_call: match.status === "active" && match.expires_at && new Date(match.expires_at) > new Date(),
+    can_voice_message: match.status === "active" && match.expires_at && new Date(match.expires_at) > new Date(),
     seconds_left: live && match.expires_at
       ? Math.max(0, Math.floor((new Date(match.expires_at) - Date.now()) / 1000)) : null
   };
   if (live) {
     const db = serviceClient();
     const [{ data: partner }, { data: me }, { data: photos }] = await Promise.all([
-      db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values").eq("id", partnerId).maybeSingle(),
-      db.from("profiles").select("core_values").eq("id", userId).maybeSingle(),
+      db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values, is_active, suspended_at").eq("id", partnerId).maybeSingle(),
+      db.from("profiles").select("core_values, is_active, suspended_at").eq("id", userId).maybeSingle(),
       db.from("profile_photos").select("id, object_path, sort_order").eq("user_id", partnerId).eq("approval_status", "approved").order("sort_order")
     ]);
     const visiblePhotos = [];
@@ -113,16 +126,21 @@ async function matchView(match, userId) {
       const { data: signed } = await db.storage.from("profile-photos").createSignedUrl(photo.object_path, 600);
       if (signed?.signedUrl) visiblePhotos.push({ id: photo.id, url: signed.signedUrl, sort_order: photo.sort_order });
     }
-    view.partner = partner ? partnerView(partner, me?.core_values || [], visiblePhotos) : null;
+    const accountsActive = Boolean(partner?.is_active && !partner.suspended_at && me?.is_active && !me.suspended_at);
+    view.chat_open = Boolean(view.chat_open && accountsActive);
+    view.can_voice_message = Boolean(view.can_voice_message && accountsActive);
+    view.partner = partner && accountsActive ? partnerView(partner, me?.core_values || [], visiblePhotos) : null;
   }
   return view;
 }
 
 async function endLiveMatchesFor(userId, reason, actorId) {
   const db = serviceClient();
-  const { data } = await db.from("match_members").select("match_id").eq("user_id", userId);
+  const { data, error } = await db.from("match_members").select("match_id").eq("user_id", userId);
+  if (error) throw error;
   for (const row of data || []) {
-    await db.rpc("nivora_end_match", { p_user: userId, p_match: row.match_id, p_reason: reason });
+    const { error: endError } = await db.rpc("nivora_end_match", { p_user: userId, p_match: row.match_id, p_reason: reason });
+    if (endError) throw endError;
   }
   return (data || []).length;
 }

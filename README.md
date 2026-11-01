@@ -64,3 +64,8 @@ Before public launch, implement and test secure accounts and sessions, access co
 - `data/demo-db.json` — generated local demo data (created on first run)
 
 No npm dependencies are required. Node.js 18 or newer is recommended.
+
+
+## Validation
+
+GitHub Actions runs backend syntax checks, backend tests, and frontend JavaScript syntax checks for pull requests and pushes to `main`.

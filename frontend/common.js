@@ -1,4 +1,4 @@
-/* NIVORA shared browser helpers: config, Supabase client, API calls, phone-OTP sign-in panel. */
+/* NIVORA shared browser helpers: config, Google OAuth, Supabase client and API calls. */
 (function () {
   "use strict";
   const cfg = window.NIVORA_CONFIG || {};
@@ -11,32 +11,14 @@
       network: "Could not reach the server. Check your connection and try again.",
       generic: "Something went wrong. Please try again.",
       sessionExpired: "Your session expired. Please sign in again.",
-      signInTitle: "Sign in with your phone", signInDesc: "We will send a one-time code (OTP) by SMS. The same step creates your account or signs you in.",
-      phone: "Mobile number", phoneHint: "Indian numbers: 10 digits. Other countries: start with + and country code.",
-      sendOtp: "Send OTP", resend: "Resend OTP", resendIn: "Resend in", code: "6-digit code", verify: "Verify & continue",
-      sending: "Sending…", verifying: "Verifying…", sent: "OTP sent. Enter the code from your SMS.",
-      badPhone: "Enter a valid mobile number.", badCode: "Enter the code from your SMS.",
-      rateLimited: "Too many attempts. Please wait a few minutes and try again.",
-      smsFailed: "The SMS could not be sent. The SMS provider may not be set up yet — please contact support.",
-      otpExpired: "That code has expired. Request a new OTP.", otpInvalid: "That code is not correct or has expired. Check it, or request a new OTP.",
-      resendLimit: "Resend limit reached. Please close this window and try again later.",
-      changeNumber: "Use a different number", cancel: "Cancel"
+      signInTitle: "Sign in", cancel: "Cancel"
     },
     ml: {
       noApi: "Server address configure cheythittilla. supabase-config.js-ൽ apiBase നൽകുക.",
       network: "Server-ലേക്ക് എത്താൻ കഴിഞ്ഞില്ല. Connection പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.",
       generic: "എന്തോ പിശക് സംഭവിച്ചു. വീണ്ടും ശ്രമിക്കുക.",
       sessionExpired: "Session കഴിഞ്ഞു. വീണ്ടും sign in ചെയ്യുക.",
-      signInTitle: "ഫോൺ നമ്പർ ഉപയോഗിച്ച് sign in", signInDesc: "SMS വഴി ഒറ്റത്തവണ code (OTP) അയയ്ക്കും. ഇതേ ഘട്ടത്തിൽ account ഉണ്ടാകും / sign in ആകും.",
-      phone: "മൊബൈൽ നമ്പർ", phoneHint: "ഇന്ത്യൻ നമ്പർ: 10 അക്കം. മറ്റു രാജ്യങ്ങൾ: + ഉം country code ഉം ചേർക്കുക.",
-      sendOtp: "OTP അയയ്ക്കുക", resend: "OTP വീണ്ടും അയയ്ക്കുക", resendIn: "വീണ്ടും അയയ്ക്കാൻ", code: "6 അക്ക code", verify: "സ്ഥിരീകരിച്ച് തുടരുക",
-      sending: "അയയ്ക്കുന്നു…", verifying: "പരിശോധിക്കുന്നു…", sent: "OTP അയച്ചു. SMS-ലെ code നൽകുക.",
-      badPhone: "ശരിയായ മൊബൈൽ നമ്പർ നൽകുക.", badCode: "SMS-ലെ code നൽകുക.",
-      rateLimited: "ഒരുപാട് ശ്രമങ്ങൾ. കുറച്ച് മിനിറ്റ് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.",
-      smsFailed: "SMS അയയ്ക്കാൻ കഴിഞ്ഞില്ല. SMS provider ഇതുവരെ സജ്ജമായിട്ടില്ലായിരിക്കാം — support-നെ ബന്ധപ്പെടുക.",
-      otpExpired: "ആ code-ന്റെ സമയം കഴിഞ്ഞു. പുതിയ OTP ആവശ്യപ്പെടുക.", otpInvalid: "Code ശരിയല്ല അല്ലെങ്കിൽ സമയം കഴിഞ്ഞു. പരിശോധിക്കുക, അല്ലെങ്കിൽ പുതിയ OTP ആവശ്യപ്പെടുക.",
-      resendLimit: "വീണ്ടും അയയ്ക്കാവുന്ന പരിധി കഴിഞ്ഞു. പിന്നീട് ശ്രമിക്കുക.",
-      changeNumber: "മറ്റൊരു നമ്പർ ഉപയോഗിക്കുക", cancel: "റദ്ദാക്കുക"
+      signInTitle: "Sign in", cancel: "റദ്ദാക്കുക"
     }
   };
   const lang = () => (typeof language !== "undefined" ? language : "en");

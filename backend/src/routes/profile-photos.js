@@ -31,6 +31,9 @@ async function signedPhoto(db, photo) {
 
 router.get("/", async (req, res) => {
   const db = serviceClient();
+  const { data: staff, error: staffError } = await db.from("staff_roles").select("user_id").eq("user_id", req.user.id).maybeSingle();
+  if (staffError) return res.status(500).json({ success: false, message: "Could not verify account type." });
+  if (staff) return res.json({ success: true, photos: [] });
   const { data, error } = await db.from("profile_photos")
     .select("id, object_path, sort_order, approval_status, review_reason, created_at")
     .eq("user_id", req.user.id).order("sort_order");
@@ -54,6 +57,9 @@ router.post("/", uploadLimit, async (req, res) => {
   const image = detectImage(req.body);
   if (!image) return res.status(400).json({ success: false, message: "Upload a valid JPEG, PNG or WebP image up to 5 MB." });
   const db = serviceClient();
+  const { data: staff, error: staffError } = await db.from("staff_roles").select("user_id").eq("user_id", req.user.id).maybeSingle();
+  if (staffError) return res.status(500).json({ success: false, message: "Could not verify account type." });
+  if (staff) return res.status(403).json({ success: false, message: "Staff accounts do not use customer photos." });
   const { data: profile, error: profileError } = await db.from("profiles")
     .select("id, approval_status, suspended_at").eq("id", req.user.id).maybeSingle();
   if (profileError) return res.status(500).json({ success: false, message: "Could not verify your profile." });

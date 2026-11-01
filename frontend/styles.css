@@ -78,3 +78,5 @@
 :root[data-theme="dark"] .summary-box,:root:not([data-theme="light"]) .summary-box{background:#1c2b22;border-color:#2c3c31}
 :root[data-theme="dark"] .lang-btn,:root[data-theme="dark"] .menu-btn,:root:not([data-theme="light"]) .lang-btn,:root:not([data-theme="light"]) .menu-btn{color:var(--green)}
 :root[data-theme="dark"] body,:root:not([data-theme="light"]) body{background:var(--cream);color:var(--ink)}
+
+.voice-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 0}.voice-messages{display:flex;flex-direction:column;gap:8px;margin-top:10px}.voice-bubble{max-width:min(100%,340px);padding:9px 12px;border-radius:10px;background:#eef1e8;display:flex;flex-direction:column;gap:5px}.voice-bubble.mine{align-self:flex-end;background:#e0eadb}.voice-bubble.theirs{align-self:flex-start}.voice-bubble small,.voice-review small{font-size:10px;color:#68766c}.voice-bubble audio,.voice-review audio{width:min(100%,280px);height:38px}.voice-review{display:flex;flex-direction:column;gap:6px;margin:8px 0}

@@ -18,10 +18,10 @@ function res() {
   r.setHeader = (k, v) => { r.headers[k] = v; };
   return r;
 }
-async function call(router, method, path, { body, params = {}, query = {}, user = { id: UID }, headers = {} } = {}) {
+async function call(router, method, path, { body, params = {}, query = {}, user = { id: UID }, headers = {}, staffRole } = {}) {
   const route = router.routes.find((x) => x.method === method && x.path === path);
   assert.ok(route, `route ${method} ${path} exists`);
-  const req = { body, params, query, user, headers };
+  const req = { body, params, query, user, headers, staffRole };
   const out = res();
   // run route-level middleware (limiters etc.) then the handler
   const { requireAuth } = require("../src/middleware");
@@ -35,16 +35,16 @@ test("every module loads and the app wires all routers", () => {
   assert.ok(createApp());
 });
 
-test("admin cannot approve their own profile", async () => {
+test("routine profile moderation is disabled in favour of report-only review", async () => {
   when(() => { throw new Error("DB must not be touched"); });
   const router = require("../src/routes/admin");
   const r = await call(router, "POST", "/profiles/:id/decision", { params: { id: UID }, body: { decision: "approved" } });
-  assert.equal(r.code, 403);
+  assert.equal(r.code, 410);
 });
-test("decision requires valid value and a reason for reject", async () => {
+test("legacy profile decision endpoint is disabled", async () => {
   const router = require("../src/routes/admin");
-  assert.equal((await call(router, "POST", "/profiles/:id/decision", { params: { id: OTHER }, body: { decision: "hacked" } })).code, 400);
-  assert.equal((await call(router, "POST", "/profiles/:id/decision", { params: { id: OTHER }, body: { decision: "rejected", reason: "no" } })).code, 400);
+  assert.equal((await call(router, "POST", "/profiles/:id/decision", { params: { id: OTHER }, body: { decision: "hacked" } })).code, 410);
+  assert.equal((await call(router, "POST", "/profiles/:id/decision", { params: { id: OTHER }, body: { decision: "rejected", reason: "no" } })).code, 410);
 });
 test("requireStaff blocks non-staff and allows listed roles", async () => {
   const { requireStaff } = require("../src/middleware");
@@ -80,12 +80,21 @@ test("chat gate: expired window, non-member and blocked are all refused", async 
   const base = { id: MATCH, user_one: UID, user_two: OTHER, status: "active" };
   when((c) => (c.table === "match_history" ? { data: { ...base, expires_at: past }, error: null } : { data: [], error: null }));
   let g = await assertLiveMatch(MATCH, UID); assert.equal(g.status, 403); assert.equal(g.code, "match_not_live");
-  when((c) => (c.table === "match_history" ? { data: { ...base, expires_at: future }, error: null } : { data: [], error: null }));
+  when((c) => {
+    if (c.table === "match_history") return { data: { ...base, expires_at: future }, error: null };
+    if (c.table === "profiles") return { data: [{ id: UID, is_active: true }, { id: OTHER, is_active: true }], error: null };
+    return { data: [], error: null };
+  });
   g = await assertLiveMatch(MATCH, "99999999-9999-4999-8999-999999999999"); assert.equal(g.status, 404, "stranger gets 404");
   g = await assertLiveMatch(MATCH, UID); assert.equal(g.partnerId, OTHER);
   when((c) => (c.table === "match_history" ? { data: { ...base, status: "ended", expires_at: future }, error: null } : { data: [], error: null }));
   g = await assertLiveMatch(MATCH, UID); assert.equal(g.status, 403, "ended match closed even inside 72h");
-  when((c) => (c.table === "match_history" ? { data: { ...base, expires_at: future }, error: null } : { data: [{ blocker_id: OTHER }], error: null }));
+  when((c) => {
+    if (c.table === "match_history") return { data: { ...base, expires_at: future }, error: null };
+    if (c.table === "profiles") return { data: [{ id: UID, is_active: true }, { id: OTHER, is_active: true }], error: null };
+    if (c.table === "blocks") return { data: [{ blocker_id: OTHER }], error: null };
+    return { data: [], error: null };
+  });
   g = await assertLiveMatch(MATCH, UID); assert.equal(g.code, "blocked");
 });
 
@@ -122,13 +131,13 @@ test("profile: duplicate create -> 409; rejected profiles cannot edit; approved 
   const body = { full_name: "Ananya Nair", age: 26, district: "Kochi", gender: "woman", looking_for: "man", relationship_intention: "marriage", core_values: ["family"], consents: { terms: true, privacy: true } };
   when((c) => (c.table === "profiles" ? { data: { id: UID }, error: null } : { data: null, error: null }));
   assert.equal((await call(router, "POST", "/", { body })).code, 409);
-  when(() => ({ data: { approval_status: "rejected" }, error: null }));
+  when((c) => (c.table === "staff_roles" ? { data: null, error: null } : { data: { approval_status: "rejected" }, error: null }));
   assert.equal((await call(router, "PUT", "/", { body: { bio: "new bio text here" } })).code, 403);
   let update;
   when((c) => {
     const u = c.table === "profiles" ? c.ops.find((o) => o[0] === "update") : null;
     if (u && !update) { update = u[1]; return { data: { id: UID, approval_status: "approved" }, error: null }; }
-    return { data: { approval_status: "approved" }, error: null };
+    return c.table === "staff_roles" ? { data: null, error: null } : { data: { approval_status: "approved" }, error: null };
   });
   const r = await call(router, "PUT", "/", { body: { bio: "a changed biography text", approval_status: "approved" } });
   assert.equal(r.code, 200); assert.equal(update.approval_status, "approved", "client-sent status ignored; profile remains auto-approved");
@@ -174,4 +183,97 @@ test("payments: duplicate webhook event is acknowledged without reprocessing", a
   const bad = res();
   await webhookHandler({ body: Buffer.from(raw), headers: { "x-razorpay-signature": "bad", "x-razorpay-event-id": "evt_2" } }, bad);
   assert.equal(bad.code, 400);
+});
+
+
+
+test("staff accounts cannot create customer profiles", async () => {
+  when((c) => {
+    if (c.table === "staff_roles") return { data: { user_id: UID, role: "admin" }, error: null };
+    throw new Error("customer profile query must not run for staff");
+  });
+  const r = await call(require("../src/routes/profile"), "POST", "/", {
+    body: { full_name: "Staff Member", age: 30, district: "Kochi", gender: "woman",
+      looking_for: "man", relationship_intention: "marriage", core_values: ["family"],
+      consents: { terms: true, privacy: true } }
+  });
+  assert.equal(r.code, 403);
+});
+
+test("report endpoint records a report against the matched partner", async () => {
+  let reportRow;
+  when((c) => {
+    if (c.table === "match_history") return { data: { id: MATCH, user_one: UID, user_two: OTHER, status: "active" }, error: null };
+    if (c.table === "reports") { reportRow = c.ops.find((o) => o[0] === "insert")?.[1]; return { data: { id: "44444444-4444-4444-8444-444444444444" }, error: null }; }
+    return { data: null, error: null };
+  });
+  const r = await call(require("../src/routes/safety"), "POST", "/report", {
+    body: { match_id: MATCH, reason: "harassment", details: "Unwanted repeated messages" }
+  });
+  assert.equal(r.code, 201);
+  assert.equal(reportRow.reporter_id, UID);
+  assert.equal(reportRow.reported_id, OTHER);
+});
+
+test("block endpoint closes the match and records the block", async () => {
+  let blockRow, ended = false;
+  when((c) => {
+    if (c.table === "match_history") return { data: { id: MATCH, user_one: UID, user_two: OTHER, status: "active" }, error: null };
+    if (c.table === "blocks") { blockRow = c.ops.find((o) => o[0] === "upsert")?.[1]; return { data: null, error: null }; }
+    if (c.table === "rpc:nivora_end_match") { ended = true; return { data: null, error: null }; }
+    return { data: null, error: null };
+  });
+  const r = await call(require("../src/routes/safety"), "POST", "/block", { body: { match_id: MATCH } });
+  assert.equal(r.code, 200);
+  assert.equal(blockRow.blocker_id, UID);
+  assert.equal(blockRow.blocked_id, OTHER);
+  assert.equal(ended, true);
+});
+
+
+
+test("chat and voice are denied when either matched account is suspended", async () => {
+  const { assertChatMatch } = require("../src/lib/matches");
+  const future = new Date(Date.now() + 3600e3).toISOString();
+  when((c) => {
+    if (c.table === "match_history") return { data: { id: MATCH, user_one: UID, user_two: OTHER, status: "active", expires_at: future }, error: null };
+    if (c.table === "profiles") return { data: [{ id: UID, is_active: true, suspended_at: null }, { id: OTHER, is_active: false, suspended_at: new Date().toISOString() }], error: null };
+    return { data: [], error: null };
+  });
+  const result = await assertChatMatch(MATCH, UID);
+  assert.equal(result.status, 403);
+  assert.equal(result.code, "account_unavailable");
+});
+
+
+
+test("only an admin can suspend a reported account during resolution", async () => {
+  const router = require("../src/routes/admin");
+  when((c) => c.table === "reports"
+    ? { data: { id: "44444444-4444-4444-8444-444444444444", reported_id: OTHER, status: "open" }, error: null }
+    : { data: null, error: null });
+  const moderator = await call(router, "POST", "/reports/:id/resolve", {
+    params: { id: "44444444-4444-4444-8444-444444444444" },
+    body: { status: "actioned", resolution: "Reviewed and confirmed", suspend_user: true },
+    staffRole: "moderator"
+  });
+  assert.equal(moderator.code, 403);
+
+  let suspended = false, resolved = false;
+  when((c) => {
+    if (c.table === "reports" && c.ops.some((o) => o[0] === "select")) return { data: { id: "44444444-4444-4444-8444-444444444444", reported_id: OTHER, status: "open" }, error: null };
+    if (c.table === "profiles" && c.ops.some((o) => o[0] === "update")) { suspended = true; return { data: { id: OTHER }, error: null }; }
+    if (c.table === "moderation_events") return { data: null, error: null };
+    if (c.table === "reports" && c.ops.some((o) => o[0] === "update")) { resolved = true; return { data: null, error: null }; }
+    if (c.table === "match_members") return { data: [], error: null };
+    return { data: null, error: null };
+  });
+  const admin = await call(router, "POST", "/reports/:id/resolve", {
+    params: { id: "44444444-4444-4444-8444-444444444444" },
+    body: { status: "actioned", resolution: "Reviewed and confirmed", suspend_user: true },
+    staffRole: "admin"
+  });
+  assert.equal(admin.code, 200);
+  assert.equal(suspended, true);
+  assert.equal(resolved, true);
 });

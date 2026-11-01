@@ -7,7 +7,7 @@
   const P = {
     en: {
       myspace: "My space", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
-      noProfile: "You have not created a profile yet.", createProfile: "Create my profile",
+      noProfile: "You have not created a profile yet.", staffAccount: "This is a NIVORA staff account. Customer profiles and matching are disabled for staff.", staffConsole: "Open staff console", createProfile: "Create my profile",
       status_pending: "Awaiting staff review", status_approved: "Approved", status_rejected: "Not approved", status_changes_requested: "Changes requested",
       suspended: "Your account is suspended. Please contact support.", incomplete: "Your profile is missing some details (gender, preferences, values). Please edit it before matching.",
       reason: "Staff note", editProfile: "Edit profile", save: "Save changes", saving: "Saving…", saved: "Saved.", reviewNote: "Your profile changes are saved immediately. Keep your details accurate and use Report or Block if needed.",
@@ -16,9 +16,9 @@
       dailyMatchesUsed: "Daily matches used", activeConversations: "Active conversations", dailyLimitReached: "You have used all five recommendations for today.", chatTab: "Chat",
       needApproval: "Save your profile details to activate matching.", payNeeded: "A paid ₹50 credit is needed to get a match.",
       accept: "Accept", decline: "Decline", continueMatch: "Continue", stopMatch: "Stop", waitingPartner: "You chose Continue. Waiting for the other person.", waitingYou: "Choose Continue or Stop to proceed.",
-      proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and calls will close.",
+      proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and voice messages will close.",
       timeLeft: "Chat window left", closed: "Closed", chat: "Chat", typeMsg: "Write a message…", send: "Send", live: "Live", reconnecting: "Reconnecting…",
-      chatClosed: "This conversation is closed (match ended or 72 hours are over).", call: "Voice call", hangup: "End call", incoming: "Incoming voice call", answer: "Answer",
+      chatClosed: "This conversation is closed (match ended or 72 hours are over).", voiceRecord: "Record voice message", voiceStop: "Stop recording", voiceUploading: "Uploading voice message…", voiceSent: "Voice message sent.", voiceError: "Voice message could not be sent.", voiceUnsupported: "Voice recording is not supported in this browser.", call: "Voice call", hangup: "End call", incoming: "Incoming voice call", answer: "Answer",
       calling: "Calling…", inCall: "In call", noMic: "Microphone is unavailable or permission was denied.", noWebrtc: "Voice calls need HTTPS (or localhost) and a modern browser.",
       callFailed: "Call could not connect. A TURN server may be needed on this network.",
       report: "Report", block: "Block", blockConfirm: "Block this person? The match ends and you will never be matched again.",
@@ -35,7 +35,7 @@
     },
     ml: {
       myspace: "എന്റെ ഇടം", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
-      noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
+      noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", staffAccount: "ഇത് NIVORA staff account ആണ്. Staff അംഗങ്ങൾക്ക് customer profile അല്ലെങ്കിൽ matching ലഭ്യമല്ല.", staffConsole: "Staff console തുറക്കുക", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
       status_pending: "Staff review കാത്തിരിക്കുന്നു", status_approved: "അംഗീകരിച്ചു", status_rejected: "അംഗീകരിച്ചില്ല", status_changes_requested: "മാറ്റങ്ങൾ ആവശ്യപ്പെട്ടിട്ടുണ്ട്",
       suspended: "നിങ്ങളുടെ account suspend ചെയ്തിരിക്കുന്നു. Support-നെ ബന്ധപ്പെടുക.", incomplete: "Profile-ൽ ചില വിവരങ്ങൾ കുറവാണ് (gender, preferences, values). Matching-ന് മുമ്പ് edit ചെയ്യുക.",
       reason: "Staff കുറിപ്പ്", editProfile: "Profile edit ചെയ്യുക", save: "സേവ് ചെയ്യുക", saving: "സേവ് ചെയ്യുന്നു…", saved: "സേവ് ചെയ്തു.", reviewNote: "Profile-ലെ മാറ്റങ്ങൾ ഉടൻ save ആകും. വിവരങ്ങൾ ശരിയായി നൽകുക; ആവശ്യമെങ്കിൽ Report / Block ഉപയോഗിക്കുക.",
@@ -44,9 +44,9 @@
       dailyMatchesUsed: "ഇന്ന് ലഭിച്ച matches", activeConversations: "സജീവ സംഭാഷണങ്ങൾ", dailyLimitReached: "ഇന്നത്തെ അഞ്ച് matching-ഉം ഉപയോഗിച്ചു.", chatTab: "Chat",
       needApproval: "Matching തുടങ്ങാൻ profile details save ചെയ്യുക.", payNeeded: "Match ലഭിക്കാൻ ₹50 credit ആവശ്യമാണ്.",
       accept: "സ്വീകരിക്കുക", decline: "നിരസിക്കുക", continueMatch: "തുടരാം", stopMatch: "നിർത്താം", waitingPartner: "നിങ്ങൾ Continue തിരഞ്ഞെടുത്തു. മറ്റേയാളുടെ തീരുമാനം കാത്തിരിക്കുന്നു.", waitingYou: "തുടരാൻ Continue അല്ലെങ്കിൽ Stop തിരഞ്ഞെടുക്കുക.",
-      proposalEnds: "ഇതിനുമുമ്പ് മറുപടി നൽകുക", endMatch: "Match അവസാനിപ്പിക്കുക", endConfirm: "ഈ match അവസാനിപ്പിക്കണോ? Chat, call അടയും.",
+      proposalEnds: "ഇതിനുമുമ്പ് മറുപടി നൽകുക", endMatch: "Match അവസാനിപ്പിക്കുക", endConfirm: "ഈ match അവസാനിപ്പിക്കണോ? Chat, voice messages അടയും.",
       timeLeft: "Chat സമയം ബാക്കി", closed: "അടച്ചു", chat: "Chat", typeMsg: "സന്ദേശം എഴുതുക…", send: "അയയ്ക്കുക", live: "ലൈവ്", reconnecting: "വീണ്ടും ബന്ധിപ്പിക്കുന്നു…",
-      chatClosed: "ഈ സംഭാഷണം അടച്ചു (match അവസാനിച്ചു / 72 മണിക്കൂർ കഴിഞ്ഞു).", call: "Voice call", hangup: "Call അവസാനിപ്പിക്കുക", incoming: "Voice call വരുന്നു", answer: "എടുക്കുക",
+      chatClosed: "ഈ സംഭാഷണം അടച്ചു (match അവസാനിച്ചു / 72 മണിക്കൂർ കഴിഞ്ഞു).", voiceRecord: "Voice message റെക്കോർഡ് ചെയ്യുക", voiceStop: "റെക്കോർഡിംഗ് നിർത്തുക", voiceUploading: "Voice message upload ചെയ്യുന്നു…", voiceSent: "Voice message അയച്ചു.", voiceError: "Voice message അയയ്ക്കാനായില്ല.", voiceUnsupported: "ഈ browser-ൽ voice recording ലഭ്യമല്ല.", call: "Voice call", hangup: "Call അവസാനിപ്പിക്കുക", incoming: "Voice call വരുന്നു", answer: "എടുക്കുക",
       calling: "വിളിക്കുന്നു…", inCall: "Call-ൽ", noMic: "Microphone ലഭ്യമല്ല അല്ലെങ്കിൽ അനുമതി നിഷേധിച്ചു.", noWebrtc: "Voice call-ന് HTTPS (അല്ലെങ്കിൽ localhost) ഉം പുതിയ browser ഉം വേണം.",
       callFailed: "Call connect ആയില്ല. ഈ network-ൽ TURN server വേണ്ടിവന്നേക്കാം.",
       report: "Report", block: "Block", blockConfirm: "ഇവരെ block ചെയ്യണോ? Match അവസാനിക്കും, വീണ്ടും match ചെയ്യില്ല.",
@@ -79,21 +79,20 @@
     modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
   }
   function open() { ensureModal(); modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; }
-  function close() { stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
+  function close() { stopVoiceRecording(true); stopRealtime(); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
-  let me = null, profile = null, match = null, matches = [], selectedMatchId = null, dailyQuota = { daily_used: 0, daily_limit: 5 }, payInfo = null, history = [], photos = [], isStaff = false;
-  let tickTimer = null, chatChannel = null, signalChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
-  let pc = null, localStream = null, pendingIce = [], incomingOffer = null, callState = "idle";
+  let me = null, profile = null, match = null, matches = [], selectedMatchId = null, dailyQuota = { daily_used: 0, daily_limit: 5 }, history = [], photos = [], isStaff = false;
+  let tickTimer = null, chatChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
+  let voiceRecorder = null, voiceStream = null, voiceChunks = [], voiceMime = "", voiceStartedAt = 0, voiceLimitTimer = null, voiceDisplayTimer = null, voiceDiscard = false, voiceSeen = new Set(), lastVoiceTs = null;
   const val = (k) => (k in (profile || {}) ? profile[k] : "");
 
   async function loadAll() {
     const s = await session(); me = s?.user || null;
-    const [pr, m, pay, h] = await Promise.all([
-      api("/api/profile"), api("/api/match/current"),
-      api("/api/payments/status").catch(() => null), api("/api/match/history").catch(() => ({ history: [] }))
+    const [pr, m, h] = await Promise.all([
+      api("/api/profile"), api("/api/match/current"), api("/api/match/history").catch(() => ({ history: [] }))
     ]);
-    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; payInfo = pay; history = h.history || [];
+    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; history = h.history || [];
     photos = profile ? ((await api("/api/profile/photos").catch(() => ({ photos: [] }))).photos || []) : [];
     isStaff = await api("/api/admin/me").then(() => true).catch(() => false);
   }
@@ -184,7 +183,9 @@
   function render() {
     clearInterval(tickTimer); stopRealtime();
     let h = `<div class="modal-topline"><span class="section-kicker">${p("myspace")}</span></div>`;
-    if (!profile) {
+    if (!profile && isStaff) {
+      h += `<p class="modal-description">${p("staffAccount")}</p><a class="primary-btn" href="admin.html">${p("staffConsole")} <span class="arrow">→</span></a>`;
+    } else if (!profile) {
       h += `<p class="modal-description">${p("noProfile")}</p><button class="primary-btn" id="pCreate" type="button">${p("createProfile")} <span class="arrow">→</span></button>`;
     } else {
       const st = profile.approval_status;
@@ -197,7 +198,6 @@
 
       h += `<h3 class="nv-h">${p("photos")}</h3><div id="photoBox"><p class="modal-description">${p("photoHelp")}</p><div class="nv-row"><label class="outline-btn" for="photoInput">${p("addPhoto")}</label><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden ${photos.length >= 4 ? "disabled" : ""}></div><div class="photo-grid">${photos.map((ph) => `<div class="photo-card"><img src="${esc(ph.url || "")}" alt="Your profile photo"><small>${p("photo" + ph.approval_status[0].toUpperCase() + ph.approval_status.slice(1))}</small><button class="nv-link" data-photo-delete="${esc(ph.id)}" type="button">${p("photoDelete")}</button>${ph.review_reason ? `<small>${esc(ph.review_reason)}</small>` : ""}</div>`).join("")}</div><div class="nv-msg" id="photoMsg" role="status"></div></div>`;
       h += `<h3 class="nv-h">${p("matching")}</h3><div id="matchBox"></div>`;
-      h += `<h3 class="nv-h">${p("payment")}</h3><div id="payBox"></div>`;
       if (history.length) {
         h += `<h3 class="nv-h">${p("pastMatches")}</h3><ul class="nv-list">${history.filter((x) => !["proposed", "active"].includes(x.status)).map((x) =>
           `<li>${p("from")}: ${esc(fmt(x.started_at || x.created_at))} · ${esc(x.status)} ${x.started_at ? `<button class="nv-link" data-fb="${esc(x.id)}" type="button">${p("feedback")}</button>` : ""}</li>`).join("") || `<li>${p("none")}</li>`}</ul><div id="fbBox"></div>`;
@@ -220,7 +220,7 @@
     const photoInput = $("#photoInput");
     if (photoInput) photoInput.onchange = async () => { const file = photoInput.files?.[0]; if (!file) return; await uploadPhoto(file); };
     body.querySelectorAll("[data-photo-delete]").forEach((b) => (b.onclick = async () => { if (!confirm(p("photoDelete") + "?")) return; try { await api("/api/profile/photos/" + encodeURIComponent(b.dataset.photoDelete), { method: "DELETE" }); await loadAll(); render(); } catch (e) { const out = $("#photoMsg"); if (out) out.textContent = e.message; } }));
-    if (profile) { renderMatch(); renderPay(); }
+    if (profile) renderMatch();
   }
 
   function msg(text, ok) { const el = body.querySelector("#pMsg"); if (el) { el.textContent = text; el.className = "nv-msg" + (ok ? " ok" : ""); } }
@@ -301,7 +301,7 @@
       if (["proposed", "active"].includes(m.status)) {
         h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
           <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
-          <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div></div>`;
+          <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div><div class="voice-messages" id="voiceLog" aria-live="polite"></div><div class="voice-controls"><button class="outline-btn" id="voiceRecord" type="button">${p("voiceRecord")}</button><span class="nv-msg" id="voiceStatus" role="status"></span></div></div>`;
         if (m.status === "proposed") {
           h += m.i_accepted
             ? `<p class="modal-description">${p("waitingPartner")}</p>`
@@ -356,17 +356,107 @@
     const d = document.createElement("div"); d.className = "bubble " + (m.mine ? "mine" : "theirs"); d.textContent = m.body;
     log.appendChild(d); log.scrollTop = log.scrollHeight;
   }
+  function appendVoice(m) {
+    if (!m?.id || voiceSeen.has(m.id)) return;
+    voiceSeen.add(m.id);
+    if (!lastVoiceTs || m.created_at > lastVoiceTs) lastVoiceTs = m.created_at;
+    const log = body.querySelector("#voiceLog"); if (!log || !m.url) return;
+    const wrap = document.createElement("div");
+    wrap.className = "voice-bubble " + (m.mine ? "mine" : "theirs");
+    const label = document.createElement("small");
+    label.textContent = (m.mine ? "You" : "Match") + " · " + Math.max(1, Number(m.duration_seconds) || 1) + "s";
+    const audio = document.createElement("audio");
+    audio.controls = true; audio.preload = "none"; audio.src = m.url;
+    wrap.append(label, audio); log.appendChild(wrap); log.scrollTop = log.scrollHeight;
+  }
+
+  function voiceStatus(message) {
+    const el = body.querySelector("#voiceStatus"); if (el) el.textContent = message || "";
+  }
+
+  async function uploadVoice(blob, duration) {
+    const button = body.querySelector("#voiceRecord");
+    if (blob.size < 12 || blob.size > 2 * 1024 * 1024) { voiceStatus(p("voiceError")); return; }
+    if (button) button.disabled = true;
+    voiceStatus(p("voiceUploading"));
+    try {
+      const s = await session();
+      const mime = (blob.type || voiceMime || "").split(";")[0];
+      const response = await fetch(window.NV.API + "/api/chat/" + encodeURIComponent(match.id) + "/voice", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + s.access_token, "Content-Type": mime, "X-Voice-Duration": String(duration) },
+        body: blob
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.message || p("voiceError"));
+      if (result.voice_message) appendVoice(result.voice_message);
+      voiceStatus(p("voiceSent"));
+    } catch (e) { voiceStatus(e.message || p("voiceError")); }
+    finally { if (button) button.disabled = false; }
+  }
+
+  async function startVoiceRecording() {
+    const button = body.querySelector("#voiceRecord");
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) { voiceStatus(p("voiceUnsupported")); return; }
+    try {
+      voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const types = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/mp4"];
+      const chosen = types.find((t) => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t));
+      voiceRecorder = chosen ? new MediaRecorder(voiceStream, { mimeType: chosen }) : new MediaRecorder(voiceStream);
+      voiceMime = voiceRecorder.mimeType || chosen || "";
+      if (!["audio/webm", "audio/ogg", "audio/mp4"].includes(voiceMime.split(";")[0])) {
+        stopVoiceRecording(true); voiceStatus(p("voiceUnsupported")); return;
+      }
+      voiceChunks = []; voiceDiscard = false; voiceStartedAt = Date.now();
+      voiceRecorder.ondataavailable = (event) => { if (event.data && event.data.size) voiceChunks.push(event.data); };
+      voiceRecorder.onstop = async () => {
+        clearTimeout(voiceLimitTimer); clearInterval(voiceDisplayTimer); voiceDisplayTimer = null;
+        const blob = new Blob(voiceChunks, { type: voiceMime });
+        const duration = Math.min(60, Math.max(1, Math.ceil((Date.now() - voiceStartedAt) / 1000)));
+        voiceChunks = [];
+        if (voiceStream) voiceStream.getTracks().forEach((track) => track.stop());
+        voiceStream = null; voiceRecorder = null;
+        if (button) { button.textContent = p("voiceRecord"); button.disabled = false; }
+        if (!voiceDiscard) await uploadVoice(blob, duration);
+        voiceDiscard = false;
+      };
+      voiceRecorder.start(250);
+      if (button) button.textContent = p("voiceStop");
+      voiceStatus(L() === "ml" ? "റെക്കോർഡിംഗ്… 00:00 / 01:00" : "Recording… 00:00 / 01:00");
+      voiceDisplayTimer = setInterval(() => {
+        const seconds = Math.min(60, Math.floor((Date.now() - voiceStartedAt) / 1000));
+        voiceStatus((L() === "ml" ? "റെക്കോർഡിംഗ്… " : "Recording… ") + "00:" + String(seconds).padStart(2, "0") + " / 01:00");
+      }, 1000);
+      voiceLimitTimer = setTimeout(() => { if (voiceRecorder?.state === "recording") voiceRecorder.stop(); }, 60_000);
+    } catch (e) {
+      if (voiceStream) voiceStream.getTracks().forEach((track) => track.stop());
+      voiceStream = null; voiceRecorder = null;
+      if (button) button.textContent = p("voiceRecord");
+      voiceStatus(p("voiceError"));
+    }
+  }
+
+  function stopVoiceRecording(discard) {
+    clearTimeout(voiceLimitTimer); clearInterval(voiceDisplayTimer); voiceDisplayTimer = null;
+    if (discard) voiceDiscard = true;
+    if (voiceRecorder && voiceRecorder.state === "recording") voiceRecorder.stop();
+    else {
+      if (voiceStream) voiceStream.getTracks().forEach((track) => track.stop());
+      voiceStream = null; voiceRecorder = null;
+    }
+  }
+
   function closeChat() {
     setStatus(p("chatClosed"));
     const i = body.querySelector("#chatText"), b = body.querySelector("#chatSend"); if (i) i.disabled = true; if (b) b.disabled = true;
-    const c = body.querySelector("#callBtn"); if (c) c.disabled = true;
-    endCall(false); stopRealtime();
+    stopVoiceRecording(true);
+    stopRealtime();
   }
 
   async function startChat(m) {
     if (tickTimer) clearInterval(tickTimer);
     stopRealtime();
-    seen = new Set(); lastTs = null;
+    seen = new Set(); lastTs = null; voiceSeen = new Set(); lastVoiceTs = null;
     const left = () => Math.max(0, Math.floor((new Date(m.expires_at) - Date.now()) / 1000));
     const tick = () => {
       const s = left(), el = body.querySelector("#mLeft"); if (!el) return;
@@ -380,6 +470,10 @@
         const r = await api(`/api/chat/${m.id}/messages` + (lastTs ? `?after=${encodeURIComponent(lastTs)}` : ""));
         r.messages.forEach(appendMsg);
       } catch (e) { if (e.code === "match_not_live" || e.status === 403 || e.status === 404) closeChat(); }
+      try {
+        const v = await api(`/api/chat/${m.id}/voice` + (lastVoiceTs ? `?after=${encodeURIComponent(lastVoiceTs)}` : ""));
+        (v.voice_messages || []).forEach(appendVoice);
+      } catch (e) { if (e.code === "match_not_live" || e.status === 403 || e.status === 404) closeChat(); }
     };
     await pull();
     pollTimer = setInterval(pull, 5000);
@@ -391,6 +485,11 @@
     };
     body.querySelector("#chatSend").onclick = send;
     body.querySelector("#chatText").onkeydown = (e) => { if (e.key === "Enter") send(); };
+    const voiceButton = body.querySelector("#voiceRecord");
+    if (voiceButton) voiceButton.onclick = () => {
+      if (voiceRecorder && voiceRecorder.state === "recording") voiceRecorder.stop();
+      else startVoiceRecording();
+    };
 
     // Realtime for instant delivery; polling covers reconnects and network drops.
     const c = client();
@@ -399,84 +498,12 @@
         const r = pl.new; appendMsg({ id: r.id, mine: r.sender_id === me.id, body: r.body, created_at: r.created_at });
       })
       .subscribe((s) => { if (s === "SUBSCRIBED") setStatus(p("live")); else if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(s)) setStatus(p("reconnecting")); });
-    if (m.status === "active") {
-      signalChannel = c.channel("signals:" + m.id)
-        .on("postgres_changes", { event: "INSERT", schema: "public", table: "call_signals", filter: "to_user=eq." + me.id }, (pl) => onSignal(m.id, pl.new))
-        .subscribe();
-      const callButton = body.querySelector("#callBtn");
-      if (callButton) callButton.onclick = () => (callState === "idle" ? startCall(m.id) : endCall(true));
-    }
   }
 
   function stopRealtime() {
     clearInterval(pollTimer); pollTimer = null;
-    try { chatChannel && client().removeChannel(chatChannel); signalChannel && client().removeChannel(signalChannel); } catch { /* ignore */ }
-    chatChannel = signalChannel = null;
-  }
-
-  // ----- voice (WebRTC, signalling through the authorised backend + Supabase Realtime) -----
-  const callMsg = (t) => { const el = body.querySelector("#callBox"); if (el) el.innerHTML = t; };
-  const signal = (matchId, kind, payload) => api(`/api/call/${matchId}/signal`, { method: "POST", body: { kind, payload } });
-
-  async function makePc(matchId) {
-    if (!window.RTCPeerConnection || !navigator.mediaDevices?.getUserMedia) throw new Error(p("noWebrtc"));
-    const ice = await api(`/api/call/${matchId}/ice`);
-    try { localStream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { throw new Error(p("noMic")); }
-    pc = new RTCPeerConnection({ iceServers: ice.ice_servers });
-    localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
-    pc.onicecandidate = (e) => { if (e.candidate) signal(matchId, "ice", e.candidate.toJSON()).catch(() => {}); };
-    pc.ontrack = (e) => { const a = body.querySelector("#remoteAudio"); if (a) { a.srcObject = e.streams[0]; a.play().catch(() => {}); } };
-    pc.onconnectionstatechange = () => {
-      if (pc?.connectionState === "connected") { callState = "connected"; callMsg(p("inCall")); setCallBtn(); }
-      if (pc?.connectionState === "failed") { callMsg(p("callFailed")); endCall(true); }
-    };
-    return pc;
-  }
-  function setCallBtn() { const b = body.querySelector("#callBtn"); if (b) b.textContent = callState === "idle" ? "☏ " + p("call") : "✕ " + p("hangup"); }
-
-  async function startCall(matchId) {
-    try {
-      callState = "calling"; setCallBtn(); callMsg(p("calling"));
-      await makePc(matchId);
-      const offer = await pc.createOffer({ offerToReceiveAudio: true });
-      await pc.setLocalDescription(offer);
-      await signal(matchId, "offer", { type: offer.type, sdp: offer.sdp });
-    } catch (e) { callMsg(esc(e.message)); endCall(true); }
-  }
-  async function acceptCall(matchId) {
-    try {
-      callState = "connecting"; setCallBtn(); callMsg(p("calling"));
-      await makePc(matchId);
-      await pc.setRemoteDescription(incomingOffer); incomingOffer = null;
-      for (const c of pendingIce.splice(0)) await pc.addIceCandidate(c).catch(() => {});
-      const ans = await pc.createAnswer();
-      await pc.setLocalDescription(ans);
-      await signal(matchId, "answer", { type: ans.type, sdp: ans.sdp });
-    } catch (e) { callMsg(esc(e.message)); endCall(true); }
-  }
-  async function onSignal(matchId, s) {
-    if (s.match_id !== matchId) return;
-    const pl = s.payload || {};
-    if (s.kind === "offer") {
-      if (callState !== "idle") return;
-      incomingOffer = { type: pl.type, sdp: pl.sdp }; callState = "ringing";
-      callMsg(`${p("incoming")} <button class="primary-btn" id="cAns" type="button">${p("answer")}</button> <button class="outline-btn" id="cDec" type="button">${p("decline")}</button>`);
-      body.querySelector("#cAns").onclick = () => acceptCall(matchId);
-      body.querySelector("#cDec").onclick = () => endCall(true);
-    } else if (s.kind === "answer" && pc) {
-      await pc.setRemoteDescription({ type: pl.type, sdp: pl.sdp }).catch(() => {});
-      for (const c of pendingIce.splice(0)) await pc.addIceCandidate(c).catch(() => {});
-    } else if (s.kind === "ice") {
-      if (pc && pc.remoteDescription) await pc.addIceCandidate(pl).catch(() => {}); else pendingIce.push(pl);
-    } else if (s.kind === "hangup") { endCall(false); callMsg(""); }
-  }
-  function endCall(notify) {
-    const mid = match?.id;
-    if (notify && mid && callState !== "idle") signal(mid, "hangup", {}).catch(() => {});
-    try { pc && pc.close(); localStream && localStream.getTracks().forEach((t) => t.stop()); } catch { /* ignore */ }
-    pc = null; localStream = null; pendingIce = []; incomingOffer = null; callState = "idle";
-    const a = body && body.querySelector("#remoteAudio"); if (a) a.srcObject = null;
-    setCallBtn(); if (notify) callMsg("");
+    try { chatChannel && client().removeChannel(chatChannel); } catch { /* ignore */ }
+    chatChannel = null;
   }
 
   // ----- safety, feedback -----
@@ -497,38 +524,6 @@
     body.querySelector("#fbSend").onclick = async () => {
       try { await api("/api/feedback", { method: "POST", body: { match_id: matchId, wants_to_continue: body.querySelector("[name=fbc]:checked").value === "yes", feedback_text: body.querySelector("#fbText").value || null } }); body.querySelector("#fbBox").innerHTML = `<p class="nv-msg ok">${p("feedbackThanks")}</p>`; }
       catch (e) { body.querySelector("#fbBox").insertAdjacentHTML("beforeend", `<p class="nv-msg">${esc(e.message)}</p>`); }
-    };
-  }
-
-  // ----- payment -----
-  function loadRazorpay() {
-    return new Promise((res, rej) => {
-      if (window.Razorpay) return res();
-      const s = document.createElement("script"); s.src = "https://checkout.razorpay.com/v1/checkout.js";
-      s.onload = res; s.onerror = () => rej(new Error(window.NV.t("network"))); document.head.appendChild(s);
-    });
-  }
-  function renderPay() {
-    const box = body.querySelector("#payBox");
-    if (!payInfo || !payInfo.enabled) { box.innerHTML = `<p class="modal-description">${p("payOff")}</p>`; return; }
-    if (payInfo.has_credit) { box.innerHTML = `<p class="nv-msg ok">${p("hasCredit")}</p>`; return; }
-    box.innerHTML = `<div class="nv-row"><button class="outline-btn" id="payBtn" type="button" ${profile.approval_status !== "approved" ? "disabled" : ""}>${p("pay")}</button></div><div class="nv-msg" id="payMsg"></div>`;
-    box.querySelector("#payBtn").onclick = async () => {
-      const out = box.querySelector("#payMsg");
-      try {
-        const o = await api("/api/payments/order", { method: "POST" });
-        await loadRazorpay();
-        const rz = new window.Razorpay({
-          key: o.key_id, order_id: o.order_id, amount: o.amount, currency: o.currency, name: "NIVORA", description: p("payment"),
-          handler: async (resp) => {
-            out.textContent = p("payVerifying");
-            try { await api("/api/payments/verify", { method: "POST", body: resp }); await loadAll(); render(); msg(p("paid"), true); }
-            catch (e) { out.textContent = e.message || p("payFail"); }
-          },
-          modal: { ondismiss: () => { out.textContent = ""; } }
-        });
-        rz.open();
-      } catch (e) { out.textContent = e.message; }
     };
   }
 

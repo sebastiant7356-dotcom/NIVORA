@@ -4,7 +4,7 @@ const GENDERS = ["woman", "man", "other"];
 const LOOKING_FOR = ["woman", "man", "any"];
 const INTENTIONS = ["marriage", "longterm"];
 const VALUES = ["family", "kindness", "career", "faith", "communication", "lifestyle"];
-// Changing any of these sends an approved profile back to staff review.
+// Legacy field list retained for compatibility; customer profile edits now remain auto-approved.
 const REVIEW_FIELDS = ["full_name", "age", "gender", "district", "job_title", "bio"];
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
