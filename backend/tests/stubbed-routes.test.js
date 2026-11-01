@@ -89,7 +89,12 @@ test("chat gate: expired window, non-member and blocked are all refused", async 
   g = await assertLiveMatch(MATCH, UID); assert.equal(g.partnerId, OTHER);
   when((c) => (c.table === "match_history" ? { data: { ...base, status: "ended", expires_at: future }, error: null } : { data: [], error: null }));
   g = await assertLiveMatch(MATCH, UID); assert.equal(g.status, 403, "ended match closed even inside 72h");
-  when((c) => (c.table === "match_history" ? { data: { ...base, expires_at: future }, error: null } : { data: [{ blocker_id: OTHER }], error: null }));
+  when((c) => {
+    if (c.table === "match_history") return { data: { ...base, expires_at: future }, error: null };
+    if (c.table === "profiles") return { data: [{ id: UID, is_active: true }, { id: OTHER, is_active: true }], error: null };
+    if (c.table === "blocks") return { data: [{ blocker_id: OTHER }], error: null };
+    return { data: [], error: null };
+  });
   g = await assertLiveMatch(MATCH, UID); assert.equal(g.code, "blocked");
 });
 
