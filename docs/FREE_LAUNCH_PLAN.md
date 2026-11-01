@@ -29,8 +29,9 @@ NIVORA will be prepared as a free-to-use Kerala matchmaking MVP. No paid match c
 - Use a private Supabase Storage bucket.
 - Authorize upload/download only for the two members of an active, unexpired match.
 - Validate audio MIME type, file signature where practical, duration, and byte size; rate-limit uploads.
-- Store metadata in a dedicated table; use short-lived signed URLs.
-- Delete orphaned media and define retention/deletion behavior.
+- Store voice metadata on the chat message row and use short-lived signed URLs.
+- The feature branch now adds a private bucket, 2 MB upload cap, per-user upload rate limit, match-membership checks, and chat UI recording/playback. Client-side recording stops at 60 seconds; the submitted duration value is not independently verified by the server yet.
+- Add orphan cleanup and retention/deletion behavior before public launch.
 - Do not expose storage object paths or permanent public URLs.
 
 ### Remove from launch scope
@@ -58,7 +59,7 @@ NIVORA will be prepared as a free-to-use Kerala matchmaking MVP. No paid match c
 
 1. Reconcile product rules and database state (especially proposal vs active chat timing).
 2. [Feature branch implementation added] Enforce five successful recommendations per member per Asia/Kolkata day in the database, with per-member transaction locking, RLS on the quota table, no-repeat rules, and a visible quota counter. It remains sequential (one live match at a time); multiple simultaneous chats require a separate schema and portal redesign. Apply and verify the migration in a non-production Supabase branch before any production rollout.
-3. Add private voice-message storage, metadata, authorization, limits, retention, and chat UI.
+3. [Feature branch implementation added; not yet applied to Supabase] Add private voice-message storage, message metadata, match authorization, upload rate/size limits, signed URLs, and chat recording/playback UI. Verify MIME handling, real media duration limits, retention/deletion, and two-account access before launch.
 4. Remove call signalling/WebRTC from public member experience and disable public call API routes.
 5. Implement safe auto-approval only for low-risk profiles; retain human review for flags and all photo risk cases.
 6. Remove payment/paid-credit requirements from the free launch path without deleting payment history or secrets.
