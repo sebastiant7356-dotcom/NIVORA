@@ -63,7 +63,7 @@ router.post("/", writeLimit, async (req, res) => {
   const row = {
     ...parsed.value,
     id: req.user.id,                 // always the verified token's user id
-    approval_status: "pending",      // never client-controlled
+    approval_status: "approved",     // server-controlled: customer profiles activate automatically
     consent_terms_at: now,
     consent_privacy_at: now,
     consent_version: config.policyVersion
@@ -75,7 +75,7 @@ router.post("/", writeLimit, async (req, res) => {
   }
   await storeAiReview(req.user.id, data).catch(() => {});
   await audit(req.user.id, "profile_created", "profile", req.user.id);
-  res.status(201).json({ success: true, message: "Profile saved. It is awaiting staff approval.", profile: present(data) });
+  res.status(201).json({ success: true, message: "Profile saved and activated.", profile: present(data) });
 });
 
 router.put("/", writeLimit, async (req, res) => {
@@ -90,18 +90,21 @@ router.put("/", writeLimit, async (req, res) => {
     return res.status(403).json({ success: false, message: "This profile was rejected and cannot be edited. Please contact support." });
   }
 
-  const updates = { ...parsed.value };
-  const resubmit = needsReview(updates) && ["approved", "changes_requested"].includes(current.approval_status);
-  if (current.approval_status === "changes_requested") updates.approval_status = "pending";
-  if (resubmit) { updates.approval_status = "pending"; updates.reviewed_by = null; updates.reviewed_at = null; }
+  const updates = {
+    ...parsed.value,
+    approval_status: "approved",
+    reviewed_by: null,
+    reviewed_at: null,
+    review_reason: null
+  };
 
   const { data, error } = await db.from("profiles").update(updates).eq("id", req.user.id).select(OWN_COLUMNS).maybeSingle();
   if (error || !data) return res.status(500).json({ success: false, message: "Profile update failed." });
-  if (updates.approval_status === "pending") await storeAiReview(req.user.id, data).catch(() => {});
+  await storeAiReview(req.user.id, data).catch(() => {});
   await audit(req.user.id, "profile_updated", "profile", req.user.id, { fields: Object.keys(parsed.value) });
   res.json({
     success: true,
-    message: updates.approval_status === "pending" ? "Profile updated and sent for staff review." : "Profile updated.",
+    message: "Profile updated and remains active.",
     profile: present(data)
   });
 });
