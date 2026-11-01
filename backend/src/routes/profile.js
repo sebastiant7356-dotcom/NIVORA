@@ -92,7 +92,6 @@ router.put("/", writeLimit, async (req, res) => {
 
   const { data, error } = await db.from("profiles").update(updates).eq("id", req.user.id).select(OWN_COLUMNS).maybeSingle();
   if (error || !data) return res.status(500).json({ success: false, message: "Profile update failed." });
-  await storeAiReview(req.user.id, data).catch(() => {});
   await audit(req.user.id, "profile_updated", "profile", req.user.id, { fields: Object.keys(parsed.value) });
   res.json({
     success: true,
