@@ -96,7 +96,7 @@ async function matchView(match, userId) {
     expires_at: match.expires_at,
     ended_reason: match.ended_reason,
     chat_open: live && match.expires_at && new Date(match.expires_at) > new Date(),
-    can_call: match.status === "active" && match.expires_at && new Date(match.expires_at) > new Date(),
+    can_call: false, // Live calls are excluded from the free public launch.
     seconds_left: live && match.expires_at
       ? Math.max(0, Math.floor((new Date(match.expires_at) - Date.now()) / 1000)) : null
   };
