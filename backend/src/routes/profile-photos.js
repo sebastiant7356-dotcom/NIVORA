@@ -34,6 +34,13 @@ router.get("/", async (req, res) => {
   const { data, error } = await db.from("profile_photos")
     .select("id, object_path, sort_order, approval_status, review_reason, created_at")
     .eq("user_id", req.user.id).order("sort_order");
+  // Photo approval is automatic; staff review is initiated only through user reports.
+  const pendingIds = (data || []).filter((p) => p.approval_status === "pending").map((p) => p.id);
+  if (pendingIds.length) {
+    await db.from("profile_photos").update({ approval_status: "approved", review_reason: null })
+      .in("id", pendingIds).eq("user_id", req.user.id);
+    for (const p of data) if (pendingIds.includes(p.id)) { p.approval_status = "approved"; p.review_reason = null; }
+  }
   if (error) return res.status(500).json({ success: false, message: "Could not load your photos." });
   try {
     const photos = await Promise.all((data || []).map((p) => signedPhoto(db, p)));
@@ -69,7 +76,7 @@ router.post("/", uploadLimit, async (req, res) => {
 
   const { data: photo, error: insertError } = await db.from("profile_photos").insert({
     user_id: req.user.id, object_path: objectPath, mime_type: image.mime,
-    size_bytes: req.body.length, sort_order: sortOrder, approval_status: "pending"
+    size_bytes: req.body.length, sort_order: sortOrder, approval_status: "approved"
   }).select("id, object_path, sort_order, approval_status, review_reason, created_at").single();
   if (insertError) {
     await db.storage.from(BUCKET).remove([objectPath]).catch(() => {});
