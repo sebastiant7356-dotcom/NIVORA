@@ -41,7 +41,7 @@ function createApp() {
   app.use("/api/profile", require("./routes/profile"));
   app.use("/api/match", require("./routes/match"));
   app.use("/api/chat", require("./routes/chat"));
-  app.use("/api/call", require("./routes/call"));
+  // Live voice/video call API is intentionally not mounted for the free launch.
   app.use("/api/safety", require("./routes/safety"));
   app.use("/api/feedback", require("./routes/feedback"));
   app.use("/api/payments", payments.router);
