@@ -13,7 +13,7 @@ const limit = createLimiter({ windowMs: 60 * 60_000, max: 5, keyFn: byUser });
 // Personal-data export (copy of what we hold about the signed-in user).
 router.get("/export", limit, async (req, res) => {
   const db = serviceClient(); const id = req.user.id;
-  const [profile, matches, feedback, sent, payments] = await Promise.all([
+  const [profile, matches, feedback, sent, payments, photos] = await Promise.all([
     db.from("profiles").select("*").eq("id", id).maybeSingle(),
     db.from("match_history").select("id, status, started_at, expires_at, created_at, ended_reason").or(`user_one.eq.${id},user_two.eq.${id}`),
     db.from("match_feedback").select("match_id, wants_to_continue, feedback_text, created_at").eq("reviewer_id", id),
@@ -23,7 +23,7 @@ router.get("/export", limit, async (req, res) => {
   if (profile.data) { delete profile.data.ai_flags; delete profile.data.ai_risk_score; }
   await audit(id, "data_export", "account", id);
   res.json({ success: true, exported_at: new Date().toISOString(), profile: profile.data, matches: matches.data || [],
-             feedback: feedback.data || [], messages_sent: sent.data || [], payments: payments.data || [] });
+             feedback: feedback.data || [], messages_sent: sent.data || [], payments: payments.data || [], photos: photos.data || [] });
 });
 
 // Irreversible deletion. Requires an explicit confirmation word.
@@ -34,6 +34,14 @@ router.delete("/", limit, async (req, res) => {
   const db = serviceClient(); const id = req.user.id;
   try {
     await endLiveMatchesFor(id, "account_deleted", id);
+    // Storage objects do not cascade with the profile_photos metadata row.
+    const { data: photoRows, error: photoLookupError } = await db.from("profile_photos").select("object_path").eq("user_id", id);
+    if (photoLookupError) throw photoLookupError;
+    const paths = (photoRows || []).map((p) => p.object_path);
+    if (paths.length) {
+      const { error: photoDeleteError } = await db.storage.from("profile-photos").remove(paths);
+      if (photoDeleteError) throw photoDeleteError;
+    }
     // Deleting matches cascades to messages, call signals and feedback for those matches.
     await db.from("match_history").delete().or(`user_one.eq.${id},user_two.eq.${id}`);
     await db.from("match_feedback").delete().eq("reviewer_id", id);
