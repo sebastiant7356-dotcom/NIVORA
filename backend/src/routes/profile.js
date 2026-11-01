@@ -5,7 +5,6 @@ const { serviceClient } = require("../lib/clients");
 const { requireAuth } = require("../middleware");
 const { createLimiter, byUser } = require("../lib/ratelimit");
 const { parseProfileInput } = require("../lib/validation");
-const { reviewProfile } = require("../lib/moderation-ai");
 const { audit } = require("../lib/audit");
 
 const router = express.Router();
@@ -27,12 +26,6 @@ function present(p) {
   return { ...rest, suspended: Boolean(suspended_at), profile_complete: isComplete(p) };
 }
 
-async function storeAiReview(id, profile) {
-  const r = await reviewProfile(profile);
-  await serviceClient().from("profiles").update({
-    ai_risk_score: r.score, ai_flags: r.flags, ai_checked_at: new Date().toISOString(), ai_source: r.source
-  }).eq("id", id);
-}
 
 router.get("/", async (req, res) => {
   const { data, error } = await serviceClient().from("profiles").select(OWN_COLUMNS).eq("id", req.user.id).maybeSingle();
@@ -73,7 +66,6 @@ router.post("/", writeLimit, async (req, res) => {
     if (error.code === "23505") return res.status(409).json({ success: false, code: "profile_exists", message: "A profile already exists for this account." });
     return res.status(500).json({ success: false, message: "Profile could not be saved." });
   }
-  await storeAiReview(req.user.id, data).catch(() => {});
   await audit(req.user.id, "profile_created", "profile", req.user.id);
   res.status(201).json({ success: true, message: "Profile saved and activated.", profile: present(data) });
 });
