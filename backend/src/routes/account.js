@@ -13,18 +13,19 @@ const limit = createLimiter({ windowMs: 60 * 60_000, max: 5, keyFn: byUser });
 // Personal-data export (copy of what we hold about the signed-in user).
 router.get("/export", limit, async (req, res) => {
   const db = serviceClient(); const id = req.user.id;
-  const [profile, matches, feedback, sent, payments, photos] = await Promise.all([
+  const [profile, matches, feedback, sent, payments, photos, voiceSent] = await Promise.all([
     db.from("profiles").select("*").eq("id", id).maybeSingle(),
     db.from("match_history").select("id, status, started_at, expires_at, created_at, ended_reason").or(`user_one.eq.${id},user_two.eq.${id}`),
     db.from("match_feedback").select("match_id, wants_to_continue, feedback_text, created_at").eq("reviewer_id", id),
     db.from("messages").select("match_id, body, created_at").eq("sender_id", id),
     db.from("payments").select("status, amount_paise, currency, created_at, paid_at").eq("user_id", id),
-    db.from("profile_photos").select("approval_status, mime_type, size_bytes, sort_order, created_at").eq("user_id", id)
+    db.from("profile_photos").select("approval_status, mime_type, size_bytes, sort_order, created_at").eq("user_id", id),
+    db.from("voice_messages").select("match_id, mime_type, size_bytes, duration_seconds, created_at").eq("sender_id", id)
   ]);
   if (profile.data) { delete profile.data.ai_flags; delete profile.data.ai_risk_score; }
   await audit(id, "data_export", "account", id);
   res.json({ success: true, exported_at: new Date().toISOString(), profile: profile.data, matches: matches.data || [],
-             feedback: feedback.data || [], messages_sent: sent.data || [], payments: payments.data || [], photos: photos.data || [] });
+             feedback: feedback.data || [], messages_sent: sent.data || [], payments: payments.data || [], photos: photos.data || [], voice_messages_sent: voiceSent.data || [] });
 });
 
 // Irreversible deletion. Requires an explicit confirmation word.
