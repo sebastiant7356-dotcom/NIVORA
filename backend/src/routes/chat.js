@@ -125,3 +125,4 @@ router.post("/:matchId/voice", voiceLimit, async (req, res) => {
 });
 
 module.exports = router;
+module.exports.validAudio = validAudio;
