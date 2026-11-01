@@ -3,7 +3,7 @@
   "use strict";
   const { api, client, session, authPanel, esc } = window.NV;
   const $ = (s) => document.querySelector(s);
-  let tab = "pending", role = null;
+  let tab = "reports", role = null;
   const TABS = [["reports", "Open reports"], ["history", "Moderation history"], ["audit", "Audit log"]];
   const msg = (t, ok) => { const m = $("#msg"); m.textContent = t || ""; m.className = "nv-msg" + (ok ? " ok" : ""); };
   const fmt = (i) => (i ? new Date(i).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "—");
