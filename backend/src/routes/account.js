@@ -35,16 +35,30 @@ router.delete("/", limit, async (req, res) => {
   const db = serviceClient(); const id = req.user.id;
   try {
     await endLiveMatchesFor(id, "account_deleted", id);
-    // Storage objects do not cascade with the profile_photos metadata row.
+    // Storage objects do not cascade with database rows.
     const { data: photoRows, error: photoLookupError } = await db.from("profile_photos").select("object_path").eq("user_id", id);
     if (photoLookupError) throw photoLookupError;
-    const paths = (photoRows || []).map((p) => p.object_path);
-    if (paths.length) {
-      const { error: photoDeleteError } = await db.storage.from("profile-photos").remove(paths);
+    const photoPaths = (photoRows || []).map((p) => p.object_path);
+    if (photoPaths.length) {
+      const { error: photoDeleteError } = await db.storage.from("profile-photos").remove(photoPaths);
       if (photoDeleteError) throw photoDeleteError;
     }
-    // Deleting matches cascades to messages, call signals and feedback for those matches.
-    await db.from("match_history").delete().or(`user_one.eq.${id},user_two.eq.${id}`);
+    // Voice files are private Storage objects; remove them before their match rows cascade.
+    const { data: userMatches, error: matchLookupError } = await db.from("match_history").select("id").or(`user_one.eq.${id},user_two.eq.${id}`);
+    if (matchLookupError) throw matchLookupError;
+    const matchIds = (userMatches || []).map((m) => m.id);
+    if (matchIds.length) {
+      const { data: voiceRows, error: voiceLookupError } = await db.from("voice_messages").select("object_path").in("match_id", matchIds);
+      if (voiceLookupError) throw voiceLookupError;
+      const voicePaths = (voiceRows || []).map((v) => v.object_path);
+      if (voicePaths.length) {
+        const { error: voiceDeleteError } = await db.storage.from("voice-messages").remove(voicePaths);
+        if (voiceDeleteError) throw voiceDeleteError;
+      }
+      // Deleting matches cascades to text/voice messages, call signals and feedback.
+      const { error: matchDeleteError } = await db.from("match_history").delete().in("id", matchIds);
+      if (matchDeleteError) throw matchDeleteError;
+    }
     await db.from("match_feedback").delete().eq("reviewer_id", id);
     await db.from("match_members").delete().eq("user_id", id);
     // Payment records are kept for accounting but detached from the person.
