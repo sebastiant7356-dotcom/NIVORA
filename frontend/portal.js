@@ -84,7 +84,7 @@
   // ---------- state ----------
   let me = null, profile = null, match = null, matches = [], selectedMatchId = null, dailyQuota = { daily_used: 0, daily_limit: 5 }, history = [], photos = [], isStaff = false;
   let tickTimer = null, chatChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
-  let voiceRecorder = null, voiceStream = null, voiceChunks = [], voiceMime = "", voiceStartedAt = 0, voiceLimitTimer = null, voiceDiscard = false, voiceSeen = new Set(), lastVoiceTs = null;
+  let voiceRecorder = null, voiceStream = null, voiceChunks = [], voiceMime = "", voiceStartedAt = 0, voiceLimitTimer = null, voiceDisplayTimer = null, voiceDiscard = false, voiceSeen = new Set(), lastVoiceTs = null;
   const val = (k) => (k in (profile || {}) ? profile[k] : "");
 
   async function loadAll() {
@@ -410,7 +410,7 @@
       voiceChunks = []; voiceDiscard = false; voiceStartedAt = Date.now();
       voiceRecorder.ondataavailable = (event) => { if (event.data && event.data.size) voiceChunks.push(event.data); };
       voiceRecorder.onstop = async () => {
-        clearTimeout(voiceLimitTimer);
+        clearTimeout(voiceLimitTimer); clearInterval(voiceDisplayTimer); voiceDisplayTimer = null;
         const blob = new Blob(voiceChunks, { type: voiceMime });
         const duration = Math.min(60, Math.max(1, Math.ceil((Date.now() - voiceStartedAt) / 1000)));
         voiceChunks = [];
@@ -422,7 +422,11 @@
       };
       voiceRecorder.start(250);
       if (button) button.textContent = p("voiceStop");
-      voiceStatus("00:00 / 01:00");
+      voiceStatus(L() === "ml" ? "റെക്കോർഡിംഗ്… 00:00 / 01:00" : "Recording… 00:00 / 01:00");
+      voiceDisplayTimer = setInterval(() => {
+        const seconds = Math.min(60, Math.floor((Date.now() - voiceStartedAt) / 1000));
+        voiceStatus((L() === "ml" ? "റെക്കോർഡിംഗ്… " : "Recording… ") + "00:" + String(seconds).padStart(2, "0") + " / 01:00");
+      }, 1000);
       voiceLimitTimer = setTimeout(() => { if (voiceRecorder?.state === "recording") voiceRecorder.stop(); }, 60_000);
     } catch (e) {
       if (voiceStream) voiceStream.getTracks().forEach((track) => track.stop());
@@ -433,7 +437,7 @@
   }
 
   function stopVoiceRecording(discard) {
-    clearTimeout(voiceLimitTimer);
+    clearTimeout(voiceLimitTimer); clearInterval(voiceDisplayTimer); voiceDisplayTimer = null;
     if (discard) voiceDiscard = true;
     if (voiceRecorder && voiceRecorder.state === "recording") voiceRecorder.stop();
     else {
