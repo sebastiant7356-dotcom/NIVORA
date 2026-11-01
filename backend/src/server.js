@@ -4,11 +4,6 @@ const config = require("./config");
 const mw = require("./middleware");
 const { createLimiter } = require("./lib/ratelimit");
 
-// DIAGNOSTIC (safe to keep briefly, remove once resolved): proves which Postgres role each
-// configured Supabase key actually carries, without ever printing the key itself.
-console.log(`[DIAG] SUPABASE_SERVICE_ROLE_KEY decodes to role: "${config.serviceKeyRoleClaim}" (expected "service_role")`);
-console.log(`[DIAG] SUPABASE_PUBLISHABLE_KEY decodes to role: "${config.anonKeyRoleClaim}" (expected "anon")`);
-
 function createApp() {
   const app = express();
   app.disable("x-powered-by");
@@ -17,10 +12,6 @@ function createApp() {
   app.use(mw.requestLogger);
   app.use(mw.securityHeaders);
   app.use(mw.corsMiddleware());
-
-  // Webhook needs the RAW body for signature verification, so it is mounted before express.json().
-  const payments = require("./routes/payments");
-  app.post("/api/payments/webhook", express.raw({ type: "*/*", limit: "100kb" }), payments.webhookHandler);
 
   app.use("/api", createLimiter({ windowMs: 15 * 60_000, max: 600 }));
 
@@ -35,7 +26,6 @@ function createApp() {
   // Public, non-secret runtime settings for the frontend.
   app.get("/api/config", (req, res) => res.json({
     success: true,
-    payment: { enabled: config.payment.enabled, required: config.payment.required, amount_paise: config.payment.amountPaise },
     policy_version: config.policyVersion
   }));
 
@@ -44,7 +34,6 @@ function createApp() {
   app.use("/api/chat", require("./routes/chat"));
   app.use("/api/safety", require("./routes/safety"));
   app.use("/api/feedback", require("./routes/feedback"));
-  app.use("/api/payments", payments.router);
   app.use("/api/account", require("./routes/account"));
   app.use("/api/admin", require("./routes/admin"));
 
@@ -62,7 +51,6 @@ if (require.main === module) {
   }
   createApp().listen(config.port, "0.0.0.0", () => {
     console.log(`NIVORA backend running on port ${config.port} (${config.isProd ? "production" : "development"})`);
-    if (!config.payment.enabled) console.log("Payments: disabled (Razorpay keys not set)");
   });
 }
 
