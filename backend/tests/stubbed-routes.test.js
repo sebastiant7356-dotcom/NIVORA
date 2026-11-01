@@ -35,16 +35,16 @@ test("every module loads and the app wires all routers", () => {
   assert.ok(createApp());
 });
 
-test("admin cannot approve their own profile", async () => {
+test("routine profile moderation is disabled in favour of report-only review", async () => {
   when(() => { throw new Error("DB must not be touched"); });
   const router = require("../src/routes/admin");
   const r = await call(router, "POST", "/profiles/:id/decision", { params: { id: UID }, body: { decision: "approved" } });
-  assert.equal(r.code, 403);
+  assert.equal(r.code, 410);
 });
-test("decision requires valid value and a reason for reject", async () => {
+test("legacy profile decision endpoint is disabled", async () => {
   const router = require("../src/routes/admin");
-  assert.equal((await call(router, "POST", "/profiles/:id/decision", { params: { id: OTHER }, body: { decision: "hacked" } })).code, 400);
-  assert.equal((await call(router, "POST", "/profiles/:id/decision", { params: { id: OTHER }, body: { decision: "rejected", reason: "no" } })).code, 400);
+  assert.equal((await call(router, "POST", "/profiles/:id/decision", { params: { id: OTHER }, body: { decision: "hacked" } })).code, 410);
+  assert.equal((await call(router, "POST", "/profiles/:id/decision", { params: { id: OTHER }, body: { decision: "rejected", reason: "no" } })).code, 410);
 });
 test("requireStaff blocks non-staff and allows listed roles", async () => {
   const { requireStaff } = require("../src/middleware");
@@ -122,13 +122,13 @@ test("profile: duplicate create -> 409; rejected profiles cannot edit; approved 
   const body = { full_name: "Ananya Nair", age: 26, district: "Kochi", gender: "woman", looking_for: "man", relationship_intention: "marriage", core_values: ["family"], consents: { terms: true, privacy: true } };
   when((c) => (c.table === "profiles" ? { data: { id: UID }, error: null } : { data: null, error: null }));
   assert.equal((await call(router, "POST", "/", { body })).code, 409);
-  when(() => ({ data: { approval_status: "rejected" }, error: null }));
+  when((c) => (c.table === "staff_roles" ? { data: null, error: null } : { data: { approval_status: "rejected" }, error: null }));
   assert.equal((await call(router, "PUT", "/", { body: { bio: "new bio text here" } })).code, 403);
   let update;
   when((c) => {
     const u = c.table === "profiles" ? c.ops.find((o) => o[0] === "update") : null;
     if (u && !update) { update = u[1]; return { data: { id: UID, approval_status: "approved" }, error: null }; }
-    return { data: { approval_status: "approved" }, error: null };
+    return c.table === "staff_roles" ? { data: null, error: null } : { data: { approval_status: "approved" }, error: null };
   });
   const r = await call(router, "PUT", "/", { body: { bio: "a changed biography text", approval_status: "approved" } });
   assert.equal(r.code, 200); assert.equal(update.approval_status, "approved", "client-sent status ignored; profile remains auto-approved");
@@ -174,4 +174,49 @@ test("payments: duplicate webhook event is acknowledged without reprocessing", a
   const bad = res();
   await webhookHandler({ body: Buffer.from(raw), headers: { "x-razorpay-signature": "bad", "x-razorpay-event-id": "evt_2" } }, bad);
   assert.equal(bad.code, 400);
+});
+
+
+
+test("staff accounts cannot create customer profiles", async () => {
+  when((c) => {
+    if (c.table === "staff_roles") return { data: { user_id: UID, role: "admin" }, error: null };
+    throw new Error("customer profile query must not run for staff");
+  });
+  const r = await call(require("../src/routes/profile"), "POST", "/", {
+    body: { full_name: "Staff Member", age: 30, district: "Kochi", gender: "woman",
+      looking_for: "man", relationship_intention: "marriage", core_values: ["family"],
+      consents: { terms: true, privacy: true } }
+  });
+  assert.equal(r.code, 403);
+});
+
+test("report endpoint records a report against the matched partner", async () => {
+  let reportRow;
+  when((c) => {
+    if (c.table === "match_history") return { data: { id: MATCH, user_one: UID, user_two: OTHER, status: "active" }, error: null };
+    if (c.table === "reports") { reportRow = c.ops.find((o) => o[0] === "insert")?.[1]; return { data: { id: "44444444-4444-4444-8444-444444444444" }, error: null }; }
+    return { data: null, error: null };
+  });
+  const r = await call(require("../src/routes/safety"), "POST", "/report", {
+    body: { match_id: MATCH, reason: "harassment", details: "Unwanted repeated messages" }
+  });
+  assert.equal(r.code, 201);
+  assert.equal(reportRow.reporter_id, UID);
+  assert.equal(reportRow.reported_id, OTHER);
+});
+
+test("block endpoint closes the match and records the block", async () => {
+  let blockRow, ended = false;
+  when((c) => {
+    if (c.table === "match_history") return { data: { id: MATCH, user_one: UID, user_two: OTHER, status: "active" }, error: null };
+    if (c.table === "blocks") { blockRow = c.ops.find((o) => o[0] === "upsert")?.[1]; return { data: null, error: null }; }
+    if (c.table === "rpc:nivora_end_match") { ended = true; return { data: null, error: null }; }
+    return { data: null, error: null };
+  });
+  const r = await call(require("../src/routes/safety"), "POST", "/block", { body: { match_id: MATCH } });
+  assert.equal(r.code, 200);
+  assert.equal(blockRow.blocker_id, UID);
+  assert.equal(blockRow.blocked_id, OTHER);
+  assert.equal(ended, true);
 });
