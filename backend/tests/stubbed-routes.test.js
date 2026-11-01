@@ -117,7 +117,7 @@ test("match response never contains phone, email or last name", async () => {
   assert.deepEqual(v.shared_values, ["family"]);
 });
 
-test("profile: duplicate create -> 409; rejected profiles cannot edit; approved edit goes back to pending", async () => {
+test("profile: duplicate create -> 409; rejected profiles cannot edit; approved edit remains approved", async () => {
   const router = require("../src/routes/profile");
   const body = { full_name: "Ananya Nair", age: 26, district: "Kochi", gender: "woman", looking_for: "man", relationship_intention: "marriage", core_values: ["family"], consents: { terms: true, privacy: true } };
   when((c) => (c.table === "profiles" ? { data: { id: UID }, error: null } : { data: null, error: null }));
@@ -127,13 +127,13 @@ test("profile: duplicate create -> 409; rejected profiles cannot edit; approved 
   let update;
   when((c) => {
     const u = c.table === "profiles" ? c.ops.find((o) => o[0] === "update") : null;
-    if (u && !update) { update = u[1]; return { data: { id: UID, approval_status: "pending" }, error: null }; }
+    if (u && !update) { update = u[1]; return { data: { id: UID, approval_status: "approved" }, error: null }; }
     return { data: { approval_status: "approved" }, error: null };
   });
   const r = await call(router, "PUT", "/", { body: { bio: "a changed biography text", approval_status: "approved" } });
-  assert.equal(r.code, 200); assert.equal(update.approval_status, "pending", "client-sent status ignored; re-review forced");
+  assert.equal(r.code, 200); assert.equal(update.approval_status, "approved", "client-sent status ignored; profile remains auto-approved");
 });
-test("profile create stores verified id, forced pending status and consent timestamps", async () => {
+test("profile create stores verified id, forced approved status and consent timestamps", async () => {
   const router = require("../src/routes/profile");
   let row;
   when((c) => {
@@ -143,7 +143,7 @@ test("profile create stores verified id, forced pending status and consent times
     return { data: null, error: null };
   });
   const r = await call(router, "POST", "/", { body: { full_name: "Ananya Nair", age: 26, district: "Kochi", gender: "woman", looking_for: "man", relationship_intention: "marriage", core_values: ["family"], consents: { terms: true, privacy: true }, id: OTHER, approval_status: "approved" } });
-  assert.equal(r.code, 201); assert.equal(row.id, UID); assert.equal(row.approval_status, "pending");
+  assert.equal(r.code, 201); assert.equal(row.id, UID); assert.equal(row.approval_status, "approved");
   assert.ok(row.consent_terms_at && row.consent_privacy_at && row.consent_version);
 });
 
