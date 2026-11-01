@@ -61,14 +61,14 @@ test("requireStaff blocks non-staff and allows listed roles", async () => {
   assert.equal(nexted, true);
 });
 
-test("requireAuth rejects missing token, email-only accounts and unconfirmed phones", async () => {
+test("requireAuth permits Google OAuth only and keeps only the immutable user id", async () => {
   const { requireAuth } = require("../src/middleware");
   let r = res(); await requireAuth({ headers: {} }, r, () => {}); assert.equal(r.code, 401);
-  globalThis.__fakeAuth = async () => ({ data: { user: { id: UID, email: "a@b.c" } }, error: null });
+  globalThis.__fakeAuth = async () => ({ data: { user: { id: UID, email: "a@b.c", app_metadata: { provider: "email" }, identities: [{ provider: "email" }] } }, error: null });
   r = res(); await requireAuth({ headers: { authorization: "Bearer x" } }, r, () => {}); assert.equal(r.code, 403);
-  globalThis.__fakeAuth = async () => ({ data: { user: { id: UID, phone: "919876543210" } }, error: null });
-  r = res(); await requireAuth({ headers: { authorization: "Bearer x" } }, r, () => {}); assert.equal(r.code, 403, "phone not confirmed");
-  globalThis.__fakeAuth = async () => ({ data: { user: { id: UID, phone: "919876543210", phone_confirmed_at: "2026-01-01" } }, error: null });
+  globalThis.__fakeAuth = async () => ({ data: { user: { id: UID, phone: "919876543210", app_metadata: { provider: "phone", providers: ["phone"] }, identities: [{ provider: "phone" }] } }, error: null });
+  r = res(); await requireAuth({ headers: { authorization: "Bearer x" } }, r, () => {}); assert.equal(r.code, 403);
+  globalThis.__fakeAuth = async () => ({ data: { user: { id: UID, email: "a@b.c", app_metadata: { provider: "google", providers: ["google"] }, identities: [{ provider: "google" }] } }, error: null });
   const req = { headers: { authorization: "Bearer x" } }; let ok = false;
   await requireAuth(req, res(), () => { ok = true; });
   assert.ok(ok); assert.deepEqual(req.user, { id: UID }, "only the immutable id is kept");
