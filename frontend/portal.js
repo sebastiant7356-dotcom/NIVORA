@@ -326,6 +326,7 @@
       } catch (e) { if (e.code === "match_not_live" || e.status === 403 || e.status === 404) closeChat(); }
     };
     await pull();
+    pollTimer = setInterval(pull, 5000);
     const send = async () => {
       const i = body.querySelector("#chatText"); const text = i.value.trim(); if (!text) return;
       i.value = ""; 
