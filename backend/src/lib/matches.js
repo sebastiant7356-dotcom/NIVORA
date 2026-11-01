@@ -121,9 +121,11 @@ async function matchView(match, userId) {
 
 async function endLiveMatchesFor(userId, reason, actorId) {
   const db = serviceClient();
-  const { data } = await db.from("match_members").select("match_id").eq("user_id", userId);
+  const { data, error } = await db.from("match_members").select("match_id").eq("user_id", userId);
+  if (error) throw error;
   for (const row of data || []) {
-    await db.rpc("nivora_end_match", { p_user: userId, p_match: row.match_id, p_reason: reason });
+    const { error: endError } = await db.rpc("nivora_end_match", { p_user: userId, p_match: row.match_id, p_reason: reason });
+    if (endError) throw endError;
   }
   return (data || []).length;
 }
