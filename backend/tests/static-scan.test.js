@@ -51,3 +51,14 @@ test("SQL: RLS enabled and matching functions not callable by browser roles", ()
   assert.ok(/revoke all on function public\.nivora_find_partner\(uuid, boolean\)\s+from public, anon, authenticated/.test(sql));
   assert.ok(!/grant (insert|update|delete)[^;]*to (anon|authenticated)/i.test(sql));
 });
+
+test("daily match quota is enforced in the database using Kerala local dates", () => {
+  const sql = text(path.join(ROOT, "backend", "migrations", "20261101190000_daily_five_matches.sql"));
+  assert.ok(sql.includes("match_daily_usage"));
+  assert.ok(sql.includes("Asia/Kolkata"));
+  assert.ok(sql.includes("used_today >= 5"));
+  assert.ok(sql.includes("daily_match_limit_reached"));
+  assert.ok(sql.includes("enable row level security"));
+  assert.ok(/revoke all on public\.match_daily_usage from anon, authenticated/i.test(sql));
+  assert.ok(/grant execute on function public\.nivora_find_partner\(uuid, boolean\) to service_role/i.test(sql));
+});
