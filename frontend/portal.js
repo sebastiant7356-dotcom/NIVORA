@@ -80,7 +80,7 @@
   function close() { try { if (activeRecorder && activeRecorder.state !== "inactive") activeRecorder.stop(); } catch (_) {} if (activeVoiceStream) activeVoiceStream.getTracks().forEach((t) => t.stop()); activeRecorder = null; activeVoiceStream = null; stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
-  let me = null, profile = null, match = null, matches = [], payInfo = null, history = [], photos = [], isStaff = false, dailyQuota = { daily_used: 0, daily_limit: 5 };
+  let me = null, profile = null, match = null, matches = [], selectedMatchId = null, payInfo = null, history = [], photos = [], isStaff = false, dailyQuota = { daily_used: 0, daily_limit: 5 };
   let tickTimer = null, chatChannel = null, signalChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
   let activeRecorder = null, activeVoiceStream = null;
   let pc = null, localStream = null, pendingIce = [], incomingOffer = null, callState = "idle";
@@ -92,7 +92,7 @@
       api("/api/profile"), api("/api/match/current").catch(() => ({ match: null })),
       api("/api/payments/status").catch(() => null), api("/api/match/history").catch(() => ({ history: [] }))
     ]);
-    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === match?.id) || matches[0] || null; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; payInfo = pay; history = h.history || [];
+    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; payInfo = pay; history = h.history || [];
     photos = profile ? ((await api("/api/profile/photos").catch(() => ({ photos: [] }))).photos || []) : [];
     isStaff = await api("/api/admin/me").then(() => true).catch(() => false);
   }
@@ -319,7 +319,7 @@
       button.onclick = () => {
         const next = matches.find((item) => item.id === button.dataset.matchId);
         if (!next || next.id === match?.id) return;
-        closeChat(); stopRealtime(); match = next; render();
+        closeChat(); stopRealtime(); match = next; selectedMatchId = next.id; render();
       };
     });
     const findButton = box.querySelector("#mFind");
@@ -331,7 +331,7 @@
           const message = box.querySelector("#mMsg"); if (message) message.textContent = r.message || p("noMatchNow");
           ev.target.disabled = !canFind; ev.target.textContent = p("findMatch"); return;
         }
-        await loadAll(); render();
+        selectedMatchId = r.match?.id || selectedMatchId; await loadAll(); render();
       } catch (e) {
         const message = box.querySelector("#mMsg"); if (message) message.textContent = e.message;
         ev.target.disabled = !canFind; ev.target.textContent = p("findMatch");
