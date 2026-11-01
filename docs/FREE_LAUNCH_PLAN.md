@@ -49,7 +49,7 @@ NIVORA will be prepared as a free-to-use Kerala matchmaking MVP. No paid match c
 - Existing profile creation defaults to `approval_status = pending`; staff review currently gates matching.
 - Existing profile-photo uploads default to `approval_status = pending`.
 - Existing AI profile moderation is explicitly advisory and does not approve profiles automatically.
-- Existing matching RPC created one proposed match at a time, enforced one live match per member, and excluded previously paired member pairs. The feature branch now adds a database-enforced quota of five successful recommendations per member per Asia/Kolkata calendar day. Recommendations are sequential: a member must finish, decline, or expire the current proposal/conversation before requesting another. This does not yet support five simultaneous chats.
+- Existing matching RPC created one proposed match at a time and enforced one live match per member. The feature branch now adds a database-enforced quota of five successful recommendations per member per Asia/Kolkata calendar day, plus a composite (user_id, match_id) membership key so members can hold multiple live conversations. The portal now returns and displays a switchable inbox of current conversations. This is implemented in migrations/code but not yet applied to Supabase or verified with two real accounts.
 - The deployed matching RPC currently sets the proposal response deadline to 48 hours. The desired product decision mentions the existing 72-hour conversation window; proposal and active-chat timing must be reconciled before implementation.
 - Existing chat messages are text-only in the `messages` table.
 - Existing frontend still contains old payment and voice-call UI copy.
@@ -58,13 +58,13 @@ NIVORA will be prepared as a free-to-use Kerala matchmaking MVP. No paid match c
 ## Implementation sequence
 
 1. Reconcile product rules and database state (especially proposal vs active chat timing).
-2. [Feature branch implementation added] Enforce five successful recommendations per member per Asia/Kolkata day in the database, with per-member transaction locking, RLS on the quota table, no-repeat rules, and a visible quota counter. It remains sequential (one live match at a time); multiple simultaneous chats require a separate schema and portal redesign. Apply and verify the migration in a non-production Supabase branch before any production rollout.
+2. [Feature branch implementation added] Enforce five successful recommendations per member per Asia/Kolkata day and allow multiple concurrent matches using a composite membership key, transactional candidate row locking, no-repeat rules, and a switchable inbox. Apply and verify both migrations in a non-production Supabase environment before any production rollout.
 3. [Feature branch implementation added; not yet applied to Supabase] Add private voice-message storage, message metadata, match authorization, upload rate/size limits, signed URLs, and chat recording/playback UI. Verify MIME handling, real media duration limits, retention/deletion, and two-account access before launch.
 4. Remove call signalling/WebRTC from public member experience and disable public call API routes.
 5. Implement safe auto-approval only for low-risk profiles; retain human review for flags and all photo risk cases.
 6. Remove payment/paid-credit requirements from the free launch path without deleting payment history or secrets.
 7. Update Malayalam/English product copy, privacy/terms/consent, README, and launch instructions.
-8. Add tests for quota boundaries, timezone, duplicate prevention, concurrency, media authorization, file limits, report/block interactions, and disabled calls.
+8. Add/maintain static regression checks for quota and multi-chat schema/UI; still add live database concurrency tests, media authorization/file-signature tests, report/block interactions, and disabled-call integration tests.
 9. Run syntax/tests, inspect Supabase security/performance advisors, then prepare a reviewed pull request. Production database changes and deployment remain separate explicit steps.
 
 ## Non-goals / safeguards
