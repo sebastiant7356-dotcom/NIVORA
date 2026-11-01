@@ -16,7 +16,7 @@
       dailyMatchesUsed: "Daily matches used", activeConversations: "Active conversations", dailyLimitReached: "You have used all five recommendations for today.", chatTab: "Chat",
       needApproval: "Save your profile details to activate matching.", payNeeded: "A paid ₹50 credit is needed to get a match.",
       accept: "Accept", decline: "Decline", continueMatch: "Continue", stopMatch: "Stop", waitingPartner: "You chose Continue. Waiting for the other person.", waitingYou: "Choose Continue or Stop to proceed.",
-      proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and calls will close.",
+      proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and voice messages will close.",
       timeLeft: "Chat window left", closed: "Closed", chat: "Chat", typeMsg: "Write a message…", send: "Send", live: "Live", reconnecting: "Reconnecting…",
       chatClosed: "This conversation is closed (match ended or 72 hours are over).", voiceRecord: "Record voice message", voiceStop: "Stop recording", voiceUploading: "Uploading voice message…", voiceSent: "Voice message sent.", voiceError: "Voice message could not be sent.", voiceUnsupported: "Voice recording is not supported in this browser.", call: "Voice call", hangup: "End call", incoming: "Incoming voice call", answer: "Answer",
       calling: "Calling…", inCall: "In call", noMic: "Microphone is unavailable or permission was denied.", noWebrtc: "Voice calls need HTTPS (or localhost) and a modern browser.",
@@ -44,7 +44,7 @@
       dailyMatchesUsed: "ഇന്ന് ലഭിച്ച matches", activeConversations: "സജീവ സംഭാഷണങ്ങൾ", dailyLimitReached: "ഇന്നത്തെ അഞ്ച് matching-ഉം ഉപയോഗിച്ചു.", chatTab: "Chat",
       needApproval: "Matching തുടങ്ങാൻ profile details save ചെയ്യുക.", payNeeded: "Match ലഭിക്കാൻ ₹50 credit ആവശ്യമാണ്.",
       accept: "സ്വീകരിക്കുക", decline: "നിരസിക്കുക", continueMatch: "തുടരാം", stopMatch: "നിർത്താം", waitingPartner: "നിങ്ങൾ Continue തിരഞ്ഞെടുത്തു. മറ്റേയാളുടെ തീരുമാനം കാത്തിരിക്കുന്നു.", waitingYou: "തുടരാൻ Continue അല്ലെങ്കിൽ Stop തിരഞ്ഞെടുക്കുക.",
-      proposalEnds: "ഇതിനുമുമ്പ് മറുപടി നൽകുക", endMatch: "Match അവസാനിപ്പിക്കുക", endConfirm: "ഈ match അവസാനിപ്പിക്കണോ? Chat, call അടയും.",
+      proposalEnds: "ഇതിനുമുമ്പ് മറുപടി നൽകുക", endMatch: "Match അവസാനിപ്പിക്കുക", endConfirm: "ഈ match അവസാനിപ്പിക്കണോ? Chat, voice messages അടയും.",
       timeLeft: "Chat സമയം ബാക്കി", closed: "അടച്ചു", chat: "Chat", typeMsg: "സന്ദേശം എഴുതുക…", send: "അയയ്ക്കുക", live: "ലൈവ്", reconnecting: "വീണ്ടും ബന്ധിപ്പിക്കുന്നു…",
       chatClosed: "ഈ സംഭാഷണം അടച്ചു (match അവസാനിച്ചു / 72 മണിക്കൂർ കഴിഞ്ഞു).", voiceRecord: "Voice message റെക്കോർഡ് ചെയ്യുക", voiceStop: "റെക്കോർഡിംഗ് നിർത്തുക", voiceUploading: "Voice message upload ചെയ്യുന്നു…", voiceSent: "Voice message അയച്ചു.", voiceError: "Voice message അയയ്ക്കാനായില്ല.", voiceUnsupported: "ഈ browser-ൽ voice recording ലഭ്യമല്ല.", call: "Voice call", hangup: "Call അവസാനിപ്പിക്കുക", incoming: "Voice call വരുന്നു", answer: "എടുക്കുക",
       calling: "വിളിക്കുന്നു…", inCall: "Call-ൽ", noMic: "Microphone ലഭ്യമല്ല അല്ലെങ്കിൽ അനുമതി നിഷേധിച്ചു.", noWebrtc: "Voice call-ന് HTTPS (അല്ലെങ്കിൽ localhost) ഉം പുതിയ browser ഉം വേണം.",
@@ -79,13 +79,12 @@
     modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
   }
   function open() { ensureModal(); modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; }
-  function close() { stopVoiceRecording(true); stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
+  function close() { stopVoiceRecording(true); stopRealtime(); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
   let me = null, profile = null, match = null, matches = [], selectedMatchId = null, dailyQuota = { daily_used: 0, daily_limit: 5 }, history = [], photos = [], isStaff = false;
-  let tickTimer = null, chatChannel = null, signalChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
+  let tickTimer = null, chatChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
   let voiceRecorder = null, voiceStream = null, voiceChunks = [], voiceMime = "", voiceStartedAt = 0, voiceLimitTimer = null, voiceDiscard = false, voiceSeen = new Set(), lastVoiceTs = null;
-  let pc = null, localStream = null, pendingIce = [], incomingOffer = null, callState = "idle";
   const val = (k) => (k in (profile || {}) ? profile[k] : "");
 
   async function loadAll() {
@@ -446,9 +445,8 @@
   function closeChat() {
     setStatus(p("chatClosed"));
     const i = body.querySelector("#chatText"), b = body.querySelector("#chatSend"); if (i) i.disabled = true; if (b) b.disabled = true;
-    const c = body.querySelector("#callBtn"); if (c) c.disabled = true;
     stopVoiceRecording(true);
-    endCall(false); stopRealtime();
+    stopRealtime();
   }
 
   async function startChat(m) {
@@ -496,84 +494,12 @@
         const r = pl.new; appendMsg({ id: r.id, mine: r.sender_id === me.id, body: r.body, created_at: r.created_at });
       })
       .subscribe((s) => { if (s === "SUBSCRIBED") setStatus(p("live")); else if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(s)) setStatus(p("reconnecting")); });
-    if (m.status === "active") {
-      signalChannel = c.channel("signals:" + m.id)
-        .on("postgres_changes", { event: "INSERT", schema: "public", table: "call_signals", filter: "to_user=eq." + me.id }, (pl) => onSignal(m.id, pl.new))
-        .subscribe();
-      const callButton = body.querySelector("#callBtn");
-      if (callButton) callButton.onclick = () => (callState === "idle" ? startCall(m.id) : endCall(true));
-    }
   }
 
   function stopRealtime() {
     clearInterval(pollTimer); pollTimer = null;
-    try { chatChannel && client().removeChannel(chatChannel); signalChannel && client().removeChannel(signalChannel); } catch { /* ignore */ }
-    chatChannel = signalChannel = null;
-  }
-
-  // ----- voice (WebRTC, signalling through the authorised backend + Supabase Realtime) -----
-  const callMsg = (t) => { const el = body.querySelector("#callBox"); if (el) el.innerHTML = t; };
-  const signal = (matchId, kind, payload) => api(`/api/call/${matchId}/signal`, { method: "POST", body: { kind, payload } });
-
-  async function makePc(matchId) {
-    if (!window.RTCPeerConnection || !navigator.mediaDevices?.getUserMedia) throw new Error(p("noWebrtc"));
-    const ice = await api(`/api/call/${matchId}/ice`);
-    try { localStream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch { throw new Error(p("noMic")); }
-    pc = new RTCPeerConnection({ iceServers: ice.ice_servers });
-    localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
-    pc.onicecandidate = (e) => { if (e.candidate) signal(matchId, "ice", e.candidate.toJSON()).catch(() => {}); };
-    pc.ontrack = (e) => { const a = body.querySelector("#remoteAudio"); if (a) { a.srcObject = e.streams[0]; a.play().catch(() => {}); } };
-    pc.onconnectionstatechange = () => {
-      if (pc?.connectionState === "connected") { callState = "connected"; callMsg(p("inCall")); setCallBtn(); }
-      if (pc?.connectionState === "failed") { callMsg(p("callFailed")); endCall(true); }
-    };
-    return pc;
-  }
-  function setCallBtn() { const b = body.querySelector("#callBtn"); if (b) b.textContent = callState === "idle" ? "☏ " + p("call") : "✕ " + p("hangup"); }
-
-  async function startCall(matchId) {
-    try {
-      callState = "calling"; setCallBtn(); callMsg(p("calling"));
-      await makePc(matchId);
-      const offer = await pc.createOffer({ offerToReceiveAudio: true });
-      await pc.setLocalDescription(offer);
-      await signal(matchId, "offer", { type: offer.type, sdp: offer.sdp });
-    } catch (e) { callMsg(esc(e.message)); endCall(true); }
-  }
-  async function acceptCall(matchId) {
-    try {
-      callState = "connecting"; setCallBtn(); callMsg(p("calling"));
-      await makePc(matchId);
-      await pc.setRemoteDescription(incomingOffer); incomingOffer = null;
-      for (const c of pendingIce.splice(0)) await pc.addIceCandidate(c).catch(() => {});
-      const ans = await pc.createAnswer();
-      await pc.setLocalDescription(ans);
-      await signal(matchId, "answer", { type: ans.type, sdp: ans.sdp });
-    } catch (e) { callMsg(esc(e.message)); endCall(true); }
-  }
-  async function onSignal(matchId, s) {
-    if (s.match_id !== matchId) return;
-    const pl = s.payload || {};
-    if (s.kind === "offer") {
-      if (callState !== "idle") return;
-      incomingOffer = { type: pl.type, sdp: pl.sdp }; callState = "ringing";
-      callMsg(`${p("incoming")} <button class="primary-btn" id="cAns" type="button">${p("answer")}</button> <button class="outline-btn" id="cDec" type="button">${p("decline")}</button>`);
-      body.querySelector("#cAns").onclick = () => acceptCall(matchId);
-      body.querySelector("#cDec").onclick = () => endCall(true);
-    } else if (s.kind === "answer" && pc) {
-      await pc.setRemoteDescription({ type: pl.type, sdp: pl.sdp }).catch(() => {});
-      for (const c of pendingIce.splice(0)) await pc.addIceCandidate(c).catch(() => {});
-    } else if (s.kind === "ice") {
-      if (pc && pc.remoteDescription) await pc.addIceCandidate(pl).catch(() => {}); else pendingIce.push(pl);
-    } else if (s.kind === "hangup") { endCall(false); callMsg(""); }
-  }
-  function endCall(notify) {
-    const mid = match?.id;
-    if (notify && mid && callState !== "idle") signal(mid, "hangup", {}).catch(() => {});
-    try { pc && pc.close(); localStream && localStream.getTracks().forEach((t) => t.stop()); } catch { /* ignore */ }
-    pc = null; localStream = null; pendingIce = []; incomingOffer = null; callState = "idle";
-    const a = body && body.querySelector("#remoteAudio"); if (a) a.srcObject = null;
-    setCallBtn(); if (notify) callMsg("");
+    try { chatChannel && client().removeChannel(chatChannel); } catch { /* ignore */ }
+    chatChannel = null;
   }
 
   // ----- safety, feedback -----
