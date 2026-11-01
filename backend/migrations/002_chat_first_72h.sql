@@ -25,7 +25,7 @@ update public.match_history
  where status = 'proposed';
 
 create or replace function public.nivora_expire_matches()
-returns integer language plpgsql security definer set search_path = public as $$
+returns integer language plpgsql security definer set search_path = pg_catalog, public as $$
 declare n integer;
 begin
   with e as (
@@ -41,7 +41,7 @@ end $$;
 create or replace function public.nivora_respond_match(
   p_user uuid, p_match uuid, p_accept boolean
 )
-returns jsonb language plpgsql security definer set search_path = public as $$
+returns jsonb language plpgsql security definer set search_path = pg_catalog, public as $$
 declare m public.match_history%rowtype;
 begin
   perform public.nivora_expire_matches();
@@ -84,7 +84,7 @@ begin
 end $$;
 
 create or replace function public.nivora_can_access_chat(p_match uuid)
-returns boolean language sql stable security definer set search_path = public as $$
+returns boolean language sql stable security definer set search_path = pg_catalog, public as $$
   select exists (
     select 1
       from public.match_history m
