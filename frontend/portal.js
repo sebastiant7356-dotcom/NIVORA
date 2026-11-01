@@ -77,7 +77,7 @@
     modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
   }
   function open() { ensureModal(); modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; }
-  function close() { stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
+  function close() { try { if (activeRecorder && activeRecorder.state !== "inactive") activeRecorder.stop(); } catch (_) {} if (activeVoiceStream) activeVoiceStream.getTracks().forEach((t) => t.stop()); activeRecorder = null; activeVoiceStream = null; stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
   let me = null, profile = null, match = null, payInfo = null, history = [], photos = [], isStaff = false, dailyQuota = { daily_used: 0, daily_limit: 5 };
