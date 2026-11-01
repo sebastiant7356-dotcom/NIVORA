@@ -78,6 +78,7 @@ test("voice messages stay private, size-limited and restricted to match members"
   const server = text(path.join(ROOT, "backend", "src", "server.js"));
   const portal = text(path.join(ROOT, "frontend", "portal.js"));
   const staff = text(path.join(ROOT, "backend", "src", "routes", "admin.js"));
+  const middleware = text(path.join(ROOT, "backend", "src", "middleware.js"));
   assert.match(migration, /public\.voice_messages/);
   assert.match(migration, /values \('voice-messages', 'voice-messages', false, 2097152/);
   assert.match(migration, /revoke all on table public\.voice_messages from public, anon, authenticated/);
@@ -85,6 +86,8 @@ test("voice messages stay private, size-limited and restricted to match members"
   assert.match(route, /assertChatMatch\(req\.params\.matchId, req\.user\.id\)/);
   assert.match(route, /MAX_VOICE_BYTES = 2 \* 1024 \* 1024/);
   assert.match(route, /duration > 60/);
+  assert.match(route, /count >= 20/);
+  assert.match(middleware, /X-Voice-Duration/);
   assert.match(server, /\/api\/chat\/:matchId\/voice.*express\.raw/);
   assert.match(portal, /MediaRecorder/);
   assert.match(portal, /\/api\/chat\/.*\/voice/);
