@@ -13,6 +13,7 @@
       reason: "Staff note", editProfile: "Edit profile", save: "Save changes", saving: "Saving…", saved: "Saved.", reviewNote: "Your profile changes are saved immediately. Keep your details accurate and use Report or Block if needed.",
       rejectedNote: "This profile was not approved and cannot be edited here.",
       matching: "Your match", findMatch: "Find my match", finding: "Searching…", noMatchNow: "No suitable profile is available right now. Please check again later.",
+      dailyMatchesUsed: "Daily matches used", activeConversations: "Active conversations", dailyLimitReached: "You have used all five recommendations for today.", chatTab: "Chat",
       needApproval: "Save your profile details to activate matching.", payNeeded: "A paid ₹50 credit is needed to get a match.",
       accept: "Accept", decline: "Decline", continueMatch: "Continue", stopMatch: "Stop", waitingPartner: "You chose Continue. Waiting for the other person.", waitingYou: "Choose Continue or Stop to proceed.",
       proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and calls will close.",
@@ -40,6 +41,7 @@
       reason: "Staff കുറിപ്പ്", editProfile: "Profile edit ചെയ്യുക", save: "സേവ് ചെയ്യുക", saving: "സേവ് ചെയ്യുന്നു…", saved: "സേവ് ചെയ്തു.", reviewNote: "Profile-ലെ മാറ്റങ്ങൾ ഉടൻ save ആകും. വിവരങ്ങൾ ശരിയായി നൽകുക; ആവശ്യമെങ്കിൽ Report / Block ഉപയോഗിക്കുക.",
       rejectedNote: "ഈ profile അംഗീകരിച്ചിട്ടില്ല; ഇവിടെ edit ചെയ്യാനാകില്ല.",
       matching: "നിങ്ങളുടെ match", findMatch: "എന്റെ match കണ്ടെത്തുക", finding: "തിരയുന്നു…", noMatchNow: "ഇപ്പോൾ അനുയോജ്യമായ profile ഇല്ല. പിന്നീട് നോക്കുക.",
+      dailyMatchesUsed: "ഇന്ന് ലഭിച്ച matches", activeConversations: "സജീവ സംഭാഷണങ്ങൾ", dailyLimitReached: "ഇന്നത്തെ അഞ്ച് matching-ഉം ഉപയോഗിച്ചു.", chatTab: "Chat",
       needApproval: "Matching തുടങ്ങാൻ profile details save ചെയ്യുക.", payNeeded: "Match ലഭിക്കാൻ ₹50 credit ആവശ്യമാണ്.",
       accept: "സ്വീകരിക്കുക", decline: "നിരസിക്കുക", continueMatch: "തുടരാം", stopMatch: "നിർത്താം", waitingPartner: "നിങ്ങൾ Continue തിരഞ്ഞെടുത്തു. മറ്റേയാളുടെ തീരുമാനം കാത്തിരിക്കുന്നു.", waitingYou: "തുടരാൻ Continue അല്ലെങ്കിൽ Stop തിരഞ്ഞെടുക്കുക.",
       proposalEnds: "ഇതിനുമുമ്പ് മറുപടി നൽകുക", endMatch: "Match അവസാനിപ്പിക്കുക", endConfirm: "ഈ match അവസാനിപ്പിക്കണോ? Chat, call അടയും.",
@@ -290,9 +292,9 @@
       `<button type="button" class="${match?.id === item.id ? "primary-btn" : "outline-btn"}" data-match-id="${esc(item.id)}">Chat ${i + 1}${item.status === "proposed" ? " · Pending" : ""}</button>`
     ).join("")}</div>` : "";
     const find = `<div class="nv-row"><button class="primary-btn" id="mFind" type="button" ${canFind ? "" : "disabled"}>${p("findMatch")}</button></div>`;
-    let header = `<p class="modal-description">Daily matches used: ${dailyQuota.daily_used}/${dailyQuota.daily_limit} (Kerala time). Active conversations: ${matches.length}</p>`;
+    let header = `<p class="modal-description">${p("dailyMatchesUsed")}: ${dailyQuota.daily_used}/${dailyQuota.daily_limit} (Kerala time). ${p("activeConversations")}: ${matches.length}</p>`;
     if (needPay) header += `<p class="modal-description">${p("payNeeded")}</p>`;
-    if (dailyQuota.daily_used >= dailyQuota.daily_limit) header += '<p class="modal-description">You have used all five recommendations for today.</p>';
+    if (dailyQuota.daily_used >= dailyQuota.daily_limit) header += `<p class="modal-description">${p("dailyLimitReached")}</p>`;
     if (!match) {
       box.innerHTML = header + find + `<div class="nv-msg" id="mMsg"></div>`;
     } else {
