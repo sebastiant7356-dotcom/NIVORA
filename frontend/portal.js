@@ -80,7 +80,7 @@
   function close() { stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
-  let me = null, profile = null, match = null, payInfo = null, history = [], photos = [], isStaff = false;
+  let me = null, profile = null, match = null, matches = [], selectedMatchId = null, dailyQuota = { daily_used: 0, daily_limit: 5 }, payInfo = null, history = [], photos = [], isStaff = false;
   let tickTimer = null, chatChannel = null, signalChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
   let pc = null, localStream = null, pendingIce = [], incomingOffer = null, callState = "idle";
   const val = (k) => (k in (profile || {}) ? profile[k] : "");
@@ -91,7 +91,7 @@
       api("/api/profile"), api("/api/match/current").catch(() => ({ match: null })),
       api("/api/payments/status").catch(() => null), api("/api/match/history").catch(() => ({ history: [] }))
     ]);
-    profile = pr.profile; match = m.match; payInfo = pay; history = h.history || [];
+    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; payInfo = pay; history = h.history || [];
     photos = profile ? ((await api("/api/profile/photos").catch(() => ({ photos: [] }))).photos || []) : [];
     isStaff = await api("/api/admin/me").then(() => true).catch(() => false);
   }
@@ -283,44 +283,68 @@
   function renderMatch() {
     const box = body.querySelector("#matchBox");
     if (profile.approval_status !== "approved") { box.innerHTML = `<p class="modal-description">${p("needApproval")}</p>`; return; }
+
+    const needPay = payInfo?.required && !payInfo?.has_credit;
+    const canFind = dailyQuota.daily_used < dailyQuota.daily_limit && !needPay && profile.profile_complete && !profile.suspended;
+    const tabs = matches.length ? `<div class="nv-row" style="flex-wrap:wrap;gap:8px;margin-bottom:12px">${matches.map((item, i) =>
+      `<button type="button" class="${match?.id === item.id ? "primary-btn" : "outline-btn"}" data-match-id="${esc(item.id)}">Chat ${i + 1}${item.status === "proposed" ? " · Pending" : ""}</button>`
+    ).join("")}</div>` : "";
+    const find = `<div class="nv-row"><button class="primary-btn" id="mFind" type="button" ${canFind ? "" : "disabled"}>${p("findMatch")}</button></div>`;
+    let header = `<p class="modal-description">Daily matches used: ${dailyQuota.daily_used}/${dailyQuota.daily_limit} (Kerala time). Active conversations: ${matches.length}</p>`;
+    if (needPay) header += `<p class="modal-description">${p("payNeeded")}</p>`;
+    if (dailyQuota.daily_used >= dailyQuota.daily_limit) header += '<p class="modal-description">You have used all five recommendations for today.</p>';
     if (!match) {
-      const needPay = payInfo?.required && !payInfo?.has_credit;
-      box.innerHTML = `${needPay ? `<p class="modal-description">${p("payNeeded")}</p>` : ""}<div class="nv-row"><button class="primary-btn" id="mFind" type="button" ${needPay || !profile.profile_complete || profile.suspended ? "disabled" : ""}>${p("findMatch")}</button></div><div class="nv-msg" id="mMsg"></div>`;
-      box.querySelector("#mFind").onclick = async (ev) => {
-        ev.target.disabled = true; ev.target.textContent = p("finding");
-        try {
-          const r = await api("/api/match/find", { method: "POST" });
-          if (!r.found) { box.querySelector("#mMsg").textContent = r.message || p("noMatchNow"); ev.target.disabled = false; ev.target.textContent = p("findMatch"); return; }
-          await loadAll(); render();
-        } catch (e) { box.querySelector("#mMsg").textContent = e.message; ev.target.disabled = false; ev.target.textContent = p("findMatch"); }
-      };
-      return;
-    }
-    const m = match;
-    let h = partnerHtml(m.partner);
-    if (["proposed", "active"].includes(m.status)) {
-      h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
-        <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
-        <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div></div>`;
-      if (m.status === "proposed") {
-        h += m.i_accepted
-          ? `<p class="modal-description">${p("waitingPartner")}</p>`
-          : `<p class="modal-description">${p("waitingYou")}</p>`;
-        h += `<div class="nv-row">${m.i_accepted ? "" : `<button class="primary-btn" id="mContinue" type="button">${p("continueMatch")}</button>`}<button class="outline-btn" id="mStop" type="button">${p("stopMatch")}</button></div>`;
-      } else {
-        h += `<div class="nv-row"><button class="outline-btn" id="callBtn" type="button">☏ ${p("call")}</button><button class="outline-btn" id="mEnd" type="button">${p("endMatch")}</button></div>
-          <div id="callBox" class="callbox" aria-live="polite"></div><audio id="remoteAudio" autoplay playsinline></audio>`;
+      box.innerHTML = header + find + `<div class="nv-msg" id="mMsg"></div>`;
+    } else {
+      const m = match;
+      let h = header + tabs + find + partnerHtml(m.partner);
+      if (["proposed", "active"].includes(m.status)) {
+        h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
+          <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
+          <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div></div>`;
+        if (m.status === "proposed") {
+          h += m.i_accepted
+            ? `<p class="modal-description">${p("waitingPartner")}</p>`
+            : `<p class="modal-description">${p("waitingYou")}</p>`;
+          h += `<div class="nv-row">${m.i_accepted ? "" : `<button class="primary-btn" id="mContinue" type="button">${p("continueMatch")}</button>`}<button class="outline-btn" id="mStop" type="button">${p("stopMatch")}</button></div>`;
+        } else {
+          h += `<div class="nv-row"><button class="outline-btn" id="mEnd" type="button">${p("endMatch")}</button></div>`;
+        }
       }
+      h += `<div class="nv-row nv-links"><button class="nv-link" id="mReport" type="button">${p("report")}</button><button class="nv-link" id="mBlock" type="button">${p("block")}</button></div><div id="safeBox"></div><div class="nv-msg" id="mMsg"></div>`;
+      box.innerHTML = h;
     }
-    h += `<div class="nv-row nv-links"><button class="nv-link" id="mReport" type="button">${p("report")}</button><button class="nv-link" id="mBlock" type="button">${p("block")}</button></div><div id="safeBox"></div><div class="nv-msg" id="mMsg"></div>`;
-    box.innerHTML = h;
-    const $ = (s) => box.querySelector(s);
+
+    box.querySelectorAll("[data-match-id]").forEach((button) => {
+      button.onclick = () => {
+        const next = matches.find((item) => item.id === button.dataset.matchId);
+        if (!next || next.id === match?.id) return;
+        closeChat(); stopRealtime(); match = next; selectedMatchId = next.id; render();
+      };
+    });
+    const findButton = box.querySelector("#mFind");
+    if (findButton) findButton.onclick = async (ev) => {
+      ev.target.disabled = true; ev.target.textContent = p("finding");
+      try {
+        const r = await api("/api/match/find", { method: "POST" });
+        if (!r.found) {
+          const message = box.querySelector("#mMsg"); if (message) message.textContent = r.message || p("noMatchNow");
+          ev.target.disabled = !canFind; ev.target.textContent = p("findMatch"); return;
+        }
+        selectedMatchId = r.match?.id || selectedMatchId; await loadAll(); render();
+      } catch (e) {
+        const message = box.querySelector("#mMsg"); if (message) message.textContent = e.message;
+        ev.target.disabled = !canFind; ev.target.textContent = p("findMatch");
+      }
+    };
+    if (!match) return;
+    const m = match, $ = (s) => box.querySelector(s);
     const respond = async (accept) => { try { await api(`/api/match/${m.id}/respond`, { method: "POST", body: { accept } }); await loadAll(); render(); } catch (e) { $("#mMsg").textContent = e.message; } };
     $("#mContinue") && ($("#mContinue").onclick = () => respond(true));
     $("#mStop") && ($("#mStop").onclick = () => respond(false));
     $("#mEnd") && ($("#mEnd").onclick = async () => { if (!confirm(p("endConfirm"))) return; try { await api(`/api/match/${m.id}/end`, { method: "POST" }); await loadAll(); render(); } catch (e) { $("#mMsg").textContent = e.message; } });
-    $("#mReport").onclick = () => reportForm(m.id);
-    $("#mBlock").onclick = async () => { if (!confirm(p("blockConfirm"))) return; try { const r = await api("/api/safety/block", { method: "POST", body: { match_id: m.id } }); await loadAll(); render(); msg(r.message, true); } catch (e) { $("#mMsg").textContent = e.message; } };
+    $("#mReport") && ($("#mReport").onclick = () => reportForm(m.id));
+    $("#mBlock") && ($("#mBlock").onclick = async () => { if (!confirm(p("blockConfirm"))) return; try { const r = await api("/api/safety/block", { method: "POST", body: { match_id: m.id } }); await loadAll(); render(); msg(r.message, true); } catch (e) { $("#mMsg").textContent = e.message; } });
     if (["proposed", "active"].includes(m.status)) startChat(m);
   }
 
