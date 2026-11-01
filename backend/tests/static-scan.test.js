@@ -58,6 +58,8 @@ test("daily match quota is enforced in the database using Kerala local dates", (
   assert.ok(sql.includes("Asia/Kolkata"));
   assert.ok(sql.includes("used_today >= 5"));
   assert.ok(sql.includes("daily_match_limit_reached"));
+  assert.ok(sql.includes("du.matches_count >= 5"), "do not recommend to members who used their daily quota");
+  assert.ok(sql.includes("values (p_user, today_kerala, 1, now()), (cand.id, today_kerala, 1, now())"), "count recommendations for both participants");
   assert.ok(sql.includes("enable row level security"));
   assert.ok(/revoke all on public\.match_daily_usage from anon, authenticated/i.test(sql));
   assert.ok(/grant execute on function public\.nivora_find_partner\(uuid, boolean\) to service_role/i.test(sql));
