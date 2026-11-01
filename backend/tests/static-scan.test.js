@@ -64,3 +64,14 @@ test("daily match quota is enforced in the database using Kerala local dates", (
   assert.ok(/revoke all on public\.match_daily_usage from anon, authenticated/i.test(sql));
   assert.ok(/grant execute on function public\.nivora_find_partner\(uuid, boolean\) to service_role/i.test(sql));
 });
+
+test("voice messages are private, match-gated and bounded", () => {
+  const sql = text(path.join(ROOT, "backend", "migrations", "20261101193000_voice_messages.sql"));
+  const route = text(path.join(ROOT, "backend", "src", "routes", "chat.js"));
+  assert.ok(sql.includes("public = false"), "voice bucket must be private");
+  assert.ok(sql.includes("2097152"), "voice bucket size limit must be 2 MB");
+  assert.ok(route.includes('assertChatMatch(req.params.matchId, req.user.id)'), "voice uploads and reads must check match membership");
+  assert.ok(route.includes('createSignedUrl(m.voice_object_path, 600)'), "voice reads use short-lived signed URLs");
+  assert.ok(route.includes('max: 8'), "voice upload rate limit exists");
+  assert.ok(route.includes('MAX_VOICE_BYTES = 2 * 1024 * 1024'), "voice API size limit exists");
+});
