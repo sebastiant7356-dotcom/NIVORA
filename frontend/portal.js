@@ -308,8 +308,7 @@
           : `<p class="modal-description">${p("waitingYou")}</p>`;
         h += `<div class="nv-row">${m.i_accepted ? "" : `<button class="primary-btn" id="mContinue" type="button">${p("continueMatch")}</button>`}<button class="outline-btn" id="mStop" type="button">${p("stopMatch")}</button></div>`;
       } else {
-        h += `<div class="nv-row"><button class="outline-btn" id="callBtn" type="button">☏ ${p("call")}</button><button class="outline-btn" id="mEnd" type="button">${p("endMatch")}</button></div>
-          <div id="callBox" class="callbox" aria-live="polite"></div><audio id="remoteAudio" autoplay playsinline></audio>`;
+        h += `<div class="nv-row"><button class="outline-btn" id="mEnd" type="button">${p("endMatch")}</button></div>`;
       }
     }
     h += `<div class="nv-row nv-links"><button class="nv-link" id="mReport" type="button">${p("report")}</button><button class="nv-link" id="mBlock" type="button">${p("block")}</button></div><div id="safeBox"></div><div class="nv-msg" id="mMsg"></div>`;
@@ -335,8 +334,7 @@
   function closeChat() {
     setStatus(p("chatClosed"));
     const i = body.querySelector("#chatText"), b = body.querySelector("#chatSend"); if (i) i.disabled = true; if (b) b.disabled = true;
-    const c = body.querySelector("#callBtn"); if (c) c.disabled = true;
-    endCall(false); stopRealtime();
+    stopRealtime();
   }
 
   async function startChat(m) {
@@ -375,13 +373,8 @@
         const r = pl.new; appendMsg({ id: r.id, mine: r.sender_id === me.id, body: r.body, created_at: r.created_at });
       })
       .subscribe((s) => { if (s === "SUBSCRIBED") setStatus(p("live")); else if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(s)) setStatus(p("reconnecting")); });
-    if (m.status === "active") {
-      signalChannel = c.channel("signals:" + m.id)
-        .on("postgres_changes", { event: "INSERT", schema: "public", table: "call_signals", filter: "to_user=eq." + me.id }, (pl) => onSignal(m.id, pl.new))
-        .subscribe();
-      const callButton = body.querySelector("#callBtn");
-      if (callButton) callButton.onclick = () => (callState === "idle" ? startCall(m.id) : endCall(true));
-    }
+    // Live calls are intentionally excluded from the free public launch.
+    // Text chat remains available; voice messages will be added separately.
   }
 
   function stopRealtime() {
