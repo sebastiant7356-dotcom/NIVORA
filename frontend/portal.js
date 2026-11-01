@@ -7,7 +7,7 @@
   const P = {
     en: {
       myspace: "My space", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
-      noProfile: "You have not created a profile yet.", createProfile: "Create my profile",
+      noProfile: "You have not created a profile yet.", staffAccount: "This is a NIVORA staff account. Customer profiles and matching are disabled for staff.", staffConsole: "Open staff console", createProfile: "Create my profile",
       status_pending: "Awaiting staff review", status_approved: "Approved", status_rejected: "Not approved", status_changes_requested: "Changes requested",
       suspended: "Your account is suspended. Please contact support.", incomplete: "Your profile is missing some details (gender, preferences, values). Please edit it before matching.",
       reason: "Staff note", editProfile: "Edit profile", save: "Save changes", saving: "Saving…", saved: "Saved.", reviewNote: "Your profile changes are saved immediately. Keep your details accurate and use Report or Block if needed.",
@@ -35,7 +35,7 @@
     },
     ml: {
       myspace: "എന്റെ ഇടം", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
-      noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
+      noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", staffAccount: "ഇത് NIVORA staff account ആണ്. Staff അംഗങ്ങൾക്ക് customer profile അല്ലെങ്കിൽ matching ലഭ്യമല്ല.", staffConsole: "Staff console തുറക്കുക", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
       status_pending: "Staff review കാത്തിരിക്കുന്നു", status_approved: "അംഗീകരിച്ചു", status_rejected: "അംഗീകരിച്ചില്ല", status_changes_requested: "മാറ്റങ്ങൾ ആവശ്യപ്പെട്ടിട്ടുണ്ട്",
       suspended: "നിങ്ങളുടെ account suspend ചെയ്തിരിക്കുന്നു. Support-നെ ബന്ധപ്പെടുക.", incomplete: "Profile-ൽ ചില വിവരങ്ങൾ കുറവാണ് (gender, preferences, values). Matching-ന് മുമ്പ് edit ചെയ്യുക.",
       reason: "Staff കുറിപ്പ്", editProfile: "Profile edit ചെയ്യുക", save: "സേവ് ചെയ്യുക", saving: "സേവ് ചെയ്യുന്നു…", saved: "സേവ് ചെയ്തു.", reviewNote: "Profile-ലെ മാറ്റങ്ങൾ ഉടൻ save ആകും. വിവരങ്ങൾ ശരിയായി നൽകുക; ആവശ്യമെങ്കിൽ Report / Block ഉപയോഗിക്കുക.",
@@ -185,7 +185,9 @@
   function render() {
     clearInterval(tickTimer); stopRealtime();
     let h = `<div class="modal-topline"><span class="section-kicker">${p("myspace")}</span></div>`;
-    if (!profile) {
+    if (!profile && isStaff) {
+      h += `<p class="modal-description">${p("staffAccount")}</p><a class="primary-btn" href="admin.html">${p("staffConsole")} <span class="arrow">→</span></a>`;
+    } else if (!profile) {
       h += `<p class="modal-description">${p("noProfile")}</p><button class="primary-btn" id="pCreate" type="button">${p("createProfile")} <span class="arrow">→</span></button>`;
     } else {
       const st = profile.approval_status;
