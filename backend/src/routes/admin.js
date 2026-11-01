@@ -28,8 +28,13 @@ router.get("/profiles", async (req, res) => {
     return res.status(400).json({ success: false, message: "Invalid status filter." });
   }
   const { limit, offset } = page(req);
-  let q = serviceClient().from("profiles").select(LIST_COLS, { count: "exact" })
+  const db = serviceClient();
+  const { data: staffRows, error: staffError } = await db.from("staff_roles").select("user_id");
+  if (staffError) return res.status(500).json({ success: false, message: "Could not load staff accounts." });
+  const staffIds = (staffRows || []).map((row) => row.user_id);
+  let q = db.from("profiles").select(LIST_COLS, { count: "exact" })
     .order("created_at", { ascending: true }).range(offset, offset + limit - 1);
+  if (staffIds.length) q = q.not("id", "in", "(" + staffIds.join(",") + ")");
   if (status !== "all") q = q.eq("approval_status", status);
   const { data, count, error } = await q;
   if (error) return res.status(500).json({ success: false, message: "Could not load profiles." });
@@ -39,6 +44,8 @@ router.get("/profiles", async (req, res) => {
 router.get("/profiles/:id", async (req, res) => {
   if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id." });
   const db = serviceClient();
+  const { data: staff } = await db.from("staff_roles").select("user_id").eq("user_id", req.params.id).maybeSingle();
+  if (staff) return res.status(404).json({ success: false, message: "Customer profile not found." });
   const [{ data: profile }, { data: history }, { data: reports }] = await Promise.all([
     db.from("profiles").select(LIST_COLS).eq("id", req.params.id).maybeSingle(),
     db.from("moderation_events").select("id, admin_id, decision, reason, created_at").eq("profile_id", req.params.id).order("created_at", { ascending: false }),
