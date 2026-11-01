@@ -23,13 +23,18 @@ async function dailyUsage(userId) {
 router.get("/current", async (req, res) => {
   await expire();
   const db = serviceClient();
-  const [{ data: member }, quota] = await Promise.all([
-    db.from("match_members").select("match_id").eq("user_id", req.user.id).maybeSingle(),
+  const [{ data: members, error: memberError }, quota] = await Promise.all([
+    db.from("match_members").select("match_id").eq("user_id", req.user.id),
     dailyUsage(req.user.id)
   ]);
-  if (!member) return res.json({ success: true, match: null, ...quota });
-  const match = await getMatchFor(member.match_id, req.user.id);
-  res.json({ success: true, match: match ? await matchView(match, req.user.id) : null, ...quota });
+  if (memberError) return res.status(500).json({ success: false, message: "Could not load your conversations." });
+  const matches = [];
+  for (const member of members || []) {
+    const row = await getMatchFor(member.match_id, req.user.id);
+    if (row && ["proposed", "active"].includes(row.status)) matches.push(await matchView(row, req.user.id));
+  }
+  matches.sort((a, b) => String(b.started_at || b.proposal_expires_at || "").localeCompare(String(a.started_at || a.proposal_expires_at || "")));
+  res.json({ success: true, matches, match: matches[0] || null, ...quota });
 });
 
 router.post("/find", findLimit, async (req, res) => {
