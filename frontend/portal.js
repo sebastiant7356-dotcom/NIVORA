@@ -14,7 +14,7 @@
       rejectedNote: "This profile was not approved and cannot be edited here.",
       matching: "Your match", findMatch: "Find my match", finding: "Searching…", noMatchNow: "No suitable profile is available right now. Please check again later.",
       needApproval: "Matching opens after staff approve your profile.", payNeeded: "A paid ₹50 credit is needed to get a match.",
-      accept: "Accept", decline: "Decline", waitingPartner: "You accepted. Waiting for the other person to respond.", waitingYou: "A match is waiting for your response.",
+      accept: "Accept", decline: "Decline", continueMatch: "Continue", stopMatch: "Stop", waitingPartner: "You chose Continue. Waiting for the other person.", waitingYou: "Choose Continue or Stop to proceed.",
       proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and calls will close.",
       timeLeft: "Chat window left", closed: "Closed", chat: "Chat", typeMsg: "Write a message…", send: "Send", live: "Live", reconnecting: "Reconnecting…",
       chatClosed: "This conversation is closed (match ended or 72 hours are over).", call: "Voice call", hangup: "End call", incoming: "Incoming voice call", answer: "Answer",
@@ -41,7 +41,7 @@
       rejectedNote: "ഈ profile അംഗീകരിച്ചിട്ടില്ല; ഇവിടെ edit ചെയ്യാനാകില്ല.",
       matching: "നിങ്ങളുടെ match", findMatch: "എന്റെ match കണ്ടെത്തുക", finding: "തിരയുന്നു…", noMatchNow: "ഇപ്പോൾ അനുയോജ്യമായ profile ഇല്ല. പിന്നീട് നോക്കുക.",
       needApproval: "Staff profile അംഗീകരിച്ച ശേഷം matching തുറക്കും.", payNeeded: "Match ലഭിക്കാൻ ₹50 credit ആവശ്യമാണ്.",
-      accept: "സ്വീകരിക്കുക", decline: "നിരസിക്കുക", waitingPartner: "നിങ്ങൾ സ്വീകരിച്ചു. മറ്റേയാളുടെ മറുപടി കാത്തിരിക്കുന്നു.", waitingYou: "ഒരു match നിങ്ങളുടെ മറുപടി കാത്തിരിക്കുന്നു.",
+      accept: "സ്വീകരിക്കുക", decline: "നിരസിക്കുക", continueMatch: "തുടരാം", stopMatch: "നിർത്താം", waitingPartner: "നിങ്ങൾ Continue തിരഞ്ഞെടുത്തു. മറ്റേയാളുടെ തീരുമാനം കാത്തിരിക്കുന്നു.", waitingYou: "തുടരാൻ Continue അല്ലെങ്കിൽ Stop തിരഞ്ഞെടുക്കുക.",
       proposalEnds: "ഇതിനുമുമ്പ് മറുപടി നൽകുക", endMatch: "Match അവസാനിപ്പിക്കുക", endConfirm: "ഈ match അവസാനിപ്പിക്കണോ? Chat, call അടയും.",
       timeLeft: "Chat സമയം ബാക്കി", closed: "അടച്ചു", chat: "Chat", typeMsg: "സന്ദേശം എഴുതുക…", send: "അയയ്ക്കുക", live: "ലൈവ്", reconnecting: "വീണ്ടും ബന്ധിപ്പിക്കുന്നു…",
       chatClosed: "ഈ സംഭാഷണം അടച്ചു (match അവസാനിച്ചു / 72 മണിക്കൂർ കഴിഞ്ഞു).", call: "Voice call", hangup: "Call അവസാനിപ്പിക്കുക", incoming: "Voice call വരുന്നു", answer: "എടുക്കുക",
@@ -266,26 +266,30 @@
     }
     const m = match;
     let h = partnerHtml(m.partner);
-    if (m.status === "proposed") {
-      h += m.i_accepted ? `<p class="modal-description">${p("waitingPartner")}</p>` : `<p class="modal-description">${p("waitingYou")} · ${p("proposalEnds")} ${esc(fmt(m.proposal_expires_at))}</p>`;
-      h += `<div class="nv-row">${m.i_accepted ? "" : `<button class="primary-btn" id="mAccept" type="button">${p("accept")}</button>`}<button class="outline-btn" id="mDecline" type="button">${p("decline")}</button></div>`;
-    } else if (m.status === "active") {
+    if (["proposed", "active"].includes(m.status)) {
       h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
         <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
-        <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div></div>
-        <div class="nv-row"><button class="outline-btn" id="callBtn" type="button">☏ ${p("call")}</button><button class="outline-btn" id="mEnd" type="button">${p("endMatch")}</button></div>
-        <div id="callBox" class="callbox" aria-live="polite"></div><audio id="remoteAudio" autoplay playsinline></audio>`;
+        <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div></div>`;
+      if (m.status === "proposed") {
+        h += m.i_accepted
+          ? `<p class="modal-description">${p("waitingPartner")}</p>`
+          : `<p class="modal-description">${p("waitingYou")}</p>`;
+        h += `<div class="nv-row">${m.i_accepted ? "" : `<button class="primary-btn" id="mContinue" type="button">${p("continueMatch")}</button>`}<button class="outline-btn" id="mStop" type="button">${p("stopMatch")}</button></div>`;
+      } else {
+        h += `<div class="nv-row"><button class="outline-btn" id="callBtn" type="button">☏ ${p("call")}</button><button class="outline-btn" id="mEnd" type="button">${p("endMatch")}</button></div>
+          <div id="callBox" class="callbox" aria-live="polite"></div><audio id="remoteAudio" autoplay playsinline></audio>`;
+      }
     }
     h += `<div class="nv-row nv-links"><button class="nv-link" id="mReport" type="button">${p("report")}</button><button class="nv-link" id="mBlock" type="button">${p("block")}</button></div><div id="safeBox"></div><div class="nv-msg" id="mMsg"></div>`;
     box.innerHTML = h;
     const $ = (s) => box.querySelector(s);
     const respond = async (accept) => { try { await api(`/api/match/${m.id}/respond`, { method: "POST", body: { accept } }); await loadAll(); render(); } catch (e) { $("#mMsg").textContent = e.message; } };
-    $("#mAccept") && ($("#mAccept").onclick = () => respond(true));
-    $("#mDecline") && ($("#mDecline").onclick = () => respond(false));
+    $("#mContinue") && ($("#mContinue").onclick = () => respond(true));
+    $("#mStop") && ($("#mStop").onclick = () => respond(false));
     $("#mEnd") && ($("#mEnd").onclick = async () => { if (!confirm(p("endConfirm"))) return; try { await api(`/api/match/${m.id}/end`, { method: "POST" }); await loadAll(); render(); } catch (e) { $("#mMsg").textContent = e.message; } });
     $("#mReport").onclick = () => reportForm(m.id);
     $("#mBlock").onclick = async () => { if (!confirm(p("blockConfirm"))) return; try { const r = await api("/api/safety/block", { method: "POST", body: { match_id: m.id } }); await loadAll(); render(); msg(r.message, true); } catch (e) { $("#mMsg").textContent = e.message; } };
-    if (m.status === "active") startChat(m);
+    if (["proposed", "active"].includes(m.status)) startChat(m);
   }
 
   function setStatus(txt) { const el = body.querySelector("#chatStatus"); if (el) el.textContent = txt; }
@@ -304,6 +308,8 @@
   }
 
   async function startChat(m) {
+    if (tickTimer) clearInterval(tickTimer);
+    stopRealtime();
     seen = new Set(); lastTs = null;
     const left = () => Math.max(0, Math.floor((new Date(m.expires_at) - Date.now()) / 1000));
     const tick = () => {
@@ -336,11 +342,13 @@
         const r = pl.new; appendMsg({ id: r.id, mine: r.sender_id === me.id, body: r.body, created_at: r.created_at });
       })
       .subscribe((s) => { if (s === "SUBSCRIBED") setStatus(p("live")); else if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(s)) setStatus(p("reconnecting")); });
-    signalChannel = c.channel("signals:" + m.id)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "call_signals", filter: "to_user=eq." + me.id }, (pl) => onSignal(m.id, pl.new))
-      .subscribe();
-    pollTimer = setInterval(pull, 8000);
-    body.querySelector("#callBtn").onclick = () => (callState === "idle" ? startCall(m.id) : endCall(true));
+    if (m.status === "active") {
+      signalChannel = c.channel("signals:" + m.id)
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "call_signals", filter: "to_user=eq." + me.id }, (pl) => onSignal(m.id, pl.new))
+        .subscribe();
+      const callButton = body.querySelector("#callBtn");
+      if (callButton) callButton.onclick = () => (callState === "idle" ? startCall(m.id) : endCall(true));
+    }
   }
 
   function stopRealtime() {
