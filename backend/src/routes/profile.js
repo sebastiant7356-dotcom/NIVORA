@@ -4,7 +4,7 @@ const config = require("../config");
 const { serviceClient } = require("../lib/clients");
 const { requireAuth } = require("../middleware");
 const { createLimiter, byUser } = require("../lib/ratelimit");
-const { parseProfileInput, needsReview } = require("../lib/validation");
+const { parseProfileInput } = require("../lib/validation");
 const { reviewProfile } = require("../lib/moderation-ai");
 const { audit } = require("../lib/audit");
 
