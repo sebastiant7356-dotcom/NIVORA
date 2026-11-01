@@ -82,7 +82,7 @@
   function close() { stopVoiceRecording(true); stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
-  let me = null, profile = null, match = null, matches = [], selectedMatchId = null, dailyQuota = { daily_used: 0, daily_limit: 5 }, payInfo = null, history = [], photos = [], isStaff = false;
+  let me = null, profile = null, match = null, matches = [], selectedMatchId = null, dailyQuota = { daily_used: 0, daily_limit: 5 }, history = [], photos = [], isStaff = false;
   let tickTimer = null, chatChannel = null, signalChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
   let voiceRecorder = null, voiceStream = null, voiceChunks = [], voiceMime = "", voiceStartedAt = 0, voiceLimitTimer = null, voiceDiscard = false, voiceSeen = new Set(), lastVoiceTs = null;
   let pc = null, localStream = null, pendingIce = [], incomingOffer = null, callState = "idle";
@@ -90,11 +90,10 @@
 
   async function loadAll() {
     const s = await session(); me = s?.user || null;
-    const [pr, m, pay, h] = await Promise.all([
-      api("/api/profile"), api("/api/match/current"),
-      api("/api/payments/status").catch(() => null), api("/api/match/history").catch(() => ({ history: [] }))
+    const [pr, m, h] = await Promise.all([
+      api("/api/profile"), api("/api/match/current"), api("/api/match/history").catch(() => ({ history: [] }))
     ]);
-    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; payInfo = pay; history = h.history || [];
+    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; history = h.history || [];
     photos = profile ? ((await api("/api/profile/photos").catch(() => ({ photos: [] }))).photos || []) : [];
     isStaff = await api("/api/admin/me").then(() => true).catch(() => false);
   }
@@ -200,7 +199,6 @@
 
       h += `<h3 class="nv-h">${p("photos")}</h3><div id="photoBox"><p class="modal-description">${p("photoHelp")}</p><div class="nv-row"><label class="outline-btn" for="photoInput">${p("addPhoto")}</label><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden ${photos.length >= 4 ? "disabled" : ""}></div><div class="photo-grid">${photos.map((ph) => `<div class="photo-card"><img src="${esc(ph.url || "")}" alt="Your profile photo"><small>${p("photo" + ph.approval_status[0].toUpperCase() + ph.approval_status.slice(1))}</small><button class="nv-link" data-photo-delete="${esc(ph.id)}" type="button">${p("photoDelete")}</button>${ph.review_reason ? `<small>${esc(ph.review_reason)}</small>` : ""}</div>`).join("")}</div><div class="nv-msg" id="photoMsg" role="status"></div></div>`;
       h += `<h3 class="nv-h">${p("matching")}</h3><div id="matchBox"></div>`;
-      h += `<h3 class="nv-h">${p("payment")}</h3><div id="payBox"></div>`;
       if (history.length) {
         h += `<h3 class="nv-h">${p("pastMatches")}</h3><ul class="nv-list">${history.filter((x) => !["proposed", "active"].includes(x.status)).map((x) =>
           `<li>${p("from")}: ${esc(fmt(x.started_at || x.created_at))} · ${esc(x.status)} ${x.started_at ? `<button class="nv-link" data-fb="${esc(x.id)}" type="button">${p("feedback")}</button>` : ""}</li>`).join("") || `<li>${p("none")}</li>`}</ul><div id="fbBox"></div>`;
@@ -223,7 +221,7 @@
     const photoInput = $("#photoInput");
     if (photoInput) photoInput.onchange = async () => { const file = photoInput.files?.[0]; if (!file) return; await uploadPhoto(file); };
     body.querySelectorAll("[data-photo-delete]").forEach((b) => (b.onclick = async () => { if (!confirm(p("photoDelete") + "?")) return; try { await api("/api/profile/photos/" + encodeURIComponent(b.dataset.photoDelete), { method: "DELETE" }); await loadAll(); render(); } catch (e) { const out = $("#photoMsg"); if (out) out.textContent = e.message; } }));
-    if (profile) { renderMatch(); renderPay(); }
+    if (profile) renderMatch();
   }
 
   function msg(text, ok) { const el = body.querySelector("#pMsg"); if (el) { el.textContent = text; el.className = "nv-msg" + (ok ? " ok" : ""); } }
@@ -596,38 +594,6 @@
     body.querySelector("#fbSend").onclick = async () => {
       try { await api("/api/feedback", { method: "POST", body: { match_id: matchId, wants_to_continue: body.querySelector("[name=fbc]:checked").value === "yes", feedback_text: body.querySelector("#fbText").value || null } }); body.querySelector("#fbBox").innerHTML = `<p class="nv-msg ok">${p("feedbackThanks")}</p>`; }
       catch (e) { body.querySelector("#fbBox").insertAdjacentHTML("beforeend", `<p class="nv-msg">${esc(e.message)}</p>`); }
-    };
-  }
-
-  // ----- payment -----
-  function loadRazorpay() {
-    return new Promise((res, rej) => {
-      if (window.Razorpay) return res();
-      const s = document.createElement("script"); s.src = "https://checkout.razorpay.com/v1/checkout.js";
-      s.onload = res; s.onerror = () => rej(new Error(window.NV.t("network"))); document.head.appendChild(s);
-    });
-  }
-  function renderPay() {
-    const box = body.querySelector("#payBox");
-    if (!payInfo || !payInfo.enabled) { box.innerHTML = `<p class="modal-description">${p("payOff")}</p>`; return; }
-    if (payInfo.has_credit) { box.innerHTML = `<p class="nv-msg ok">${p("hasCredit")}</p>`; return; }
-    box.innerHTML = `<div class="nv-row"><button class="outline-btn" id="payBtn" type="button" ${profile.approval_status !== "approved" ? "disabled" : ""}>${p("pay")}</button></div><div class="nv-msg" id="payMsg"></div>`;
-    box.querySelector("#payBtn").onclick = async () => {
-      const out = box.querySelector("#payMsg");
-      try {
-        const o = await api("/api/payments/order", { method: "POST" });
-        await loadRazorpay();
-        const rz = new window.Razorpay({
-          key: o.key_id, order_id: o.order_id, amount: o.amount, currency: o.currency, name: "NIVORA", description: p("payment"),
-          handler: async (resp) => {
-            out.textContent = p("payVerifying");
-            try { await api("/api/payments/verify", { method: "POST", body: resp }); await loadAll(); render(); msg(p("paid"), true); }
-            catch (e) { out.textContent = e.message || p("payFail"); }
-          },
-          modal: { ondismiss: () => { out.textContent = ""; } }
-        });
-        rz.open();
-      } catch (e) { out.textContent = e.message; }
     };
   }
 
