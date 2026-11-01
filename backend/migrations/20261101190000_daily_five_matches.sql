@@ -64,6 +64,7 @@ begin
      and (me.looking_for = 'any' or me.looking_for = c.gender)
      and (c.looking_for = 'any' or c.looking_for = me.gender)
      and not exists (select 1 from public.match_members m where m.user_id = c.id)
+     and not exists (select 1 from public.match_daily_usage du where du.user_id = c.id and du.usage_date = today_kerala and du.matches_count >= 5)
      and not exists (select 1 from public.blocks b
                       where (b.blocker_id = p_user and b.blocked_id = c.id)
                          or (b.blocker_id = c.id and b.blocked_id = p_user))
@@ -89,11 +90,13 @@ begin
   values (p_user, new_id), (cand.id, new_id);
 
   insert into public.match_daily_usage (user_id, usage_date, matches_count, updated_at)
-  values (p_user, today_kerala, 1, now())
+  values (p_user, today_kerala, 1, now()), (cand.id, today_kerala, 1, now())
   on conflict (user_id, usage_date) do update
     set matches_count = public.match_daily_usage.matches_count + 1,
-        updated_at = now()
-  returning matches_count into used_today;
+        updated_at = now();
+
+  select matches_count into used_today from public.match_daily_usage
+   where user_id = p_user and usage_date = today_kerala;
 
   if pay_id is not null then
     update public.payments set consumed_at = now(), consumed_match_id = new_id where id = pay_id;
