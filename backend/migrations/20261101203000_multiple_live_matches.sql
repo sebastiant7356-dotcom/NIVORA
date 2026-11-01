@@ -11,6 +11,11 @@ alter table public.match_members
 create index if not exists match_members_match_idx
   on public.match_members (match_id);
 
+-- A pair must never be matched twice, even if two users request each other
+-- concurrently. Existing production data was checked for duplicate pairs.
+create unique index if not exists match_history_pair_unique_idx
+  on public.match_history (least(user_one, user_two), greatest(user_one, user_two));
+
 create or replace function public.nivora_find_partner(
   p_user uuid,
   p_require_payment boolean default false
@@ -28,7 +33,7 @@ begin
   perform pg_advisory_xact_lock(hashtextextended(p_user::text, 0));
   perform public.nivora_expire_matches();
 
-  select * into me from public.profiles where id = p_user;
+  select * into me from public.profiles where id = p_user for update;
   if not found then raise exception 'profile_missing'; end if;
   if me.approval_status <> 'approved' then raise exception 'not_approved'; end if;
   if not me.is_active or me.suspended_at is not null then raise exception 'inactive'; end if;
@@ -89,7 +94,7 @@ begin
 
   insert into public.match_history
     (user_one, user_two, status, started_at, expires_at, proposal_expires_at)
-  values (p_user, cand.id, 'proposed', null, null, now() + interval '48 hours')
+  values (p_user, cand.id, 'proposed', null, null, now() + interval '72 hours')
   returning id into new_id;
 
   insert into public.match_members (user_id, match_id)
