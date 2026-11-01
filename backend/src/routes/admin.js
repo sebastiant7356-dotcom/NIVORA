@@ -4,7 +4,6 @@ const { serviceClient } = require("../lib/clients");
 const { requireAuth, requireStaff } = require("../middleware");
 const { createLimiter, byUser } = require("../lib/ratelimit");
 const { isUuid, clean } = require("../lib/validation");
-const { reviewProfile } = require("../lib/moderation-ai");
 const { endLiveMatchesFor } = require("../lib/matches");
 const { audit } = require("../lib/audit");
 
@@ -20,84 +19,43 @@ const page = (req) => ({
   offset: Math.max(parseInt(req.query.offset, 10) || 0, 0)
 });
 
+async function hasOpenReport(db, userId) {
+  const { data, error } = await db.from("reports").select("id").eq("reported_id", userId).eq("status", "open").limit(1).maybeSingle();
+  if (error) throw error;
+  return Boolean(data);
+}
+
 router.get("/me", (req, res) => res.json({ success: true, role: req.staffRole }));
 
-router.get("/profiles", async (req, res) => {
-  const status = req.query.status || "pending";
-  if (!["pending", "approved", "rejected", "changes_requested", "all"].includes(status)) {
-    return res.status(400).json({ success: false, message: "Invalid status filter." });
-  }
-  const { limit, offset } = page(req);
-  const db = serviceClient();
-  const { data: staffRows, error: staffError } = await db.from("staff_roles").select("user_id");
-  if (staffError) return res.status(500).json({ success: false, message: "Could not load staff accounts." });
-  const staffIds = (staffRows || []).map((row) => row.user_id);
-  let q = db.from("profiles").select(LIST_COLS, { count: "exact" })
-    .order("created_at", { ascending: true }).range(offset, offset + limit - 1);
-  if (staffIds.length) q = q.not("id", "in", "(" + staffIds.join(",") + ")");
-  if (status !== "all") q = q.eq("approval_status", status);
-  const { data, count, error } = await q;
-  if (error) return res.status(500).json({ success: false, message: "Could not load profiles." });
-  res.json({ success: true, total: count, profiles: data || [] });
-});
+router.get("/profiles", (req, res) => res.status(410).json({
+  success: false, message: "Routine profile review is disabled. Staff should review accounts only through open reports."
+}));
 
 router.get("/profiles/:id", async (req, res) => {
   if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id." });
   const db = serviceClient();
   const { data: staff } = await db.from("staff_roles").select("user_id").eq("user_id", req.params.id).maybeSingle();
   if (staff) return res.status(404).json({ success: false, message: "Customer profile not found." });
+  try {
+    if (!(await hasOpenReport(db, req.params.id))) return res.status(404).json({ success: false, message: "Only reported accounts can be reviewed." });
+  } catch { return res.status(500).json({ success: false, message: "Could not verify report status." }); }
   const [{ data: profile }, { data: history }, { data: reports }] = await Promise.all([
     db.from("profiles").select(LIST_COLS).eq("id", req.params.id).maybeSingle(),
     db.from("moderation_events").select("id, admin_id, decision, reason, created_at").eq("profile_id", req.params.id).order("created_at", { ascending: false }),
     db.from("reports").select("id, reason, status, created_at").eq("reported_id", req.params.id).order("created_at", { ascending: false })
   ]);
   if (!profile) return res.status(404).json({ success: false, message: "Profile not found." });
+  await audit(req.user.id, "viewed_reported_profile", "profile", req.params.id);
   res.json({ success: true, profile, history: history || [], reports: reports || [] });
 });
 
-router.post("/profiles/:id/decision", async (req, res) => {
-  const { decision, reason } = req.body || {};
-  if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id." });
-  if (!["approved", "rejected", "changes_requested"].includes(decision)) {
-    return res.status(400).json({ success: false, message: "Decision must be approved, rejected or changes_requested." });
-  }
-  if (req.params.id === req.user.id) {
-    return res.status(403).json({ success: false, message: "You cannot review your own profile." });
-  }
-  const note = typeof reason === "string" ? clean(reason).slice(0, 500) : "";
-  if (decision !== "approved" && note.length < 5) {
-    return res.status(400).json({ success: false, message: "A reason (at least 5 characters) is required." });
-  }
-  const db = serviceClient();
-  const { data: p } = await db.from("profiles").select("id, approval_status, ai_risk_score, ai_flags, ai_source, suspended_at").eq("id", req.params.id).maybeSingle();
-  if (!p) return res.status(404).json({ success: false, message: "Profile not found." });
-  if (decision === "approved" && p.suspended_at) {
-    return res.status(409).json({ success: false, message: "Reinstate the suspended user first." });
-  }
-  const now = new Date().toISOString();
-  const { error } = await db.from("profiles").update({
-    approval_status: decision, reviewed_by: req.user.id, reviewed_at: now, review_reason: note || null
-  }).eq("id", req.params.id);
-  if (error) return res.status(500).json({ success: false, message: "Decision could not be saved." });
-  await db.from("moderation_events").insert({
-    profile_id: req.params.id, admin_id: req.user.id, decision, reason: note || null,
-    ai_snapshot: { score: p.ai_risk_score, flags: p.ai_flags, source: p.ai_source, advisory: true }
-  });
-  if (decision !== "approved") await endLiveMatchesFor(req.params.id, "profile_" + decision, req.user.id);
-  await audit(req.user.id, "profile_decision", "profile", req.params.id, { decision, from: p.approval_status });
-  res.json({ success: true, approval_status: decision });
-});
+router.post("/profiles/:id/decision", (req, res) => res.status(410).json({
+  success: false, message: "Customer profiles are automatically approved. Review reported accounts through the Reports tab."
+}));
 
-router.post("/profiles/:id/rerun-ai", async (req, res) => {
-  if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id." });
-  const db = serviceClient();
-  const { data: p } = await db.from("profiles").select("*").eq("id", req.params.id).maybeSingle();
-  if (!p) return res.status(404).json({ success: false, message: "Profile not found." });
-  const r = await reviewProfile(p);
-  await db.from("profiles").update({ ai_risk_score: r.score, ai_flags: r.flags, ai_checked_at: new Date().toISOString(), ai_source: r.source }).eq("id", p.id);
-  await audit(req.user.id, "ai_rerun", "profile", p.id);
-  res.json({ success: true, ai: { score: r.score, flags: r.flags, source: r.source, advisory: true } });
-});
+router.post("/profiles/:id/rerun-ai", (req, res) => res.status(410).json({
+  success: false, message: "Routine AI screening is disabled. Review only accounts with open reports."
+}));
 
 // ---- Reports and safety actions ----
 router.get("/reports", async (req, res) => {
@@ -194,6 +152,9 @@ const PHOTO_BUCKET = "profile-photos";
 router.get("/profiles/:id/photos", async (req, res) => {
   if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id." });
   const db = serviceClient();
+  try {
+    if (!(await hasOpenReport(db, req.params.id))) return res.status(404).json({ success: false, message: "Only reported accounts can be reviewed." });
+  } catch { return res.status(500).json({ success: false, message: "Could not verify report status." }); }
   const { data, error } = await db.from("profile_photos")
     .select("id, object_path, sort_order, approval_status, review_reason, created_at")
     .eq("user_id", req.params.id).order("sort_order");
@@ -217,6 +178,9 @@ router.post("/profiles/:id/photos/:photoId/decision", async (req, res) => {
   const note = typeof reason === "string" ? clean(reason).slice(0, 500) : "";
   if (decision === "rejected" && note.length < 5) return res.status(400).json({ success: false, message: "A rejection reason (at least 5 characters) is required." });
   const db = serviceClient();
+  try {
+    if (!(await hasOpenReport(db, req.params.id))) return res.status(404).json({ success: false, message: "Only reported accounts can be reviewed." });
+  } catch { return res.status(500).json({ success: false, message: "Could not verify report status." }); }
   const { data: photo, error: lookupError } = await db.from("profile_photos")
     .select("id, user_id, approval_status").eq("id", req.params.photoId).eq("user_id", req.params.id).maybeSingle();
   if (lookupError) return res.status(500).json({ success: false, message: "Could not load photo." });
