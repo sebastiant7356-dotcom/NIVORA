@@ -4,7 +4,7 @@
   const { api, client, session, authPanel, esc } = window.NV;
   const $ = (s) => document.querySelector(s);
   let tab = "pending", role = null;
-  const TABS = [["pending", "Pending"], ["changes_requested", "Changes requested"], ["approved", "Approved"], ["rejected", "Rejected"], ["reports", "Open reports"], ["history", "Moderation history"], ["audit", "Audit log"]];
+  const TABS = [["reports", "Open reports"], ["history", "Moderation history"], ["audit", "Audit log"]];
   const msg = (t, ok) => { const m = $("#msg"); m.textContent = t || ""; m.className = "nv-msg" + (ok ? " ok" : ""); };
   const fmt = (i) => (i ? new Date(i).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "—");
 
@@ -109,6 +109,7 @@
       <div class="admin-actions"><textarea placeholder="Resolution note (required)" rows="2" maxlength="500"></textarea>
       <button data-r="actioned" type="button">Mark actioned</button><button data-r="dismissed" class="alt" type="button">Dismiss</button>
       ${role === "admin" ? `<button data-r="actioned" data-s="1" class="bad" type="button">Action + suspend user</button>` : ""}
+      ${r.reported_id ? `<button data-profile="${esc(r.reported_id)}" class="alt" type="button">View reported profile</button><button data-photos="${esc(r.reported_id)}" class="alt" type="button">View reported profile photos</button>` : ""}
       ${r.match_id ? `<button data-chat class="alt" type="button">View reported chat (audit-logged)</button><button data-voice class="alt" type="button">Review reported voice (audit-logged)</button>` : ""}</div><div class="hist"></div></div>`).join("");
     $("#list").onclick = async (e) => {
       const card = e.target.closest(".card"); if (!card) return; const id = card.dataset.id;
@@ -117,6 +118,17 @@
       } else if (e.target.dataset.chat !== undefined) {
         if (!confirm("Reading a private conversation is logged in the audit trail. Continue?")) return;
         try { const r = await api(`/api/admin/reports/${id}/messages`); card.querySelector(".hist").innerHTML = r.messages.map((m) => `<div class="bubble theirs">${esc(m.body)}</div>`).join("") || "<small>No messages.</small>"; } catch (er) { msg(er.message); }
+      } else if (e.target.dataset.profile) {
+        try {
+          const r = await api(`/api/admin/profiles/${e.target.dataset.profile}`), p = r.profile;
+          card.querySelector(".hist").innerHTML = `<h4>${esc(p.full_name)}, ${esc(p.age)} · ${esc(p.district || "—")}</h4><p>${esc(p.job_title || "—")} · ${esc(p.gender || "—")} · ${esc(p.relationship_intention || "—")}</p><p>${esc(p.bio || "")}</p><small>Status: ${esc(p.approval_status)}${p.suspended_at ? " · SUSPENDED" : ""} · ${r.reports.length} report(s)</small>`;
+        } catch (er) { msg(er.message); }
+      } else if (e.target.dataset.photos) {
+        if (!confirm("Viewing a reported member’s private profile photos is audit-logged. Continue?")) return;
+        try {
+          const r = await api(`/api/admin/profiles/${e.target.dataset.photos}/photos`);
+          card.querySelector(".hist").innerHTML = r.photos.map((ph) => `<div class="photo-review"><img src="${esc(ph.url || "")}" alt="Reported profile photo"><small>${esc(ph.approval_status)}</small></div>`).join("") || "<small>No profile photos.</small>";
+        } catch (er) { msg(er.message); }
       } else if (e.target.dataset.voice !== undefined) {
         if (!confirm("Reviewing private voice messages is logged in the audit trail. Continue?")) return;
         try {
