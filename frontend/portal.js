@@ -286,14 +286,12 @@
     const box = body.querySelector("#matchBox");
     if (profile.approval_status !== "approved") { box.innerHTML = `<p class="modal-description">${p("needApproval")}</p>`; return; }
 
-    const needPay = payInfo?.required && !payInfo?.has_credit;
-    const canFind = dailyQuota.daily_used < dailyQuota.daily_limit && !needPay && profile.profile_complete && !profile.suspended;
+    const canFind = dailyQuota.daily_used < dailyQuota.daily_limit && profile.profile_complete && !profile.suspended;
     const tabs = matches.length ? `<div class="nv-row" style="flex-wrap:wrap;gap:8px;margin-bottom:12px">${matches.map((item, i) =>
       `<button type="button" class="${match?.id === item.id ? "primary-btn" : "outline-btn"}" data-match-id="${esc(item.id)}">${p("chatTab")} ${i + 1}${item.status === "proposed" ? " · Pending" : ""}</button>`
     ).join("")}</div>` : "";
     const find = `<div class="nv-row"><button class="primary-btn" id="mFind" type="button" ${canFind ? "" : "disabled"}>${p("findMatch")}</button></div>`;
     let header = `<p class="modal-description">${p("dailyMatchesUsed")}: ${dailyQuota.daily_used}/${dailyQuota.daily_limit} (Kerala time). ${p("activeConversations")}: ${matches.length}</p>`;
-    if (needPay) header += `<p class="modal-description">${p("payNeeded")}</p>`;
     if (dailyQuota.daily_used >= dailyQuota.daily_limit) header += `<p class="modal-description">${p("dailyLimitReached")}</p>`;
     if (!match) {
       box.innerHTML = header + find + `<div class="nv-msg" id="mMsg"></div>`;
