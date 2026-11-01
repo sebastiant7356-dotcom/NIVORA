@@ -51,3 +51,22 @@ test("SQL: RLS enabled and matching functions not callable by browser roles", ()
   assert.ok(/revoke all on function public\.nivora_find_partner\(uuid, boolean\)\s+from public, anon, authenticated/.test(sql));
   assert.ok(!/grant (insert|update|delete)[^;]*to (anon|authenticated)/i.test(sql));
 });
+
+test("daily five matching and multiple live match UI are wired together", () => {
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261101230000_daily_five_multiple_matches.sql"));
+  const route = text(path.join(ROOT, "backend", "src", "routes", "match.js"));
+  const portal = text(path.join(ROOT, "frontend", "portal.js"));
+  assert.match(migration, /create table if not exists public\.match_daily_usage/);
+  assert.match(migration, /time zone 'Asia\/Kolkata'/);
+  assert.match(migration, /matches_count between 0 and 5/);
+  assert.match(migration, /pg_advisory_xact_lock/);
+  assert.match(migration, /daily_match_limit_reached/);
+  assert.match(migration, /primary key \(user_id, match_id\)/);
+  assert.match(migration, /match_history_pair_unique_idx/);
+  assert.match(migration, /grant execute on function public\.nivora_find_partner\(uuid, boolean\) to service_role/);
+  assert.match(route, /dailyUsage\(req\.user\.id\)/);
+  assert.match(route, /matches, match: matches\[0\] \|\| null/);
+  assert.match(portal, /dailyQuota\.daily_used/);
+  assert.match(portal, /data-match-id/);
+  assert.match(portal, /matches\.map/);
+});
