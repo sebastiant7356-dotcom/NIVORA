@@ -4,7 +4,9 @@
   "description": "NIVORA backend API (Express + Supabase)",
   "main": "src/server.js",
   "private": true,
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
