@@ -171,7 +171,7 @@
   function partnerHtml(pt) {
     if (!pt) return "";
     return `<div class="summary-box"><b>${esc(pt.first_name)}, ${esc(pt.age)}</b><br>${esc(pt.district || "—")} · ${esc(pt.job_title || "—")}<br>
-      <b>${p("intention")}:</b> ${esc(p(pt.relationship_intention))}<br>
+      ${pt.photos && pt.photos.length ? `<div class="partner-photos">${pt.photos.map((ph) => `<img src="${esc(ph.url)}" alt="Approved profile photo" loading="lazy">`).join("")}</div>` : ""}\n      <b>${p("intention")}:</b> ${esc(p(pt.relationship_intention))}<br>
       <b>${p("values")}:</b> ${esc((pt.core_values || []).map(valName).join(", ") || "—")}<br>
       ${pt.shared_values?.length ? `<b>${p("sharedValues")}:</b> ${esc(pt.shared_values.map(valName).join(", "))}<br>` : ""}
       ${pt.bio ? `<br>${esc(pt.bio)}` : ""}</div>`;
