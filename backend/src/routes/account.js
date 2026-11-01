@@ -18,7 +18,8 @@ router.get("/export", limit, async (req, res) => {
     db.from("match_history").select("id, status, started_at, expires_at, created_at, ended_reason").or(`user_one.eq.${id},user_two.eq.${id}`),
     db.from("match_feedback").select("match_id, wants_to_continue, feedback_text, created_at").eq("reviewer_id", id),
     db.from("messages").select("match_id, body, created_at").eq("sender_id", id),
-    db.from("payments").select("status, amount_paise, currency, created_at, paid_at").eq("user_id", id)
+    db.from("payments").select("status, amount_paise, currency, created_at, paid_at").eq("user_id", id),
+    db.from("profile_photos").select("approval_status, mime_type, size_bytes, sort_order, created_at").eq("user_id", id)
   ]);
   if (profile.data) { delete profile.data.ai_flags; delete profile.data.ai_risk_score; }
   await audit(id, "data_export", "account", id);
