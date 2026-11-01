@@ -49,9 +49,6 @@ async function requireAuth(req, res, next) {
       return res.status(401).json({ success: false, message: "Invalid or expired login session." });
     }
     const u = data.user;
-    if (!u.phone || !u.phone_confirmed_at) {
-      return res.status(403).json({ success: false, message: "A phone-verified account is required. Please sign in with your phone number and OTP." });
-    }
     req.user = { id: u.id }; // immutable id only; phone is never copied into request logs
     return next();
   } catch {
