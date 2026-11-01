@@ -42,3 +42,15 @@ a.outline-btn{display:inline-flex;align-items:center}
 .admin-actions button.alt{background:transparent;color:var(--green)}.admin-actions button.bad{background:#9a4332;border-color:#9a4332}
 table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,table.audit th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 @media(max-width:700px){.portal-modal{padding:24px 16px}.chat-log{height:200px}}
+
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;margin:12px 0}
+.photo-card,.photo-review{display:flex;flex-direction:column;gap:6px;min-width:0;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+.photo-card img,.photo-review img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:7px;background:var(--line)}
+.photo-card small,.photo-review small{font-size:11px;color:var(--muted)}
+.photo-card .nv-link{align-self:flex-start}
+.photo-review{display:inline-flex;vertical-align:top;width:min(220px,100%);margin:8px}
+.photo-review button{padding:7px 10px;border-radius:7px;border:1px solid var(--green);background:var(--green);color:#fffdf6;font-size:11px}
+.photo-review button.bad{background:#9a4332;border-color:#9a4332}
+
+.partner-photos{display:flex;gap:8px;overflow-x:auto;margin:10px 0;padding-bottom:4px}
+.partner-photos img{width:min(46%,180px);aspect-ratio:4/5;object-fit:cover;border-radius:9px;background:var(--line);flex:0 0 auto}

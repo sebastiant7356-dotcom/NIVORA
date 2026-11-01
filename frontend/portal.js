@@ -14,7 +14,7 @@
       rejectedNote: "This profile was not approved and cannot be edited here.",
       matching: "Your match", findMatch: "Find my match", finding: "Searching…", noMatchNow: "No suitable profile is available right now. Please check again later.",
       needApproval: "Matching opens after staff approve your profile.", payNeeded: "A paid ₹50 credit is needed to get a match.",
-      accept: "Accept", decline: "Decline", waitingPartner: "You accepted. Waiting for the other person to respond.", waitingYou: "A match is waiting for your response.",
+      accept: "Accept", decline: "Decline", continueMatch: "Continue", stopMatch: "Stop", waitingPartner: "You chose Continue. Waiting for the other person.", waitingYou: "Choose Continue or Stop to proceed.",
       proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and calls will close.",
       timeLeft: "Chat window left", closed: "Closed", chat: "Chat", typeMsg: "Write a message…", send: "Send", live: "Live", reconnecting: "Reconnecting…",
       chatClosed: "This conversation is closed (match ended or 72 hours are over).", call: "Voice call", hangup: "End call", incoming: "Incoming voice call", answer: "Answer",
@@ -27,7 +27,7 @@
       pastMatches: "Past matches", none: "None yet.", from: "Started",
       payment: "Match credit (₹50)", payOff: "Payments are not enabled on this server yet.", pay: "Pay ₹50", hasCredit: "You have a paid credit ready.", payVerifying: "Confirming payment…", paid: "Payment confirmed.", payFail: "Payment could not be confirmed.",
       account: "Account & privacy", export: "Download my data", del: "Delete my account", delWarn: "This permanently deletes your profile, matches and chats. Type DELETE to confirm.", delDone: "Your account was deleted.",
-      adminLink: "Staff review screen", values: "Values", intention: "Intention", sharedValues: "Shared values",
+      adminLink: "Staff review screen", photos: "Profile photos", photoHelp: "Upload up to 4 clear photos (JPEG, PNG or WebP, max 5 MB each). Staff must approve each photo before it is shown to others.", addPhoto: "Choose photo", photoPending: "Awaiting review", photoApproved: "Approved", photoRejected: "Not approved", photoDelete: "Remove", photoLimit: "You have reached the 4-photo limit.", photoUpload: "Uploading…", photoError: "Photo upload failed.", values: "Values", intention: "Intention", sharedValues: "Shared values",
       v_family: "Family", v_kindness: "Kindness & respect", v_career: "Career", v_faith: "Faith / culture", v_communication: "Open communication", v_lifestyle: "Lifestyle",
       marriage: "Marriage", longterm: "Long-term relationship", woman: "Woman", man: "Man", other: "Other", any: "Open to possibilities",
       name: "Name", age: "Age", place: "Location", job: "Work / study", about: "About you", lookingFor: "I'm looking for", relationship: "Relationship intention", minAge: "Partner min age", maxAge: "Partner max age"
@@ -41,7 +41,7 @@
       rejectedNote: "ഈ profile അംഗീകരിച്ചിട്ടില്ല; ഇവിടെ edit ചെയ്യാനാകില്ല.",
       matching: "നിങ്ങളുടെ match", findMatch: "എന്റെ match കണ്ടെത്തുക", finding: "തിരയുന്നു…", noMatchNow: "ഇപ്പോൾ അനുയോജ്യമായ profile ഇല്ല. പിന്നീട് നോക്കുക.",
       needApproval: "Staff profile അംഗീകരിച്ച ശേഷം matching തുറക്കും.", payNeeded: "Match ലഭിക്കാൻ ₹50 credit ആവശ്യമാണ്.",
-      accept: "സ്വീകരിക്കുക", decline: "നിരസിക്കുക", waitingPartner: "നിങ്ങൾ സ്വീകരിച്ചു. മറ്റേയാളുടെ മറുപടി കാത്തിരിക്കുന്നു.", waitingYou: "ഒരു match നിങ്ങളുടെ മറുപടി കാത്തിരിക്കുന്നു.",
+      accept: "സ്വീകരിക്കുക", decline: "നിരസിക്കുക", continueMatch: "തുടരാം", stopMatch: "നിർത്താം", waitingPartner: "നിങ്ങൾ Continue തിരഞ്ഞെടുത്തു. മറ്റേയാളുടെ തീരുമാനം കാത്തിരിക്കുന്നു.", waitingYou: "തുടരാൻ Continue അല്ലെങ്കിൽ Stop തിരഞ്ഞെടുക്കുക.",
       proposalEnds: "ഇതിനുമുമ്പ് മറുപടി നൽകുക", endMatch: "Match അവസാനിപ്പിക്കുക", endConfirm: "ഈ match അവസാനിപ്പിക്കണോ? Chat, call അടയും.",
       timeLeft: "Chat സമയം ബാക്കി", closed: "അടച്ചു", chat: "Chat", typeMsg: "സന്ദേശം എഴുതുക…", send: "അയയ്ക്കുക", live: "ലൈവ്", reconnecting: "വീണ്ടും ബന്ധിപ്പിക്കുന്നു…",
       chatClosed: "ഈ സംഭാഷണം അടച്ചു (match അവസാനിച്ചു / 72 മണിക്കൂർ കഴിഞ്ഞു).", call: "Voice call", hangup: "Call അവസാനിപ്പിക്കുക", incoming: "Voice call വരുന്നു", answer: "എടുക്കുക",
@@ -54,7 +54,7 @@
       pastMatches: "മുൻ match-കൾ", none: "ഇതുവരെ ഇല്ല.", from: "തുടങ്ങിയത്",
       payment: "Match credit (₹50)", payOff: "ഈ server-ൽ payment ഇതുവരെ enable ചെയ്തിട്ടില്ല.", pay: "₹50 അടയ്ക്കുക", hasCredit: "Paid credit തയ്യാറാണ്.", payVerifying: "Payment സ്ഥിരീകരിക്കുന്നു…", paid: "Payment സ്ഥിരീകരിച്ചു.", payFail: "Payment സ്ഥിരീകരിക്കാനായില്ല.",
       account: "Account & സ്വകാര്യത", export: "എന്റെ data download ചെയ്യുക", del: "എന്റെ account delete ചെയ്യുക", delWarn: "Profile, match, chat എല്ലാം സ്ഥിരമായി മായും. സ്ഥിരീകരിക്കാൻ DELETE എന്ന് ടൈപ്പ് ചെയ്യുക.", delDone: "നിങ്ങളുടെ account delete ചെയ്തു.",
-      adminLink: "Staff review screen", values: "മൂല്യങ്ങൾ", intention: "ലക്ഷ്യം", sharedValues: "പൊതുവായ മൂല്യങ്ങൾ",
+      adminLink: "Staff review screen", photos: "Profile photos", photoHelp: "പരമാവധി 4 വ്യക്തമായ ഫോട്ടോകൾ ചേർക്കാം (JPEG, PNG, WebP; ഓരോന്നും 5 MB വരെ). മറ്റുള്ളവർക്ക് കാണുന്നതിന് മുമ്പ് Staff അംഗീകരിക്കണം.", addPhoto: "ഫോട്ടോ തിരഞ്ഞെടുക്കുക", photoPending: "Review കാത്തിരിക്കുന്നു", photoApproved: "അംഗീകരിച്ചു", photoRejected: "അംഗീകരിച്ചില്ല", photoDelete: "നീക്കം ചെയ്യുക", photoLimit: "4 ഫോട്ടോ പരിധി കഴിഞ്ഞു.", photoUpload: "Upload ചെയ്യുന്നു…", photoError: "ഫോട്ടോ upload ചെയ്യാനായില്ല.", values: "മൂല്യങ്ങൾ", intention: "ലക്ഷ്യം", sharedValues: "പൊതുവായ മൂല്യങ്ങൾ",
       v_family: "കുടുംബം", v_kindness: "ദയയും ബഹുമാനവും", v_career: "കരിയർ", v_faith: "വിശ്വാസം / സംസ്കാരം", v_communication: "തുറന്ന സംഭാഷണം", v_lifestyle: "ജീവിതശൈലി",
       marriage: "വിവാഹം", longterm: "ദീർഘകാല ബന്ധം", woman: "സ്ത്രീ", man: "പുരുഷൻ", other: "മറ്റൊന്ന്", any: "തുറന്ന മനസ്സോടെ",
       name: "പേര്", age: "വയസ്സ്", place: "സ്ഥലം", job: "ജോലി / പഠനം", about: "നിങ്ങളെക്കുറിച്ച്", lookingFor: "ഞാൻ അന്വേഷിക്കുന്നത്", relationship: "ബന്ധത്തിന്റെ ലക്ഷ്യം", minAge: "പങ്കാളിയുടെ കുറഞ്ഞ വയസ്സ്", maxAge: "പങ്കാളിയുടെ കൂടിയ വയസ്സ്"
@@ -80,7 +80,7 @@
   function close() { stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
-  let me = null, profile = null, match = null, payInfo = null, history = [], isStaff = false;
+  let me = null, profile = null, match = null, payInfo = null, history = [], photos = [], isStaff = false;
   let tickTimer = null, chatChannel = null, signalChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
   let pc = null, localStream = null, pendingIce = [], incomingOffer = null, callState = "idle";
   const val = (k) => (k in (profile || {}) ? profile[k] : "");
@@ -92,6 +92,7 @@
       api("/api/payments/status").catch(() => null), api("/api/match/history").catch(() => ({ history: [] }))
     ]);
     profile = pr.profile; match = m.match; payInfo = pay; history = h.history || [];
+    photos = profile ? ((await api("/api/profile/photos").catch(() => ({ photos: [] }))).photos || []) : [];
     isStaff = await api("/api/admin/me").then(() => true).catch(() => false);
   }
 
@@ -171,6 +172,7 @@
   function partnerHtml(pt) {
     if (!pt) return "";
     return `<div class="summary-box"><b>${esc(pt.first_name)}, ${esc(pt.age)}</b><br>${esc(pt.district || "—")} · ${esc(pt.job_title || "—")}<br>
+      ${pt.photos && pt.photos.length ? `<div class="partner-photos">${pt.photos.map((ph) => `<img src="${esc(ph.url)}" alt="Approved profile photo" loading="lazy">`).join("")}</div>` : ""}
       <b>${p("intention")}:</b> ${esc(p(pt.relationship_intention))}<br>
       <b>${p("values")}:</b> ${esc((pt.core_values || []).map(valName).join(", ") || "—")}<br>
       ${pt.shared_values?.length ? `<b>${p("sharedValues")}:</b> ${esc(pt.shared_values.map(valName).join(", "))}<br>` : ""}
@@ -191,6 +193,7 @@
         ${!profile.profile_complete ? `<p class="nv-msg">${p("incomplete")}</p>` : ""}
         <div class="nv-row">${st !== "rejected" ? `<button class="outline-btn" id="pEdit" type="button">${p("editProfile")}</button>` : `<small>${p("rejectedNote")}</small>`}</div>`;
 
+      h += `<h3 class="nv-h">${p("photos")}</h3><div id="photoBox"><p class="modal-description">${p("photoHelp")}</p><div class="nv-row"><label class="outline-btn" for="photoInput">${p("addPhoto")}</label><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden ${photos.length >= 4 ? "disabled" : ""}></div><div class="photo-grid">${photos.map((ph) => `<div class="photo-card"><img src="${esc(ph.url || "")}" alt="Your profile photo"><small>${p("photo" + ph.approval_status[0].toUpperCase() + ph.approval_status.slice(1))}</small><button class="nv-link" data-photo-delete="${esc(ph.id)}" type="button">${p("photoDelete")}</button>${ph.review_reason ? `<small>${esc(ph.review_reason)}</small>` : ""}</div>`).join("")}</div><div class="nv-msg" id="photoMsg" role="status"></div></div>`;
       h += `<h3 class="nv-h">${p("matching")}</h3><div id="matchBox"></div>`;
       h += `<h3 class="nv-h">${p("payment")}</h3><div id="payBox"></div>`;
       if (history.length) {
@@ -212,10 +215,39 @@
     $("#pExport").onclick = exportData;
     $("#pDelete").onclick = deleteAccount;
     body.querySelectorAll("[data-fb]").forEach((b) => (b.onclick = () => feedbackForm(b.dataset.fb)));
+    const photoInput = $("#photoInput");
+    if (photoInput) photoInput.onchange = async () => { const file = photoInput.files?.[0]; if (!file) return; await uploadPhoto(file); };
+    body.querySelectorAll("[data-photo-delete]").forEach((b) => (b.onclick = async () => { if (!confirm(p("photoDelete") + "?")) return; try { await api("/api/profile/photos/" + encodeURIComponent(b.dataset.photoDelete), { method: "DELETE" }); await loadAll(); render(); } catch (e) { const out = $("#photoMsg"); if (out) out.textContent = e.message; } }));
     if (profile) { renderMatch(); renderPay(); }
   }
 
   function msg(text, ok) { const el = body.querySelector("#pMsg"); if (el) { el.textContent = text; el.className = "nv-msg" + (ok ? " ok" : ""); } }
+
+  async function uploadPhoto(file) {
+    const out = body.querySelector("#photoMsg");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      if (out) out.textContent = p("photoError") + " (JPEG/PNG/WebP, max 5 MB)";
+      return;
+    }
+    if (out) out.textContent = p("photoUpload");
+    const input = body.querySelector("#photoInput");
+    if (input) input.disabled = true;
+    try {
+      const s = await session();
+      const response = await fetch(window.NV.API + "/api/profile/photos", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + s.access_token, "Content-Type": file.type },
+        body: file
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.message || p("photoError"));
+      await loadAll(); render();
+    } catch (e) {
+      if (out) out.textContent = e.message || p("photoError");
+      if (input) input.disabled = false;
+    }
+  }
+
 
   // ----- edit profile -----
   function renderEdit() {
@@ -266,26 +298,30 @@
     }
     const m = match;
     let h = partnerHtml(m.partner);
-    if (m.status === "proposed") {
-      h += m.i_accepted ? `<p class="modal-description">${p("waitingPartner")}</p>` : `<p class="modal-description">${p("waitingYou")} · ${p("proposalEnds")} ${esc(fmt(m.proposal_expires_at))}</p>`;
-      h += `<div class="nv-row">${m.i_accepted ? "" : `<button class="primary-btn" id="mAccept" type="button">${p("accept")}</button>`}<button class="outline-btn" id="mDecline" type="button">${p("decline")}</button></div>`;
-    } else if (m.status === "active") {
+    if (["proposed", "active"].includes(m.status)) {
       h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
         <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
-        <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div></div>
-        <div class="nv-row"><button class="outline-btn" id="callBtn" type="button">☏ ${p("call")}</button><button class="outline-btn" id="mEnd" type="button">${p("endMatch")}</button></div>
-        <div id="callBox" class="callbox" aria-live="polite"></div><audio id="remoteAudio" autoplay playsinline></audio>`;
+        <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div></div>`;
+      if (m.status === "proposed") {
+        h += m.i_accepted
+          ? `<p class="modal-description">${p("waitingPartner")}</p>`
+          : `<p class="modal-description">${p("waitingYou")}</p>`;
+        h += `<div class="nv-row">${m.i_accepted ? "" : `<button class="primary-btn" id="mContinue" type="button">${p("continueMatch")}</button>`}<button class="outline-btn" id="mStop" type="button">${p("stopMatch")}</button></div>`;
+      } else {
+        h += `<div class="nv-row"><button class="outline-btn" id="callBtn" type="button">☏ ${p("call")}</button><button class="outline-btn" id="mEnd" type="button">${p("endMatch")}</button></div>
+          <div id="callBox" class="callbox" aria-live="polite"></div><audio id="remoteAudio" autoplay playsinline></audio>`;
+      }
     }
     h += `<div class="nv-row nv-links"><button class="nv-link" id="mReport" type="button">${p("report")}</button><button class="nv-link" id="mBlock" type="button">${p("block")}</button></div><div id="safeBox"></div><div class="nv-msg" id="mMsg"></div>`;
     box.innerHTML = h;
     const $ = (s) => box.querySelector(s);
     const respond = async (accept) => { try { await api(`/api/match/${m.id}/respond`, { method: "POST", body: { accept } }); await loadAll(); render(); } catch (e) { $("#mMsg").textContent = e.message; } };
-    $("#mAccept") && ($("#mAccept").onclick = () => respond(true));
-    $("#mDecline") && ($("#mDecline").onclick = () => respond(false));
+    $("#mContinue") && ($("#mContinue").onclick = () => respond(true));
+    $("#mStop") && ($("#mStop").onclick = () => respond(false));
     $("#mEnd") && ($("#mEnd").onclick = async () => { if (!confirm(p("endConfirm"))) return; try { await api(`/api/match/${m.id}/end`, { method: "POST" }); await loadAll(); render(); } catch (e) { $("#mMsg").textContent = e.message; } });
     $("#mReport").onclick = () => reportForm(m.id);
     $("#mBlock").onclick = async () => { if (!confirm(p("blockConfirm"))) return; try { const r = await api("/api/safety/block", { method: "POST", body: { match_id: m.id } }); await loadAll(); render(); msg(r.message, true); } catch (e) { $("#mMsg").textContent = e.message; } };
-    if (m.status === "active") startChat(m);
+    if (["proposed", "active"].includes(m.status)) startChat(m);
   }
 
   function setStatus(txt) { const el = body.querySelector("#chatStatus"); if (el) el.textContent = txt; }
@@ -304,6 +340,8 @@
   }
 
   async function startChat(m) {
+    if (tickTimer) clearInterval(tickTimer);
+    stopRealtime();
     seen = new Set(); lastTs = null;
     const left = () => Math.max(0, Math.floor((new Date(m.expires_at) - Date.now()) / 1000));
     const tick = () => {
@@ -320,6 +358,7 @@
       } catch (e) { if (e.code === "match_not_live" || e.status === 403 || e.status === 404) closeChat(); }
     };
     await pull();
+    pollTimer = setInterval(pull, 5000);
     const send = async () => {
       const i = body.querySelector("#chatText"); const text = i.value.trim(); if (!text) return;
       i.value = ""; 
@@ -336,11 +375,13 @@
         const r = pl.new; appendMsg({ id: r.id, mine: r.sender_id === me.id, body: r.body, created_at: r.created_at });
       })
       .subscribe((s) => { if (s === "SUBSCRIBED") setStatus(p("live")); else if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(s)) setStatus(p("reconnecting")); });
-    signalChannel = c.channel("signals:" + m.id)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "call_signals", filter: "to_user=eq." + me.id }, (pl) => onSignal(m.id, pl.new))
-      .subscribe();
-    pollTimer = setInterval(pull, 8000);
-    body.querySelector("#callBtn").onclick = () => (callState === "idle" ? startCall(m.id) : endCall(true));
+    if (m.status === "active") {
+      signalChannel = c.channel("signals:" + m.id)
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "call_signals", filter: "to_user=eq." + me.id }, (pl) => onSignal(m.id, pl.new))
+        .subscribe();
+      const callButton = body.querySelector("#callBtn");
+      if (callButton) callButton.onclick = () => (callState === "idle" ? startCall(m.id) : endCall(true));
+    }
   }
 
   function stopRealtime() {

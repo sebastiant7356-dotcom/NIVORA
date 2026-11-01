@@ -57,7 +57,7 @@
           <button data-d="changes_requested" class="alt" type="button">Request changes</button>
           <button data-d="rejected" class="bad" type="button">Reject</button>
           <button data-ai class="alt" type="button">Re-run screening</button>
-          <button data-hist class="alt" type="button">History</button>
+          <button data-hist class="alt" type="button">History</button>\n          <button data-photos class="alt" type="button">Review photos</button>
           ${role === "admin" ? (p.suspended_at ? `<button data-un class="alt" type="button">Reinstate</button>` : `<button data-su class="bad" type="button">Suspend</button>`) : ""}
         </div><div class="hist"></div>
       </div>`).join("");
@@ -69,6 +69,34 @@
       else if (e.target.dataset.ai !== undefined) run(() => api(`/api/admin/profiles/${id}/rerun-ai`, { method: "POST" }), "Screening refreshed.");
       else if (e.target.dataset.su !== undefined) { if (!confirm("Suspend this user? Their live match ends.")) return; run(() => api(`/api/admin/users/${id}/suspend`, { method: "POST", body: { reason } }), "User suspended."); }
       else if (e.target.dataset.un !== undefined) run(() => api(`/api/admin/users/${id}/reinstate`, { method: "POST", body: { reason } }), "User reinstated.");
+      else if (e.target.dataset.photos !== undefined) {
+        try {
+          const r = await api(`/api/admin/profiles/${id}/photos`);
+          card.querySelector(".hist").innerHTML = r.photos.map((ph) => `
+            <div class="photo-review"><img src="${esc(ph.url || "")}" alt="Submitted profile photo">
+              <small>Status: ${esc(ph.approval_status)} ${ph.review_reason ? "· " + esc(ph.review_reason) : ""}</small>
+              <button data-photo-decision="approved" data-photo-id="${esc(ph.id)}" type="button">Approve photo</button>
+              <button data-photo-decision="rejected" data-photo-id="${esc(ph.id)}" class="bad" type="button">Reject photo</button>
+            </div>`).join("") || "<small>No photos submitted.</small>";
+        } catch (er) { msg(er.message); }
+      }
+      else if (e.target.dataset.photoDecision) {
+        const photoId = e.target.dataset.photoId, decision = e.target.dataset.photoDecision;
+        const note = card.querySelector("textarea")?.value || "";
+        if (decision === "rejected" && note.trim().length < 5) { msg("Enter a rejection reason (at least 5 characters) in the reason box."); return; }
+        if (!confirm(`Confirm photo ${decision}?`)) return;
+        try {
+          await api(`/api/admin/profiles/${id}/photos/${photoId}/decision`, { method: "POST", body: { decision, reason: note } });
+          msg("Photo decision saved.", true);
+          const r = await api(`/api/admin/profiles/${id}/photos`);
+          card.querySelector(".hist").innerHTML = r.photos.map((ph) => `
+            <div class="photo-review"><img src="${esc(ph.url || "")}" alt="Submitted profile photo">
+              <small>Status: ${esc(ph.approval_status)} ${ph.review_reason ? "· " + esc(ph.review_reason) : ""}</small>
+              <button data-photo-decision="approved" data-photo-id="${esc(ph.id)}" type="button">Approve photo</button>
+              <button data-photo-decision="rejected" data-photo-id="${esc(ph.id)}" class="bad" type="button">Reject photo</button>
+            </div>`).join("") || "<small>No photos submitted.</small>";
+        } catch (er) { msg(er.message); }
+      }
       else if (e.target.dataset.hist !== undefined) {
         try { const r = await api(`/api/admin/profiles/${id}`); card.querySelector(".hist").innerHTML = `<table class="audit"><tr><th>When</th><th>Decision</th><th>Reason</th></tr>${r.history.map((h) => `<tr><td>${fmt(h.created_at)}</td><td>${esc(h.decision)}</td><td>${esc(h.reason || "")}</td></tr>`).join("") || "<tr><td colspan=3>No decisions yet.</td></tr>"}</table><small>${r.reports.length} report(s) against this user</small>`; } catch (er) { msg(er.message); }
       }

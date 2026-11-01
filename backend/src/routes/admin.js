@@ -182,4 +182,44 @@ router.get("/audit", async (req, res) => {
   res.json({ success: true, entries: data || [] });
 });
 
+
+const PHOTO_BUCKET = "profile-photos";
+router.get("/profiles/:id/photos", async (req, res) => {
+  if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id." });
+  const db = serviceClient();
+  const { data, error } = await db.from("profile_photos")
+    .select("id, object_path, sort_order, approval_status, review_reason, created_at")
+    .eq("user_id", req.params.id).order("sort_order");
+  if (error) return res.status(500).json({ success: false, message: "Could not load profile photos." });
+  const photos = await Promise.all((data || []).map(async (photo) => {
+    const { data: signed, error: signError } = await db.storage.from(PHOTO_BUCKET).createSignedUrl(photo.object_path, 600);
+    return signError ? { id: photo.id, approval_status: photo.approval_status, error: "preview_unavailable" }
+      : { id: photo.id, sort_order: photo.sort_order, approval_status: photo.approval_status,
+          review_reason: photo.review_reason, created_at: photo.created_at, url: signed.signedUrl };
+  }));
+  await audit(req.user.id, "viewed_profile_photos", "profile", req.params.id);
+  res.json({ success: true, photos });
+});
+
+router.post("/profiles/:id/photos/:photoId/decision", async (req, res) => {
+  const { decision, reason } = req.body || {};
+  if (!isUuid(req.params.id) || !isUuid(req.params.photoId) || !["approved", "rejected"].includes(decision)) {
+    return res.status(400).json({ success: false, message: "Invalid photo review request." });
+  }
+  if (req.params.id === req.user.id) return res.status(403).json({ success: false, message: "You cannot review your own photo." });
+  const note = typeof reason === "string" ? clean(reason).slice(0, 500) : "";
+  if (decision === "rejected" && note.length < 5) return res.status(400).json({ success: false, message: "A rejection reason (at least 5 characters) is required." });
+  const db = serviceClient();
+  const { data: photo, error: lookupError } = await db.from("profile_photos")
+    .select("id, user_id, approval_status").eq("id", req.params.photoId).eq("user_id", req.params.id).maybeSingle();
+  if (lookupError) return res.status(500).json({ success: false, message: "Could not load photo." });
+  if (!photo) return res.status(404).json({ success: false, message: "Photo not found." });
+  const { error } = await db.from("profile_photos").update({
+    approval_status: decision, review_reason: note || null, reviewed_by: req.user.id, reviewed_at: new Date().toISOString()
+  }).eq("id", photo.id);
+  if (error) return res.status(500).json({ success: false, message: "Photo review could not be saved." });
+  await audit(req.user.id, "profile_photo_decision", "profile_photo", photo.id, { decision, from: photo.approval_status });
+  res.json({ success: true, approval_status: decision });
+});
+
 module.exports = router;

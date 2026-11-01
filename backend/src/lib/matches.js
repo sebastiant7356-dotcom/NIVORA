@@ -41,7 +41,23 @@ async function assertLiveMatch(matchId, userId) {
   const match = await getMatchFor(matchId, userId);
   if (!match) return { status: 404, code: "match_not_found", message: "Match not found." };
   if (match.status !== "active" || !match.expires_at || new Date(match.expires_at) <= new Date()) {
-    return { status: 403, code: "match_not_live", message: "This conversation is closed (the match ended or the 72-hour window is over)." };
+    return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
+  }
+  const partnerId = match.user_one === userId ? match.user_two : match.user_one;
+  const { data: blocked } = await serviceClient().from("blocks").select("blocker_id")
+    .or(`and(blocker_id.eq.${userId},blocked_id.eq.${partnerId}),and(blocker_id.eq.${partnerId},blocked_id.eq.${userId})`).limit(1);
+  if (blocked && blocked.length) return { status: 403, code: "blocked", message: "This conversation is closed." };
+  return { match, partnerId };
+}
+
+/** Chat is available during proposed and active states; voice remains active-only. */
+async function assertChatMatch(matchId, userId) {
+  await expire();
+  const match = await getMatchFor(matchId, userId);
+  if (!match) return { status: 404, code: "match_not_found", message: "Match not found." };
+  if (!["proposed", "active"].includes(match.status) ||
+      !match.expires_at || new Date(match.expires_at) <= new Date()) {
+    return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
   const { data: blocked } = await serviceClient().from("blocks").select("blocker_id")
@@ -51,8 +67,9 @@ async function assertLiveMatch(matchId, userId) {
 }
 
 /** Only fields a matched user may see. Never phone, email, last name or ids. */
-function partnerView(p, myValues = []) {
+function partnerView(p, myValues = [], photos = []) {
   return {
+    photos,
     first_name: firstName(p.full_name),
     age: p.age,
     district: p.district,
@@ -78,17 +95,24 @@ async function matchView(match, userId) {
     started_at: match.started_at,
     expires_at: match.expires_at,
     ended_reason: match.ended_reason,
-    chat_open: match.status === "active" && match.expires_at && new Date(match.expires_at) > new Date(),
-    seconds_left: match.status === "active" && match.expires_at
+    chat_open: live && match.expires_at && new Date(match.expires_at) > new Date(),
+    can_call: match.status === "active" && match.expires_at && new Date(match.expires_at) > new Date(),
+    seconds_left: live && match.expires_at
       ? Math.max(0, Math.floor((new Date(match.expires_at) - Date.now()) / 1000)) : null
   };
   if (live) {
     const db = serviceClient();
-    const [{ data: partner }, { data: me }] = await Promise.all([
+    const [{ data: partner }, { data: me }, { data: photos }] = await Promise.all([
       db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values").eq("id", partnerId).maybeSingle(),
-      db.from("profiles").select("core_values").eq("id", userId).maybeSingle()
+      db.from("profiles").select("core_values").eq("id", userId).maybeSingle(),
+      db.from("profile_photos").select("id, object_path, sort_order").eq("user_id", partnerId).eq("approval_status", "approved").order("sort_order")
     ]);
-    view.partner = partner ? partnerView(partner, me?.core_values || []) : null;
+    const visiblePhotos = [];
+    for (const photo of photos || []) {
+      const { data: signed } = await db.storage.from("profile-photos").createSignedUrl(photo.object_path, 600);
+      if (signed?.signedUrl) visiblePhotos.push({ id: photo.id, url: signed.signedUrl, sort_order: photo.sort_order });
+    }
+    view.partner = partner ? partnerView(partner, me?.core_values || [], visiblePhotos) : null;
   }
   return view;
 }
@@ -102,4 +126,4 @@ async function endLiveMatchesFor(userId, reason, actorId) {
   return (data || []).length;
 }
 
-module.exports = { rpcError, expire, getMatchFor, assertLiveMatch, matchView, partnerView, endLiveMatchesFor };
+module.exports = { rpcError, expire, getMatchFor, assertLiveMatch, assertChatMatch, matchView, partnerView, endLiveMatchesFor };

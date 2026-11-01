@@ -4,7 +4,7 @@ const { serviceClient } = require("../lib/clients");
 const { requireAuth } = require("../middleware");
 const { createLimiter, byUser } = require("../lib/ratelimit");
 const { isUuid, clean } = require("../lib/validation");
-const { assertLiveMatch } = require("../lib/matches");
+const { assertChatMatch } = require("../lib/matches");
 
 const router = express.Router();
 router.use(requireAuth);
@@ -12,7 +12,7 @@ const sendLimit = createLimiter({ windowMs: 60_000, max: 40, keyFn: byUser });
 
 router.get("/:matchId/messages", async (req, res) => {
   if (!isUuid(req.params.matchId)) return res.status(400).json({ success: false, message: "Invalid match." });
-  const gate = await assertLiveMatch(req.params.matchId, req.user.id);
+  const gate = await assertChatMatch(req.params.matchId, req.user.id);
   if (gate.status) return res.status(gate.status).json({ success: false, code: gate.code, message: gate.message });
   const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 100, 1), 200);
   let q = serviceClient().from("messages").select("id, sender_id, body, created_at")
@@ -33,7 +33,7 @@ router.post("/:matchId/messages", sendLimit, async (req, res) => {
   }
   const body = clean(req.body.body);
   if (body.length < 1 || body.length > 2000) return res.status(400).json({ success: false, message: "Message must be 1–2000 characters." });
-  const gate = await assertLiveMatch(req.params.matchId, req.user.id);
+  const gate = await assertChatMatch(req.params.matchId, req.user.id);
   if (gate.status) return res.status(gate.status).json({ success: false, code: gate.code, message: gate.message });
   const { data, error } = await serviceClient().from("messages")
     .insert({ match_id: req.params.matchId, sender_id: req.user.id, body })
