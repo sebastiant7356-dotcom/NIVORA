@@ -45,7 +45,7 @@ router.get("/profiles/:id", async (req, res) => {
     db.from("reports").select("id, reason, status, created_at").eq("reported_id", req.params.id).order("created_at", { ascending: false })
   ]);
   if (!profile) return res.status(404).json({ success: false, message: "Profile not found." });
-  await audit(req.user.id, "viewed_reported_profile", "profile", req.params.id);
+  if (!(await audit(req.user.id, "viewed_reported_profile", "profile", req.params.id))) return res.status(503).json({ success: false, message: "Audit logging is unavailable; profile preview was not returned." });
   res.json({ success: true, profile, history: history || [], reports: reports || [] });
 });
 
@@ -74,10 +74,12 @@ router.get("/reports", async (req, res) => {
 router.get("/reports/:id/messages", async (req, res) => {
   if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id." });
   const db = serviceClient();
-  const { data: r } = await db.from("reports").select("id, match_id").eq("id", req.params.id).maybeSingle();
+  const { data: r, error: reportError } = await db.from("reports").select("id, match_id").eq("id", req.params.id).maybeSingle();
+  if (reportError) return res.status(500).json({ success: false, message: "Could not load report." });
   if (!r || !r.match_id) return res.status(404).json({ success: false, message: "No conversation attached to this report." });
-  const { data } = await db.from("messages").select("sender_id, body, created_at").eq("match_id", r.match_id).order("created_at").limit(500);
-  await audit(req.user.id, "viewed_reported_chat", "report", r.id);
+  const { data, error } = await db.from("messages").select("sender_id, body, created_at").eq("match_id", r.match_id).order("created_at").limit(500);
+  if (error) return res.status(500).json({ success: false, message: "Could not load reported conversation." });
+  if (!(await audit(req.user.id, "viewed_reported_chat", "report", r.id))) return res.status(503).json({ success: false, message: "Audit logging is unavailable; chat preview was not returned." });
   res.json({ success: true, messages: data || [] });
 });
 
@@ -89,22 +91,37 @@ router.post("/reports/:id/resolve", async (req, res) => {
   const note = typeof resolution === "string" ? clean(resolution).slice(0, 500) : "";
   if (note.length < 5) return res.status(400).json({ success: false, message: "A resolution note is required." });
   const db = serviceClient();
-  const { data: r } = await db.from("reports").select("id, reported_id, status").eq("id", req.params.id).maybeSingle();
+  const { data: r, error: lookupError } = await db.from("reports").select("id, reported_id, status").eq("id", req.params.id).maybeSingle();
+  if (lookupError) return res.status(500).json({ success: false, message: "Could not load report." });
   if (!r) return res.status(404).json({ success: false, message: "Report not found." });
+  if (r.status !== "open") return res.status(409).json({ success: false, message: "This report has already been resolved." });
   if (suspend_user === true) {
     if (req.staffRole !== "admin") return res.status(403).json({ success: false, message: "Only admins can suspend users." });
-    if (r.reported_id) await suspend(r.reported_id, `Report ${r.id}: ${note}`, req.user.id);
+    if (r.reported_id) {
+      try { await suspend(r.reported_id, "Report " + r.id + ": " + note, req.user.id); }
+      catch { return res.status(500).json({ success: false, message: "The account could not be suspended; the report remains open." }); }
+    }
   }
-  await db.from("reports").update({ status, resolution: note, resolved_by: req.user.id, resolved_at: new Date().toISOString() }).eq("id", r.id);
+  const { error: updateError } = await db.from("reports").update({
+    status, resolution: note, resolved_by: req.user.id, resolved_at: new Date().toISOString()
+  }).eq("id", r.id);
+  if (updateError) return res.status(500).json({ success: false, message: "Report resolution could not be saved." });
   await audit(req.user.id, "report_resolved", "report", r.id, { status, suspended: suspend_user === true });
   res.json({ success: true });
 });
 
 async function suspend(userId, reason, adminId) {
   const db = serviceClient();
-  await db.from("profiles").update({ is_active: false, suspended_at: new Date().toISOString(), suspension_reason: reason.slice(0, 500) }).eq("id", userId);
+  const { data, error } = await db.from("profiles").update({
+    is_active: false, suspended_at: new Date().toISOString(), suspension_reason: reason.slice(0, 500)
+  }).eq("id", userId).select("id").maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error("Profile not found.");
   await endLiveMatchesFor(userId, "suspended", adminId);
-  await db.from("moderation_events").insert({ profile_id: userId, admin_id: adminId, decision: "suspended", reason: reason.slice(0, 500) });
+  const { error: eventError } = await db.from("moderation_events").insert({
+    profile_id: userId, admin_id: adminId, decision: "suspended", reason: reason.slice(0, 500)
+  });
+  if (eventError) throw eventError;
   await audit(adminId, "user_suspended", "profile", userId);
 }
 
@@ -112,7 +129,8 @@ router.post("/users/:id/suspend", requireStaff("admin"), async (req, res) => {
   const note = typeof req.body?.reason === "string" ? clean(req.body.reason) : "";
   if (!isUuid(req.params.id) || note.length < 5) return res.status(400).json({ success: false, message: "A reason (at least 5 characters) is required." });
   if (req.params.id === req.user.id) return res.status(403).json({ success: false, message: "You cannot suspend yourself." });
-  await suspend(req.params.id, note, req.user.id);
+  try { await suspend(req.params.id, note, req.user.id); }
+  catch { return res.status(500).json({ success: false, message: "Account suspension could not be completed." }); }
   res.json({ success: true });
 });
 
@@ -120,8 +138,11 @@ router.post("/users/:id/reinstate", requireStaff("admin"), async (req, res) => {
   const note = typeof req.body?.reason === "string" ? clean(req.body.reason) : "";
   if (!isUuid(req.params.id) || note.length < 5) return res.status(400).json({ success: false, message: "A reason (at least 5 characters) is required." });
   const db = serviceClient();
-  await db.from("profiles").update({ is_active: true, suspended_at: null, suspension_reason: null }).eq("id", req.params.id);
-  await db.from("moderation_events").insert({ profile_id: req.params.id, admin_id: req.user.id, decision: "reinstated", reason: note.slice(0, 500) });
+  const { data, error } = await db.from("profiles").update({ is_active: true, suspended_at: null, suspension_reason: null }).eq("id", req.params.id).select("id").maybeSingle();
+  if (error) return res.status(500).json({ success: false, message: "Account reinstatement could not be completed." });
+  if (!data) return res.status(404).json({ success: false, message: "Profile not found." });
+  const { error: eventError } = await db.from("moderation_events").insert({ profile_id: req.params.id, admin_id: req.user.id, decision: "reinstated", reason: note.slice(0, 500) });
+  if (eventError) return res.status(500).json({ success: false, message: "Reinstatement history could not be saved." });
   await audit(req.user.id, "user_reinstated", "profile", req.params.id);
   res.json({ success: true });
 });
@@ -165,7 +186,7 @@ router.get("/profiles/:id/photos", async (req, res) => {
       : { id: photo.id, sort_order: photo.sort_order, approval_status: photo.approval_status,
           review_reason: photo.review_reason, created_at: photo.created_at, url: signed.signedUrl };
   }));
-  await audit(req.user.id, "viewed_profile_photos", "profile", req.params.id);
+  if (!(await audit(req.user.id, "viewed_profile_photos", "profile", req.params.id))) return res.status(503).json({ success: false, message: "Audit logging is unavailable; photo previews were not returned." });
   res.json({ success: true, photos });
 });
 
@@ -210,7 +231,7 @@ router.get("/reports/:id/voice", async (req, res) => {
       const { data: signed, error: signError } = await db.storage.from("voice-messages").createSignedUrl(v.object_path, 600);
       return signError ? null : { id: v.id, sender_id: v.sender_id, duration_seconds: v.duration_seconds, created_at: v.created_at, url: signed.signedUrl };
     }));
-    await audit(req.user.id, "viewed_reported_voice", "report", report.id);
+    if (!(await audit(req.user.id, "viewed_reported_voice", "report", report.id))) return res.status(503).json({ success: false, message: "Audit logging is unavailable; voice previews were not returned." });
     res.json({ success: true, voice_messages: voiceMessages.filter(Boolean) });
   } catch {
     res.status(500).json({ success: false, message: "Voice previews could not be prepared." });
