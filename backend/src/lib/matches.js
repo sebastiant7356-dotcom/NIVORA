@@ -7,6 +7,7 @@ const ERROR_MAP = {
   not_approved: [403, "Your profile must be approved by staff first."],
   inactive: [403, "Your account is not active."],
   profile_incomplete: [409, "Please complete your profile (gender, preferences, values) first."],
+  staff_not_customer: [403, "Staff accounts do not use customer matching."],
   daily_match_limit_reached: [429, "You have used all five match recommendations for today. Come back tomorrow."],
   active_match_exists: [409, "You already have an active match."],
   payment_required: [402, "A paid match credit is required."],
