@@ -70,3 +70,33 @@ test("daily five matching and multiple live match UI are wired together", () => 
   assert.match(portal, /data-match-id/);
   assert.match(portal, /matches\.map/);
 });
+
+
+test("voice messages stay private, size-limited and restricted to match members", () => {
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261102010000_voice_messages.sql"));
+  const route = text(path.join(ROOT, "backend", "src", "routes", "chat.js"));
+  const server = text(path.join(ROOT, "backend", "src", "server.js"));
+  const portal = text(path.join(ROOT, "frontend", "portal.js"));
+  const staff = text(path.join(ROOT, "backend", "src", "routes", "admin.js"));
+  assert.match(migration, /public\.voice_messages/);
+  assert.match(migration, /values \('voice-messages', 'voice-messages', false, 2097152/);
+  assert.match(migration, /revoke all on table public\.voice_messages from public, anon, authenticated/);
+  assert.match(migration, /voice_messages_deny_browser/);
+  assert.match(route, /assertChatMatch\(req\.params\.matchId, req\.user\.id\)/);
+  assert.match(route, /MAX_VOICE_BYTES = 2 \* 1024 \* 1024/);
+  assert.match(route, /duration > 60/);
+  assert.match(server, /\/api\/chat\/:matchId\/voice.*express\.raw/);
+  assert.match(portal, /MediaRecorder/);
+  assert.match(portal, /\/api\/chat\/.*\/voice/);
+  assert.match(staff, /viewed_reported_voice/);
+});
+
+test("staff accounts cannot become customer profiles or receive matches", () => {
+  const profile = text(path.join(ROOT, "backend", "src", "routes", "profile.js"));
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261102011000_staff_separation_security_performance.sql"));
+  const account = text(path.join(ROOT, "backend", "src", "routes", "account.js"));
+  assert.match(profile, /Staff accounts do not use customer profiles/);
+  assert.match(migration, /staff_not_customer/);
+  assert.match(migration, /not exists \(select 1 from public\.staff_roles sr where sr\.user_id = c\.id\)/);
+  assert.match(account, /Staff accounts must be managed by an administrator/);
+});
