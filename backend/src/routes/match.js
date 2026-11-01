@@ -1,6 +1,5 @@
 "use strict";
 const express = require("express");
-const config = require("../config");
 const { serviceClient } = require("../lib/clients");
 const { requireAuth } = require("../middleware");
 const { createLimiter, byUser } = require("../lib/ratelimit");
@@ -12,25 +11,47 @@ const router = express.Router();
 router.use(requireAuth);
 const findLimit = createLimiter({ windowMs: 60 * 60_000, max: 10, keyFn: byUser });
 
+const keralaDate = () => new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit"
+}).format(new Date());
+
+async function dailyUsage(userId) {
+  const { data, error } = await serviceClient().from("match_daily_usage")
+    .select("matches_count").eq("user_id", userId).eq("usage_date", keralaDate()).maybeSingle();
+  if (error) throw new Error("daily_usage_unavailable");
+  return { daily_used: data?.matches_count || 0, daily_limit: 5 };
+}
+
 router.get("/current", async (req, res) => {
   await expire();
   const db = serviceClient();
-  const { data: member } = await db.from("match_members").select("match_id").eq("user_id", req.user.id).maybeSingle();
-  if (!member) return res.json({ success: true, match: null });
-  const match = await getMatchFor(member.match_id, req.user.id);
-  res.json({ success: true, match: match ? await matchView(match, req.user.id) : null });
+  const [{ data: members, error: memberError }, quota] = await Promise.all([
+    db.from("match_members").select("match_id").eq("user_id", req.user.id),
+    dailyUsage(req.user.id)
+  ]);
+  if (memberError) return res.status(500).json({ success: false, message: "Could not load your conversations." });
+  const matches = [];
+  for (const member of members || []) {
+    const row = await getMatchFor(member.match_id, req.user.id);
+    if (row && ["proposed", "active"].includes(row.status)) matches.push(await matchView(row, req.user.id));
+  }
+  matches.sort((a, b) => String(b.started_at || b.proposal_expires_at || "").localeCompare(String(a.started_at || a.proposal_expires_at || "")));
+  res.json({ success: true, matches, match: matches[0] || null, ...quota });
 });
 
 router.post("/find", findLimit, async (req, res) => {
   const { data, error } = await serviceClient().rpc("nivora_find_partner", {
     p_user: req.user.id,
-    p_require_payment: config.payment.required
+    p_require_payment: false
   });
   if (error) return rpcError(res, error);
-  if (!data?.found) return res.json({ success: true, found: false, message: "No suitable profile is available right now. Please check again later." });
+  if (!data?.found) {
+    const quota = await dailyUsage(req.user.id);
+    return res.json({ success: true, found: false, message: "No suitable profile is available right now. Please check again later.", ...quota });
+  }
   const match = await getMatchFor(data.match_id, req.user.id);
   await audit(req.user.id, "match_proposed", "match", data.match_id);
-  res.json({ success: true, found: true, match: await matchView(match, req.user.id) });
+  res.json({ success: true, found: true, match: await matchView(match, req.user.id), daily_used: data.daily_used, daily_limit: data.daily_limit });
 });
 
 router.post("/:id/respond", async (req, res) => {
