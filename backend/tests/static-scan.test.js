@@ -100,3 +100,15 @@ test("staff accounts cannot become customer profiles or receive matches", () => 
   assert.match(migration, /not exists \(select 1 from public\.staff_roles sr where sr\.user_id = c\.id\)/);
   assert.match(account, /Staff accounts must be managed by an administrator/);
 });
+
+
+test("staff moderation is limited to reported accounts", () => {
+  const admin = text(path.join(ROOT, "backend", "src", "routes", "admin.js"));
+  const ui = text(path.join(ROOT, "frontend", "admin.js"));
+  assert.match(admin, /Routine profile review is disabled/);
+  assert.match(admin, /hasOpenReport\(db, req\.params\.id\)/);
+  assert.match(admin, /viewed_reported_profile/);
+  assert.match(admin, /Routine AI screening is disabled/);
+  assert.match(ui, /let tab = "reports"/);
+  assert.doesNotMatch(ui, /const TABS = \[\["pending"/);
+});
