@@ -53,7 +53,7 @@ test("SQL: RLS enabled and matching functions not callable by browser roles", ()
 });
 
 test("daily five matching and multiple live match UI are wired together", () => {
-  const migration = text(path.join(ROOT, "backend", "migrations", "20261101230000_daily_five_multiple_matches.sql"));
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261101182853_daily_five_multiple_matches.sql"));
   const route = text(path.join(ROOT, "backend", "src", "routes", "match.js"));
   const portal = text(path.join(ROOT, "frontend", "portal.js"));
   assert.match(migration, /create table if not exists public\.match_daily_usage/);
@@ -73,8 +73,8 @@ test("daily five matching and multiple live match UI are wired together", () => 
 
 
 test("voice messages stay private, size-limited and restricted to match members", () => {
-  const migration = text(path.join(ROOT, "backend", "migrations", "20261102010000_voice_messages.sql"));
-  const hardeningMigration = text(path.join(ROOT, "backend", "migrations", "20261102011000_staff_separation_security_performance.sql"));
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261101184818_voice_messages.sql"));
+  const hardeningMigration = text(path.join(ROOT, "backend", "migrations", "20261101184824_staff_separation_security_performance.sql"));
   const route = text(path.join(ROOT, "backend", "src", "routes", "chat.js"));
   const server = text(path.join(ROOT, "backend", "src", "server.js"));
   const portal = text(path.join(ROOT, "frontend", "portal.js"));
@@ -115,4 +115,14 @@ test("staff moderation is limited to reported accounts", () => {
   assert.match(admin, /Routine AI screening is disabled/);
   assert.match(ui, /let tab = "reports"/);
   assert.doesNotMatch(ui, /const TABS = \[\["pending"/);
+});
+
+
+test("SECURITY DEFINER RLS helpers live outside the public API schema", () => {
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261101184918_private_rls_helpers_and_voice_sender_index.sql"));
+  assert.match(migration, /create schema if not exists private/);
+  assert.match(migration, /private\.nivora_is_staff/);
+  assert.match(migration, /private\.nivora_can_access_chat/);
+  assert.match(migration, /revoke all on function public\.nivora_is_staff\(\) from public, anon, authenticated/);
+  assert.match(migration, /voice_messages_sender_created_idx/);
 });
