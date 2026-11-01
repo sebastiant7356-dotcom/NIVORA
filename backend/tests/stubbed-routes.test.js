@@ -18,10 +18,10 @@ function res() {
   r.setHeader = (k, v) => { r.headers[k] = v; };
   return r;
 }
-async function call(router, method, path, { body, params = {}, query = {}, user = { id: UID }, headers = {} } = {}) {
+async function call(router, method, path, { body, params = {}, query = {}, user = { id: UID }, headers = {}, staffRole } = {}) {
   const route = router.routes.find((x) => x.method === method && x.path === path);
   assert.ok(route, `route ${method} ${path} exists`);
-  const req = { body, params, query, user, headers };
+  const req = { body, params, query, user, headers, staffRole };
   const out = res();
   // run route-level middleware (limiters etc.) then the handler
   const { requireAuth } = require("../src/middleware");
@@ -243,4 +243,37 @@ test("chat and voice are denied when either matched account is suspended", async
   const result = await assertChatMatch(MATCH, UID);
   assert.equal(result.status, 403);
   assert.equal(result.code, "account_unavailable");
+});
+
+
+
+test("only an admin can suspend a reported account during resolution", async () => {
+  const router = require("../src/routes/admin");
+  when((c) => c.table === "reports"
+    ? { data: { id: "44444444-4444-4444-8444-444444444444", reported_id: OTHER, status: "open" }, error: null }
+    : { data: null, error: null });
+  const moderator = await call(router, "POST", "/reports/:id/resolve", {
+    params: { id: "44444444-4444-4444-8444-444444444444" },
+    body: { status: "actioned", resolution: "Reviewed and confirmed", suspend_user: true },
+    staffRole: "moderator"
+  });
+  assert.equal(moderator.code, 403);
+
+  let suspended = false, resolved = false;
+  when((c) => {
+    if (c.table === "reports" && c.ops.some((o) => o[0] === "select")) return { data: { id: "44444444-4444-4444-8444-444444444444", reported_id: OTHER, status: "open" }, error: null };
+    if (c.table === "profiles" && c.ops.some((o) => o[0] === "update")) { suspended = true; return { data: { id: OTHER }, error: null }; }
+    if (c.table === "moderation_events") return { data: null, error: null };
+    if (c.table === "reports" && c.ops.some((o) => o[0] === "update")) { resolved = true; return { data: null, error: null }; }
+    if (c.table === "match_members") return { data: [], error: null };
+    return { data: null, error: null };
+  });
+  const admin = await call(router, "POST", "/reports/:id/resolve", {
+    params: { id: "44444444-4444-4444-8444-444444444444" },
+    body: { status: "actioned", resolution: "Reviewed and confirmed", suspend_user: true },
+    staffRole: "admin"
+  });
+  assert.equal(admin.code, 200);
+  assert.equal(suspended, true);
+  assert.equal(resolved, true);
 });
