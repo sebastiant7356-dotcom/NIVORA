@@ -79,7 +79,7 @@
     modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
   }
   function open() { ensureModal(); modal.classList.add("open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; }
-  function close() { stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
+  function close() { stopVoiceRecording(true); stopRealtime(); endCall(false); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
   let me = null, profile = null, match = null, matches = [], selectedMatchId = null, dailyQuota = { daily_used: 0, daily_limit: 5 }, payInfo = null, history = [], photos = [], isStaff = false;
