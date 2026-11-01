@@ -80,7 +80,11 @@ test("chat gate: expired window, non-member and blocked are all refused", async 
   const base = { id: MATCH, user_one: UID, user_two: OTHER, status: "active" };
   when((c) => (c.table === "match_history" ? { data: { ...base, expires_at: past }, error: null } : { data: [], error: null }));
   let g = await assertLiveMatch(MATCH, UID); assert.equal(g.status, 403); assert.equal(g.code, "match_not_live");
-  when((c) => (c.table === "match_history" ? { data: { ...base, expires_at: future }, error: null } : { data: [], error: null }));
+  when((c) => {
+    if (c.table === "match_history") return { data: { ...base, expires_at: future }, error: null };
+    if (c.table === "profiles") return { data: [{ id: UID, is_active: true }, { id: OTHER, is_active: true }], error: null };
+    return { data: [], error: null };
+  });
   g = await assertLiveMatch(MATCH, "99999999-9999-4999-8999-999999999999"); assert.equal(g.status, 404, "stranger gets 404");
   g = await assertLiveMatch(MATCH, UID); assert.equal(g.partnerId, OTHER);
   when((c) => (c.table === "match_history" ? { data: { ...base, status: "ended", expires_at: future }, error: null } : { data: [], error: null }));
@@ -219,4 +223,19 @@ test("block endpoint closes the match and records the block", async () => {
   assert.equal(blockRow.blocker_id, UID);
   assert.equal(blockRow.blocked_id, OTHER);
   assert.equal(ended, true);
+});
+
+
+
+test("chat and voice are denied when either matched account is suspended", async () => {
+  const { assertChatMatch } = require("../src/lib/matches");
+  const future = new Date(Date.now() + 3600e3).toISOString();
+  when((c) => {
+    if (c.table === "match_history") return { data: { id: MATCH, user_one: UID, user_two: OTHER, status: "active", expires_at: future }, error: null };
+    if (c.table === "profiles") return { data: [{ id: UID, is_active: true, suspended_at: null }, { id: OTHER, is_active: false, suspended_at: new Date().toISOString() }], error: null };
+    return { data: [], error: null };
+  });
+  const result = await assertChatMatch(MATCH, UID);
+  assert.equal(result.status, 403);
+  assert.equal(result.code, "account_unavailable");
 });
