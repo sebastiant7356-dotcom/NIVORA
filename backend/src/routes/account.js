@@ -29,6 +29,9 @@ router.get("/export", limit, async (req, res) => {
 
 // Irreversible deletion. Requires an explicit confirmation word.
 router.delete("/", limit, async (req, res) => {
+  const { data: staff, error: staffError } = await serviceClient().from("staff_roles").select("user_id").eq("user_id", req.user.id).maybeSingle();
+  if (staffError) return res.status(500).json({ success: false, message: "Could not verify account type." });
+  if (staff) return res.status(403).json({ success: false, message: "Staff accounts must be managed by an administrator." });
   if (req.body?.confirm !== "DELETE") {
     return res.status(400).json({ success: false, message: 'Send {"confirm":"DELETE"} to permanently delete your account.' });
   }
