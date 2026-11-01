@@ -109,7 +109,7 @@
       <div class="admin-actions"><textarea placeholder="Resolution note (required)" rows="2" maxlength="500"></textarea>
       <button data-r="actioned" type="button">Mark actioned</button><button data-r="dismissed" class="alt" type="button">Dismiss</button>
       ${role === "admin" ? `<button data-r="actioned" data-s="1" class="bad" type="button">Action + suspend user</button>` : ""}
-      ${r.match_id ? `<button data-chat class="alt" type="button">View reported chat (audit-logged)</button>` : ""}</div><div class="hist"></div></div>`).join("");
+      ${r.match_id ? `<button data-chat class="alt" type="button">View reported chat (audit-logged)</button><button data-voice class="alt" type="button">Review reported voice (audit-logged)</button>` : ""}</div><div class="hist"></div></div>`).join("");
     $("#list").onclick = async (e) => {
       const card = e.target.closest(".card"); if (!card) return; const id = card.dataset.id;
       if (e.target.dataset.r) {
@@ -117,6 +117,12 @@
       } else if (e.target.dataset.chat !== undefined) {
         if (!confirm("Reading a private conversation is logged in the audit trail. Continue?")) return;
         try { const r = await api(`/api/admin/reports/${id}/messages`); card.querySelector(".hist").innerHTML = r.messages.map((m) => `<div class="bubble theirs">${esc(m.body)}</div>`).join("") || "<small>No messages.</small>"; } catch (er) { msg(er.message); }
+      } else if (e.target.dataset.voice !== undefined) {
+        if (!confirm("Reviewing private voice messages is logged in the audit trail. Continue?")) return;
+        try {
+          const r = await api(`/api/admin/reports/${id}/voice`);
+          const box = card.querySelector(".hist"); box.innerHTML = r.voice_messages.map((v) => `<div class="voice-review"><small>${fmt(v.created_at)} · ${esc(v.sender_id)} · ${esc(v.duration_seconds)}s</small><audio controls preload="none" src="${esc(v.url)}"></audio></div>`).join("") || "<small>No voice messages in this conversation.</small>";
+        } catch (er) { msg(er.message); }
       }
     };
   }
