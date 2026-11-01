@@ -58,12 +58,26 @@ async function startFlow(){try{if(window.NV&&await window.NV.session()){window.N
 })();
 ['#openProfile','#heroStart','#previewStart'].forEach(s=>$(s).addEventListener('click',startFlow));
 $('#openPortal').addEventListener('click',()=>window.NivoraPortal.openPortal(openWizard));
+async function beginGoogleAuth(button){
+  const original=button.textContent;
+  button.disabled=true;
+  try{
+    if(!window.NV||typeof window.NV.signInWithGoogle!=='function') throw new Error('Google sign-in is not ready. Please try again in a moment.');
+    await window.NV.signInWithGoogle();
+  }catch(e){
+    toast(e.message||'Google sign-in failed. Please try again.');
+    button.disabled=false;
+    button.textContent=original;
+  }
+}
+$('#googleAuthStart').addEventListener('click',e=>beginGoogleAuth(e.currentTarget));
+$('#googleAuthHero').addEventListener('click',e=>beginGoogleAuth(e.currentTarget));
 // The sign-in library loads from a CDN script and can still be downloading on a slow
 // connection when someone taps a button right after the page appears. Disable the
 // sign-in-related buttons until it has actually arrived (normally under a second), and
 // force them back on after 8s regardless so nobody gets stuck if the network truly fails.
 (function gateAuthButtons(){
-  const els=['#openProfile','#heroStart','#previewStart','#openPortal'].map($).filter(Boolean);
+  const els=['#openProfile','#heroStart','#previewStart','#openPortal','#googleAuthStart','#googleAuthHero'].map($).filter(Boolean);
   els.forEach(el=>el.disabled=true);
   const enable=()=>els.forEach(el=>el.disabled=false);
   if(window.NV&&window.NV.ready) window.NV.ready.then(enable); else enable();
