@@ -7,7 +7,8 @@ const ERROR_MAP = {
   not_approved: [403, "Your profile must be approved by staff first."],
   inactive: [403, "Your account is not active."],
   profile_incomplete: [409, "Please complete your profile (gender, preferences, values) first."],
-  active_match_exists: [409, "You already have an active match."],
+  active_match_exists: [409, "You already have an active match. End or finish it before requesting another."],
+  daily_match_limit_reached: [429, "You have used all five match recommendations for today. Come back tomorrow."],
   payment_required: [402, "A paid match credit is required."],
   match_not_found: [404, "Match not found."],
   match_not_proposed: [409, "This match is no longer awaiting a response."],
@@ -32,10 +33,7 @@ async function getMatchFor(matchId, userId) {
   return data;
 }
 
-/**
- * Chat/voice gate: caller must be a member, status 'active' and inside the 72h window.
- * Returns {match, partnerId} or {status, code, message}.
- */
+/** Chat gate: caller must be a member and the proposal/72h active window must be live. */
 async function assertLiveMatch(matchId, userId) {
   await expire();
   const match = await getMatchFor(matchId, userId);
@@ -50,7 +48,7 @@ async function assertLiveMatch(matchId, userId) {
   return { match, partnerId };
 }
 
-/** Chat is available during proposed and active states; voice remains active-only. */
+/** Chat is available during proposed and active states. */
 async function assertChatMatch(matchId, userId) {
   await expire();
   const match = await getMatchFor(matchId, userId);
@@ -96,7 +94,7 @@ async function matchView(match, userId) {
     expires_at: match.expires_at,
     ended_reason: match.ended_reason,
     chat_open: live && match.expires_at && new Date(match.expires_at) > new Date(),
-    can_call: false, // Live calls are excluded from the free public launch.
+    can_call: false,
     seconds_left: live && match.expires_at
       ? Math.max(0, Math.floor((new Date(match.expires_at) - Date.now()) / 1000)) : null
   };
