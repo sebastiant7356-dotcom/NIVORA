@@ -48,7 +48,7 @@ NIVORA will be prepared as a free-to-use Kerala matchmaking MVP. No paid match c
 - Existing profile creation defaults to `approval_status = pending`; staff review currently gates matching.
 - Existing profile-photo uploads default to `approval_status = pending`.
 - Existing AI profile moderation is explicitly advisory and does not approve profiles automatically.
-- Existing matching RPC currently creates one proposed match at a time and prevents a member from having another match-member row while a match is live. It also excludes any previously paired member pair. This is not yet a five-recommendations-per-day system.
+- Existing matching RPC created one proposed match at a time, enforced one live match per member, and excluded previously paired member pairs. The feature branch now adds a database-enforced quota of five successful recommendations per member per Asia/Kolkata calendar day. Recommendations are sequential: a member must finish, decline, or expire the current proposal/conversation before requesting another. This does not yet support five simultaneous chats.
 - The deployed matching RPC currently sets the proposal response deadline to 48 hours. The desired product decision mentions the existing 72-hour conversation window; proposal and active-chat timing must be reconciled before implementation.
 - Existing chat messages are text-only in the `messages` table.
 - Existing frontend still contains old payment and voice-call UI copy.
@@ -57,7 +57,7 @@ NIVORA will be prepared as a free-to-use Kerala matchmaking MVP. No paid match c
 ## Implementation sequence
 
 1. Reconcile product rules and database state (especially proposal vs active chat timing).
-2. Design and implement a server-enforced daily five-recommendation model with safe concurrency and no-repeat rules.
+2. [Feature branch implementation added] Enforce five successful recommendations per member per Asia/Kolkata day in the database, with per-member transaction locking, RLS on the quota table, no-repeat rules, and a visible quota counter. It remains sequential (one live match at a time); multiple simultaneous chats require a separate schema and portal redesign. Apply and verify the migration in a non-production Supabase branch before any production rollout.
 3. Add private voice-message storage, metadata, authorization, limits, retention, and chat UI.
 4. Remove call signalling/WebRTC from public member experience and disable public call API routes.
 5. Implement safe auto-approval only for low-risk profiles; retain human review for flags and all photo risk cases.
