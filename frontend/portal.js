@@ -82,6 +82,7 @@
   // ---------- state ----------
   let me = null, profile = null, match = null, payInfo = null, history = [], photos = [], isStaff = false, dailyQuota = { daily_used: 0, daily_limit: 5 };
   let tickTimer = null, chatChannel = null, signalChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
+  let activeRecorder = null, activeVoiceStream = null;
   let pc = null, localStream = null, pendingIce = [], incomingOffer = null, callState = "idle";
   const val = (k) => (k in (profile || {}) ? profile[k] : "");
 
@@ -217,8 +218,7 @@
     body.querySelectorAll("[data-fb]").forEach((b) => (b.onclick = () => feedbackForm(b.dataset.fb)));
     const photoInput = $("#photoInput");
     if (photoInput) photoInput.onchange = async () => { const file = photoInput.files?.[0]; if (!file) return; await uploadPhoto(file); };
-    body.querySelectorAll("[data-photo-delete]").forEach((b) => (b.onclick = async () => { if (!confirm(p("photoDelete") + "?")) return; try { await api("/api/profile/photos/" + encodeURIComponent(b.dataset.photoDelete), { method: "DELETE" }); await loadAll(); render(); } catch (e) { const out = $("#photoMsg"); if (out) out.textContent = e.message; } }));
-    if (profile) { renderMatch(); renderPay(); }
+    body.querySelectorAll("[data-photo-delete]").forEach((b) => (b.onclick = async () => { if (!confirm(p("photoDelete") + "?")) return; try { await api("/api/profile/photos/" + encodeURIComponent(b.dataset.photoDelete), { method: "DELETE" }); await loadAll(); render(); } catch (e) { const out = $("#photoMsg"); if (out) out.textContent = e.message; } }));    if (profile) { renderMatch(); renderPay(); }
   }
 
   function msg(text, ok) { const el = body.querySelector("#pMsg"); if (el) { el.textContent = text; el.className = "nv-msg" + (ok ? " ok" : ""); } }
@@ -302,7 +302,7 @@
     if (["proposed", "active"].includes(m.status)) {
       h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
         <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
-        <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div></div>`;
+        <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button><button class="outline-btn" id="voiceRecord" type="button">🎙 Voice message</button></div></div>`;
       if (m.status === "proposed") {
         h += m.i_accepted
           ? `<p class="modal-description">${p("waitingPartner")}</p>`
@@ -329,12 +329,17 @@
     if (seen.has(m.id)) return; seen.add(m.id);
     if (!lastTs || m.created_at > lastTs) lastTs = m.created_at;
     const log = body.querySelector("#chatLog"); if (!log) return;
-    const d = document.createElement("div"); d.className = "bubble " + (m.mine ? "mine" : "theirs"); d.textContent = m.body;
+    const d = document.createElement("div"); d.className = "bubble " + (m.mine ? "mine" : "theirs");
+    if (m.type === "voice" && m.voice_url) { const a = document.createElement("audio"); a.controls = true; a.preload = "none"; a.src = m.voice_url; d.appendChild(a); const label = document.createElement("small"); label.textContent = "Voice message · " + (m.duration_seconds || "—") + "s"; d.appendChild(label); }
+    else d.textContent = m.body;
     log.appendChild(d); log.scrollTop = log.scrollHeight;
   }
   function closeChat() {
     setStatus(p("chatClosed"));
-    const i = body.querySelector("#chatText"), b = body.querySelector("#chatSend"); if (i) i.disabled = true; if (b) b.disabled = true;
+    const i = body.querySelector("#chatText"), b = body.querySelector("#chatSend"), v = body.querySelector("#voiceRecord"); if (i) i.disabled = true; if (b) b.disabled = true; if (v) v.disabled = true;
+    try { if (activeRecorder && activeRecorder.state !== "inactive") activeRecorder.stop(); } catch (_) {}
+    if (activeVoiceStream) activeVoiceStream.getTracks().forEach((t) => t.stop());
+    activeRecorder = null; activeVoiceStream = null;
     stopRealtime();
   }
 
@@ -367,12 +372,42 @@
     body.querySelector("#chatSend").onclick = send;
     body.querySelector("#chatText").onkeydown = (e) => { if (e.key === "Enter") send(); };
 
+    const voiceBtn = body.querySelector("#voiceRecord");
+    if (voiceBtn) voiceBtn.onclick = async () => {
+      if (activeRecorder && activeRecorder.state === "recording") { activeRecorder.stop(); return; }
+      if (!window.MediaRecorder || !navigator.mediaDevices?.getUserMedia) { setStatus("Voice recording is not supported in this browser."); return; }
+      try {
+        activeVoiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const preferred = ["audio/webm;codecs=opus", "audio/ogg;codecs=opus", "audio/mp4"].find((t) => MediaRecorder.isTypeSupported(t));
+        activeRecorder = new MediaRecorder(activeVoiceStream, preferred ? { mimeType: preferred } : undefined);
+        const recorder = activeRecorder, chunks = [], started = Date.now();
+        recorder.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+        recorder.onstop = async () => {
+          const duration = Math.max(1, Math.min(60, Math.round((Date.now() - started) / 1000)));
+          const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+          if (activeVoiceStream) activeVoiceStream.getTracks().forEach((t) => t.stop());
+          activeVoiceStream = null; activeRecorder = null; voiceBtn.textContent = "🎙 Voice message";
+          if (blob.size > 2 * 1024 * 1024) { setStatus("Recording is too large (maximum 2 MB)."); return; }
+          try {
+            const s = await session();
+            const mime = (blob.type || "audio/webm").split(";")[0];
+            const response = await fetch(window.NV.API + "/api/chat/" + m.id + "/voice", {
+              method: "POST", headers: { Authorization: "Bearer " + s.access_token, "Content-Type": mime, "X-Voice-Duration": String(duration) }, body: blob
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || "Voice message could not be sent.");
+            appendMsg(result.message); setStatus(p("live"));
+          } catch (e) { setStatus(e.message || "Voice message failed."); }
+        };
+        recorder.start(); voiceBtn.textContent = "Stop recording";
+        setTimeout(() => { if (activeRecorder === recorder && recorder.state === "recording") recorder.stop(); }, 60_000);
+      } catch (e) { if (activeVoiceStream) activeVoiceStream.getTracks().forEach((t) => t.stop()); activeVoiceStream = null; activeRecorder = null; setStatus("Microphone permission is required for voice messages."); }
+    };
+
     // Realtime for instant delivery; polling covers reconnects and network drops.
     const c = client();
     chatChannel = c.channel("chat:" + m.id)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "match_id=eq." + m.id }, (pl) => {
-        const r = pl.new; appendMsg({ id: r.id, mine: r.sender_id === me.id, body: r.body, created_at: r.created_at });
-      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "match_id=eq." + m.id }, () => { pull(); })
       .subscribe((s) => { if (s === "SUBSCRIBED") setStatus(p("live")); else if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(s)) setStatus(p("reconnecting")); });
     // Live calls are intentionally excluded from the free public launch.
     // Text chat remains available; voice messages will be added separately.
@@ -437,8 +472,7 @@
       await pc.setRemoteDescription({ type: pl.type, sdp: pl.sdp }).catch(() => {});
       for (const c of pendingIce.splice(0)) await pc.addIceCandidate(c).catch(() => {});
     } else if (s.kind === "ice") {
-      if (pc && pc.remoteDescription) await pc.addIceCandidate(pl).catch(() => {}); else pendingIce.push(pl);
-    } else if (s.kind === "hangup") { endCall(false); callMsg(""); }
+      if (pc && pc.remoteDescription) await pc.addIceCandidate(pl).catch(() => {}); else pendingIce.push(pl);    } else if (s.kind === "hangup") { endCall(false); callMsg(""); }
   }
   function endCall(notify) {
     const mid = match?.id;
