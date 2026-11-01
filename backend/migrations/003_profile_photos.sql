@@ -24,7 +24,7 @@ create table if not exists public.profile_photos (
   approval_status text not null default 'pending'
     check (approval_status in ('pending','approved','rejected')),
   review_reason text,
-  reviewed_by uuid references auth.users(id),
+  reviewed_by uuid references auth.users(id) on delete set null,
   reviewed_at timestamptz,
   created_at timestamptz not null default now(),
   unique (user_id, sort_order)
