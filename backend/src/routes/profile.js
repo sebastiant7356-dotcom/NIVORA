@@ -28,7 +28,11 @@ function present(p) {
 
 
 router.get("/", async (req, res) => {
-  const { data, error } = await serviceClient().from("profiles").select(OWN_COLUMNS).eq("id", req.user.id).maybeSingle();
+  const db = serviceClient();
+  const { data: staff, error: staffError } = await db.from("staff_roles").select("role").eq("user_id", req.user.id).maybeSingle();
+  if (staffError) return res.status(500).json({ success: false, message: "Could not verify account type." });
+  if (staff) return res.json({ success: true, profile: null, staff: true });
+  const { data, error } = await db.from("profiles").select(OWN_COLUMNS).eq("id", req.user.id).maybeSingle();
   if (error) {
   console.error("PROFILE_LOAD_ERROR:", error);
   return res.status(500).json({
@@ -42,6 +46,9 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", writeLimit, async (req, res) => {
+  const { data: staff, error: staffError } = await serviceClient().from("staff_roles").select("user_id").eq("user_id", req.user.id).maybeSingle();
+  if (staffError) return res.status(500).json({ success: false, message: "Could not verify account type." });
+  if (staff) return res.status(403).json({ success: false, message: "Staff accounts do not use customer profiles." });
   const parsed = parseProfileInput(req.body, { create: true });
   if (parsed.error) return res.status(400).json({ success: false, message: parsed.error });
   const db = serviceClient();
@@ -71,6 +78,9 @@ router.post("/", writeLimit, async (req, res) => {
 });
 
 router.put("/", writeLimit, async (req, res) => {
+  const { data: staff, error: staffError } = await serviceClient().from("staff_roles").select("user_id").eq("user_id", req.user.id).maybeSingle();
+  if (staffError) return res.status(500).json({ success: false, message: "Could not verify account type." });
+  if (staff) return res.status(403).json({ success: false, message: "Staff accounts do not use customer profiles." });
   const parsed = parseProfileInput(req.body, { create: false });
   if (parsed.error) return res.status(400).json({ success: false, message: parsed.error });
   const db = serviceClient();
