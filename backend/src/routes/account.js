@@ -89,11 +89,15 @@ router.delete("/", limit, async (req, res) => {
       const { error: matchDeleteError } = await db.from("match_history").delete().in("id", matchIds);
       if (matchDeleteError) throw matchDeleteError;
     }
-    await db.from("match_feedback").delete().eq("reviewer_id", id);
-    await db.from("match_members").delete().eq("user_id", id);
+    const { error: feedbackDeleteError } = await db.from("match_feedback").delete().eq("reviewer_id", id);
+    if (feedbackDeleteError) throw feedbackDeleteError;
+    const { error: memberDeleteError } = await db.from("match_members").delete().eq("user_id", id);
+    if (memberDeleteError) throw memberDeleteError;
     // Payment records are kept for accounting but detached from the person.
-    await db.from("payments").update({ user_id: null }).eq("user_id", id);
-    await audit(id, "account_deleted", "account", id);
+    const { error: paymentDetachError } = await db.from("payments").update({ user_id: null }).eq("user_id", id);
+    if (paymentDetachError) throw paymentDetachError;
+    const auditOk = await audit(id, "account_deleted", "account", id);
+    if (!auditOk) throw new Error("Account deletion audit could not be recorded.");
     const { error } = await db.auth.admin.deleteUser(id); // cascades profile, blocks, staff role, moderation events
     if (error) throw error;
     res.json({ success: true, message: "Your account and personal data have been deleted." });
