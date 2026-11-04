@@ -141,15 +141,15 @@
 
   // Called after Google redirects back to the page, if a "My space" sign-in was in progress.
   async function resumePortalLogin() {
-    let pending;
-    try { pending = sessionStorage.getItem("nivora_pending_portal"); } catch (_) { /* ignore */ }
-    if (!pending) return;
+    // Run on every homepage load, not only when a particular sign-in button set a flag.
+    // This also restores the dashboard for an already-authenticated customer reopening NIVORA.
+    let pending = false;
+    try { pending = sessionStorage.getItem("nivora_pending_portal") === "1"; } catch (_) { /* ignore */ }
     let s;
     try { s = await session(); } catch (_) { return; }
     if (!s) return;
-    try { sessionStorage.removeItem("nivora_pending_portal"); } catch (_) { /* ignore */ }
-    // Existing customers go straight to their dedicated dashboard after Google login.
-    // Staff remain on the existing staff portal; first-time customers continue to profile setup.
+    if (pending) { try { sessionStorage.removeItem("nivora_pending_portal"); } catch (_) { /* ignore */ } }
+    // Existing customers go straight to their dedicated dashboard. Staff remain in staff console.
     const [pr, staff] = await Promise.all([
       api("/api/profile").catch(() => ({ profile: null })),
       api("/api/admin/me").then(() => true).catch(() => false)
@@ -158,7 +158,9 @@
       window.location.replace("dashboard.html");
       return;
     }
-    await openPortal();
+    // Only open the profile portal after a deliberate sign-in attempt; do not interrupt
+    // a visitor who simply opens the public homepage.
+    if (pending) await openPortal();
   }
 
   // Called by the profile wizard on its final step. Returns the saved profile or {existing:true}.
@@ -260,6 +262,21 @@
     };
     const profilePanel = wrap("dashboard-profile", p("profileTab"), profileNodes);
     const matchPanel = wrap("dashboard-match", p("matchTab"), matchNodes);
+    const welcome = document.createElement("section");
+    welcome.className = "dashboard-welcome";
+    const remaining = Math.max(0, (dailyQuota.daily_limit || 5) - (dailyQuota.daily_used || 0));
+    const ml = L() === "ml";
+    welcome.innerHTML = `
+      <div class="dashboard-welcome-copy">
+        <span class="dashboard-eyebrow">NIVORA · YOUR SPACE</span>
+        <h1>${ml ? "തിരികെ സ്വാഗതം" : "Welcome back"}, ${esc((profile.full_name || "").split(" ")[0])}</h1>
+        <p>${ml ? "നിങ്ങളുടെ അടുത്ത നല്ല സംഭാഷണം ഇവിടെ തുടങ്ങാം." : "Your next meaningful connection could start here."}</p>
+      </div>
+      <div class="dashboard-stat-grid">
+        <div class="dashboard-stat"><span>♡</span><b>${remaining}</b><small>${ml ? "ഇന്നത്തെ matches ബാക്കി" : "Matches left today"}</small></div>
+        <div class="dashboard-stat"><span>✉</span><b>${matches.filter(x => ["proposed","active"].includes(x.status)).length}</b><small>${ml ? "സജീവ സംഭാഷണങ്ങൾ" : "Active conversations"}</small></div>
+      </div>`;
+    body.prepend(welcome);
     const inbox = document.createElement("section"); inbox.className = "dashboard-panel"; inbox.id = "dashboard-messages";
     inbox.innerHTML = "<h2 class='modal-title'>" + p("messagesTab") + "</h2><p class='modal-description'>" + p("inboxIntro") + "</p><div class='dashboard-inbox'></div>";
     const inboxList = inbox.querySelector(".dashboard-inbox");
