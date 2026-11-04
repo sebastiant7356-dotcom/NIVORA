@@ -409,3 +409,144 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
     box-shadow:inherit;
   }
 }
+
+
+/* NIVORA — expressive, welcoming dashboard finish */
+.dashboard-page .dashboard-welcome{
+  isolation:isolate;
+  min-height:330px;
+  grid-template-columns:minmax(0,1.08fr) minmax(280px,.82fr);
+  gap:clamp(24px,4vw,48px);
+  padding:clamp(30px,5vw,58px);
+  background:
+    radial-gradient(circle at 82% 12%,rgba(236,218,174,.25),transparent 19rem),
+    radial-gradient(circle at 4% 100%,rgba(117,160,123,.28),transparent 21rem),
+    linear-gradient(122deg,#0d382f 0%,#1a5543 56%,#52795e 100%);
+  box-shadow:0 26px 65px rgba(17,62,48,.22);
+}
+.dashboard-page .dashboard-welcome:after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  width:390px;height:390px;right:-120px;top:-180px;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:50%;
+  box-shadow:0 0 0 25px rgba(255,255,255,.035),0 0 0 52px rgba(255,255,255,.025),0 0 0 80px rgba(255,255,255,.018);
+}
+.dashboard-page .dashboard-eyebrow{
+  display:inline-flex;align-items:center;gap:9px;
+  color:#e7d9b8;font-size:9px;letter-spacing:.16em;line-height:1.6;
+}
+.dashboard-page .dashboard-eyebrow i{
+  display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:#e8c98f;box-shadow:0 0 0 5px rgba(232,201,143,.15);
+}
+.dashboard-page .dashboard-welcome h1{
+  max-width:570px;margin:18px 0 13px;
+  font-size:clamp(35px,5.2vw,57px);line-height:1.12;
+}
+.dashboard-page .dashboard-welcome h1 em{
+  color:#f0d9a9;font-family:Georgia,serif;font-weight:500;
+  font-style:italic;letter-spacing:-.055em;
+}
+.dashboard-page .dashboard-welcome p{
+  max-width:440px;font-size:14px;line-height:1.8;color:rgba(255,255,255,.83);
+}
+.dashboard-page .dashboard-hero-actions{gap:11px;margin-top:27px}
+.dashboard-page .dashboard-hero-actions button{
+  min-height:48px;padding:0 18px;border-radius:14px;
+  font-size:12px;box-shadow:0 7px 18px rgba(0,0,0,.08);
+}
+.dashboard-page .dashboard-hero-primary{
+  background:linear-gradient(135deg,#f4e7c8,#e8d2a4);
+  border:1px solid rgba(255,255,255,.45);color:#173e32;
+}
+.dashboard-page .dashboard-hero-primary span,
+.dashboard-page .dashboard-hero-secondary span{margin-left:8px;font-size:15px}
+.dashboard-page .dashboard-hero-secondary{
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.32);
+  backdrop-filter:blur(10px);
+}
+.dashboard-page .dashboard-hero-footnote{
+  display:flex;align-items:center;gap:8px;margin-top:24px;
+  color:rgba(255,255,255,.72);font-size:10px;letter-spacing:.035em;
+}
+.dashboard-page .dashboard-hero-footnote span{color:#efd39d;font-size:15px}
+.dashboard-page .dashboard-hero-side{position:relative;z-index:1;display:grid;gap:12px}
+.dashboard-page .dashboard-stat-grid{gap:11px}
+.dashboard-page .dashboard-stat{
+  min-height:132px;padding:19px 17px;border-radius:21px;
+  border-color:rgba(255,255,255,.24);
+  background:linear-gradient(145deg,rgba(255,255,255,.17),rgba(255,255,255,.075));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 12px 25px rgba(0,0,0,.07);
+}
+.dashboard-page .dashboard-stat-featured{
+  background:linear-gradient(145deg,rgba(245,224,183,.24),rgba(255,255,255,.10));
+}
+.dashboard-page .dashboard-stat>span{font-size:22px;color:#f2d9a6}
+.dashboard-page .dashboard-stat>b{font-size:42px;letter-spacing:-.055em}
+.dashboard-page .dashboard-stat>small{font-size:10px;line-height:1.5}
+.dashboard-page .dashboard-daily-card{
+  padding:16px 18px 15px;border:1px solid rgba(255,255,255,.2);
+  border-radius:18px;background:rgba(8,38,31,.24);
+  backdrop-filter:blur(12px);
+}
+.dashboard-page .dashboard-daily-card>div:first-child{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  color:#fff;font-size:10px;letter-spacing:.09em;font-weight:750;
+}
+.dashboard-page .dashboard-daily-card>div:first-child b{
+  font-size:12px;letter-spacing:0;color:#f2d9a6;
+}
+.dashboard-page .dashboard-progress{
+  height:6px;margin:12px 0 9px;border-radius:20px;
+  background:rgba(255,255,255,.17);overflow:hidden;
+}
+.dashboard-page .dashboard-progress i{
+  display:block;height:100%;border-radius:20px;
+  background:linear-gradient(90deg,#e7c88e,#f5e7c8);
+  box-shadow:0 0 12px rgba(240,217,169,.35);
+}
+.dashboard-page .dashboard-daily-card>small{
+  color:rgba(255,255,255,.7);font-size:10px;line-height:1.5;
+}
+.dashboard-page .dashboard-hero-orbit{
+  right:31%;bottom:-205px;width:390px;height:390px;
+  border-color:rgba(255,255,255,.11);
+  box-shadow:0 0 0 28px rgba(255,255,255,.025),0 0 0 56px rgba(255,255,255,.018);
+}
+.dashboard-page .dashboard-hero-spark{
+  position:absolute;right:42%;top:22px;color:rgba(244,221,178,.75);
+  font-size:22px;animation:dashboardSpark 5s ease-in-out infinite;
+}
+@keyframes dashboardSpark{0%,100%{transform:translateY(0) rotate(0);opacity:.55}50%{transform:translateY(-7px) rotate(18deg);opacity:1}}
+.dashboard-page .dashboard-panel{
+  border-color:#e5e9df;
+  box-shadow:0 16px 48px rgba(31,67,48,.055);
+}
+.dashboard-page .dashboard-panel>.modal-title{letter-spacing:-.04em}
+.dashboard-page .customer-bottom-nav{
+  border-color:rgba(214,224,211,.9);
+  box-shadow:0 -10px 35px rgba(20,48,36,.11);
+}
+.dashboard-page .customer-bottom-nav button.active{
+  background:linear-gradient(135deg,#eaf1e5,#f5f1e5);
+}
+@media(max-width:680px){
+  .dashboard-page .dashboard-welcome{
+    grid-template-columns:1fr;gap:24px;min-height:0;
+    padding:27px 21px 23px;border-radius:25px;
+  }
+  .dashboard-page .dashboard-welcome h1{font-size:clamp(34px,9vw,43px)}
+  .dashboard-page .dashboard-welcome p{font-size:13px}
+  .dashboard-page .dashboard-hero-actions{display:grid;grid-template-columns:1fr 1fr}
+  .dashboard-page .dashboard-hero-actions button{padding:0 10px;font-size:11px}
+  .dashboard-page .dashboard-hero-footnote{margin-top:18px}
+  .dashboard-page .dashboard-stat{min-height:112px;padding:15px 13px}
+  .dashboard-page .dashboard-stat>b{font-size:36px}
+  .dashboard-page .dashboard-hero-spark{right:17%;top:16px}
+  .dashboard-page .dashboard-hero-orbit{right:-30%;bottom:-235px}
+}
+@media(prefers-reduced-motion:reduce){
+  .dashboard-page .dashboard-hero-spark{animation:none}
+}
