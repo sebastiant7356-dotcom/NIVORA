@@ -56,7 +56,7 @@ async function startFlow(){try{if(window.NV&&await window.NV.session()){window.N
     paint();
   });
 })();
-['#openProfile','#heroStart','#previewStart'].forEach(s=>$(s).addEventListener('click',startFlow));
+['#openProfile','#heroStart','#previewStart'].forEach(s=>$(s)?.addEventListener('click',startFlow));
 $('#openPortal').addEventListener('click',()=>window.NivoraPortal.openPortal(openWizard));
 async function beginGoogleAuth(button){
   const original=button.textContent;
