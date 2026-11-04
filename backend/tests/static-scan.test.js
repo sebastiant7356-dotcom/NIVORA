@@ -137,3 +137,20 @@ test("account deletion fails closed when cleanup or audit steps fail", () => {
   assert.match(account, /if \(!auditOk\) throw new Error/);
   assert.match(account, /if \(error\) throw error;[\s\S]*?res\.json\(\{ success: true, message: "Your account and personal data have been deleted\." \}\)/);
 });
+
+
+test("account deletion preserves only registration identifiers for 180 days", () => {
+  const account = text(path.join(ROOT, "backend", "src", "routes", "account.js"));
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261104100000_account_deletion_180_day_retention.sql"));
+  assert.match(account, /auth\.admin\.getUserById\(id\)/);
+  assert.match(account, /registration_email: authUser\.email/);
+  assert.match(account, /registration_provider: authUser\.app_metadata\?\.provider/);
+  assert.match(account, /180 \* 24 \* 60 \* 60 \* 1000/);
+  assert.match(account, /account_deletion_retention/);
+  assert.match(account, /Limited registration details are retained for 180 days/);
+  assert.match(migration, /check \(purge_after = cancelled_at \+ interval '180 days'\)/);
+  assert.match(migration, /enable row level security/);
+  assert.match(migration, /revoke all on table public\.account_deletion_retention from public, anon, authenticated/);
+  assert.match(migration, /cron\.schedule/);
+  assert.match(migration, /purge_expired_account_registration_records/);
+});
