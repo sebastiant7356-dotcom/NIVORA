@@ -84,21 +84,21 @@ router.get("/discover", discoverLimit, async (req, res) => {
     if (!nearby.length) return res.json({ success: true, radius_km: RADIUS_KM, people: [] });
 
     const ids = nearby.map((x) => x.id);
-    const [{ data: profiles, error: profileError }, { data: blocks, error: blockError }, { data: outgoing, error: outgoingError }, { data: incoming, error: incomingError }, { data: activeMembers, error: activeError }] = await Promise.all([
+    const [{ data: profiles, error: profileError }, { data: blocks, error: blockError }, { data: outgoing, error: outgoingError }, { data: incoming, error: incomingError }, { data: activeMatches, error: activeError }] = await Promise.all([
       db.from("profiles").select("id,full_name,age,district,gender,looking_for,min_partner_age,max_partner_age,job_title,bio,relationship_intention,core_values,is_active,suspended_at,approval_status").in("id", ids).eq("approval_status", "approved").eq("is_active", true),
       db.from("blocks").select("blocker_id,blocked_id").or("blocker_id.eq." + req.user.id + ",blocked_id.eq." + req.user.id),
       db.from("shake_interests").select("to_user").eq("from_user", req.user.id),
       db.from("shake_interests").select("from_user").eq("to_user", req.user.id),
-      db.from("match_history").select("user_one,user_two").in("status", ["proposed", "active"]).gt("expires_at", new Date().toISOString()).limit(2000)
+      db.from("match_history").select("user_one,user_two,status,expires_at,proposal_expires_at").in("status", ["proposed", "active"]).or("user_one.eq." + req.user.id + ",user_two.eq." + req.user.id).limit(2000)
     ]);
     if (profileError || blockError || outgoingError || incomingError || activeError) return res.status(500).json({ success: false, message: "Nearby member privacy checks failed." });
     const hidden = new Set();
     for (const b of blocks || []) hidden.add(b.blocker_id === req.user.id ? b.blocked_id : b.blocker_id);
     const sent = new Set((outgoing || []).map((x) => x.to_user));
     const received = new Set((incoming || []).map((x) => x.from_user));
-    const busy = new Set((activeMembers || []).flatMap((x) => [x.user_one, x.user_two]));
+    const alreadyMatched = new Set((activeMatches || []).filter((x) => { const expiry = x.status === "proposed" ? x.proposal_expires_at : x.expires_at; return expiry && new Date(expiry).getTime() > Date.now(); }).map((x) => x.user_one === req.user.id ? x.user_two : x.user_one));
     const byId = new Map((profiles || []).map((p) => [p.id, p]));
-    const people = nearby.filter((n) => !hidden.has(n.id) && !busy.has(n.id) && !sent.has(n.id))
+    const people = nearby.filter((n) => !hidden.has(n.id) && !alreadyMatched.has(n.id) && !sent.has(n.id))
       .map((n) => {
         const person = byId.get(n.id);
         if (!person || !compatible(customer.profile, person) || person.suspended_at) return null;
@@ -126,7 +126,7 @@ router.post("/interest", interestLimit, async (req, res) => {
       invalid_target: [400, "Invalid member."], staff_not_customer: [403, "Staff accounts cannot use Shake & Chat."],
       profile_unavailable: [403, "One of these profiles is unavailable."], not_compatible: [409, "These profiles are not compatible."],
       blocked: [403, "This connection is unavailable."], location_not_enabled: [409, "Location discovery is no longer enabled."],
-      outside_radius: [409, "This member is outside the 50 km radius."], active_match_exists: [409, "One of you already has an active conversation."]
+      outside_radius: [409, "This member is outside the 50 km radius."], existing_match: [409, "You already have a conversation with this member."]
     };
     const mapped = messages[code];
     if (mapped) return res.status(mapped[0]).json({ success: false, code, message: mapped[1] });
