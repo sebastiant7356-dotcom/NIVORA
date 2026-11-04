@@ -63,7 +63,18 @@ router.delete("/", limit, async (req, res) => {
     return res.status(400).json({ success: false, message: 'Send {"confirm":"DELETE"} to permanently delete your account.' });
   }
   const db = serviceClient(); const id = req.user.id;
+  let retentionCancellationAt = null;
   try {
+    const { data: authResult, error: authLookupError } = await db.auth.admin.getUserById(id);
+    if (authLookupError || !authResult?.user) throw authLookupError || new Error("Account registration record unavailable.");
+    const authUser = authResult.user;
+    const registrationRecord = {
+      auth_user_id: id,
+      registration_email: authUser.email || null,
+      registration_display_name: authUser.user_metadata?.full_name || authUser.user_metadata?.name || null,
+      registration_provider: authUser.app_metadata?.provider || "google",
+      registered_at: authUser.created_at || null
+    };
     await endLiveMatchesFor(id, "account_deleted", id);
     // Storage objects do not cascade with database rows.
     const { data: photoRows, error: photoLookupError } = await db.from("profile_photos").select("object_path").eq("user_id", id);
@@ -98,9 +109,26 @@ router.delete("/", limit, async (req, res) => {
     if (paymentDetachError) throw paymentDetachError;
     const auditOk = await audit(id, "account_deleted", "account", id);
     if (!auditOk) throw new Error("Account deletion audit could not be recorded.");
+
+    // IT Intermediary Rules require registration information to be retained for
+    // 180 days after cancellation. Keep only Google registration identifiers,
+    // not the profile, photos, conversations or voice content being deleted.
+    retentionCancellationAt = new Date().toISOString();
+    const purgeAfter = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString();
+    const { error: retentionError } = await db.from("account_deletion_retention").upsert({
+      ...registrationRecord,
+      cancelled_at: retentionCancellationAt,
+      purge_after: purgeAfter
+    }, { onConflict: "auth_user_id" });
+    if (retentionError) throw retentionError;
+
     const { error } = await db.auth.admin.deleteUser(id); // cascades profile, blocks, staff role, moderation events
-    if (error) throw error;
-    res.json({ success: true, message: "Your account and personal data have been deleted." });
+    if (error) {
+      await db.from("account_deletion_retention").delete()
+        .eq("auth_user_id", id).eq("cancelled_at", retentionCancellationAt);
+      throw error;
+    }
+    res.json({ success: true, message: "Your account has been deleted. Limited registration details are retained for 180 days as required by applicable law; certain safety records may also be retained." });
   } catch {
     res.status(500).json({ success: false, message: "Deletion could not be completed. Please try again or contact support." });
   }
