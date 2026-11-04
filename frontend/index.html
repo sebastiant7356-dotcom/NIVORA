@@ -8,16 +8,6 @@
   <title>NIVORA — Oru naal mathi</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="portal.css">
-  <script>
-    // Applied before first paint so there is no flash of the wrong theme. A saved choice
-    // (from the toggle button) wins; otherwise the device's own light/dark setting is used.
-    (function () {
-      try {
-        var saved = localStorage.getItem("nv_theme");
-        if (saved === "dark" || saved === "light") document.documentElement.setAttribute("data-theme", saved);
-      } catch (_) { /* ignore */ }
-    })();
-  </script>
 </head>
 <body>
   <div class="announcement"><span class="dot"></span><span data-i18n="announcement">ബന്ധങ്ങൾ വേഗത്തിൽ അല്ല, മനസ്സിലാക്കി തുടങ്ങാം.</span></div>
@@ -32,7 +22,7 @@
       <a href="#safety" data-i18n="navSafety">സുരക്ഷ</a>
     </nav>
     <div class="nav-actions">
-      <button class="lang-btn" id="themeBtn" type="button" aria-label="Toggle dark mode" title="Dark / light mode">🌙</button>
+
       <button class="lang-btn" id="langBtn" type="button">EN ↗</button>
       <button class="lang-btn" id="openPortal" type="button" data-i18n="myspace">എന്റെ ഇടം ↗</button>
       <button class="lang-btn" id="googleAuthStart" type="button">Google Sign in / Sign up ↗</button>
