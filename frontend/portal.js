@@ -148,6 +148,16 @@
     try { s = await session(); } catch (_) { return; }
     if (!s) return;
     try { sessionStorage.removeItem("nivora_pending_portal"); } catch (_) { /* ignore */ }
+    // Existing customers go straight to their dedicated dashboard after Google login.
+    // Staff remain on the existing staff portal; first-time customers continue to profile setup.
+    const [pr, staff] = await Promise.all([
+      api("/api/profile").catch(() => ({ profile: null })),
+      api("/api/admin/me").then(() => true).catch(() => false)
+    ]);
+    if (pr.profile && !staff) {
+      window.location.replace("dashboard.html");
+      return;
+    }
     await openPortal();
   }
 
