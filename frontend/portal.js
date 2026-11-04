@@ -6,7 +6,7 @@
 
   const P = {
     en: {
-      myspace: "My space", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Find a match to start chatting.", shakeIntro: "Discover people who are also looking to connect within 50 km.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Location sharing is optional. Your exact location is private and is never shown to other members.", shakeEnable: "Enable nearby discovery", shakeDisable: "Turn off location sharing", shakeRefresh: "Find people nearby", shakeLoading: "Finding people within 50 km…", shakeNoPeople: "No compatible members are available nearby yet.", shakePermission: "Allow location access in your browser to continue.", shakeEnabled: "Nearby discovery is enabled. Your exact location stays private.", shakeLike: "Interested", shakeLikeBack: "Like back", shakeWaiting: "Interest sent. Waiting for a mutual interest.", shakeMatched: "It’s a mutual interest! Your chat is ready in Messages.", shakeDistance: "km away", shakeError: "Could not load Shake & Chat. Please try again.", shakeConsent: "By enabling, you allow NIVORA to use your location privately to find compatible members within 50 km. You can turn this off anytime.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
+      myspace: "My space", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Find a match to start chatting.", shakeIntro: "Discover people who are also looking to connect within 50 km.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Location sharing is optional. Your exact location is private and is never shown to other members.", shakeEnable: "Enable nearby discovery", shakeDisable: "Turn off location sharing", shakeRefresh: "Find people nearby", shakeLoading: "Finding people within 50 km…", shakeNoPeople: "No compatible members are available nearby yet.", shakePermission: "Allow location access in your browser to continue.", shakeEnabled: "Nearby discovery is enabled. Your exact location stays private.", shakeLike: "Interested", shakeLikeBack: "Like back", shakeWaiting: "Interest sent. Waiting for a mutual interest.", shakeMatched: "It’s a mutual interest! Your chat is ready in Messages.", shakeAnonymousTitle: "You are chatting anonymously", shakeAnonymousInfo: "Your name, photos and profile details stay hidden until both of you choose to reveal.", shakeReveal: "I am comfortable revealing my profile", shakeWaitingReveal: "Your choice is saved. Waiting for the other person to consent.", shakeRevealDone: "Both of you agreed. Profiles are now visible.", shakeRevealCheck: "Check reveal status", shakeDistance: "km away", shakeError: "Could not load Shake & Chat. Please try again.", shakeConsent: "By enabling, you allow NIVORA to use your location privately to find compatible members within 50 km. You can turn this off anytime.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
       noProfile: "You have not created a profile yet.", staffAccount: "This is a NIVORA staff account. Customer profiles and matching are disabled for staff.", staffConsole: "Open staff console", createProfile: "Create my profile",
       status_pending: "Awaiting staff review", status_approved: "Approved", status_rejected: "Not approved", status_changes_requested: "Changes requested",
       suspended: "Your account is suspended. Please contact support.", incomplete: "Your profile is missing some details (gender, preferences, values). Please edit it before matching.",
@@ -34,7 +34,7 @@
       name: "Name", age: "Age", place: "Location", job: "Work / study", about: "About you", lookingFor: "I'm looking for", relationship: "Relationship intention", minAge: "Partner min age", maxAge: "Partner max age"
     },
     ml: {
-      myspace: "എന്റെ ഇടം", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "നിങ്ങളുടെ സജീവ സംഭാഷണങ്ങൾ ഇവിടെ കാണാം.", noConversations: "ഇതുവരെ സംഭാഷണങ്ങളില്ല. Match കണ്ടെത്തി chat തുടങ്ങാം.", shakeIntro: "50 km ചുറ്റളവിൽ പരിചയപ്പെടാൻ താൽപര്യമുള്ളവരെ കണ്ടെത്താം.", shakeComing: "Shake & Chat ഉടൻ വരുന്നു", shakePrivacy: "Location പങ്കിടൽ നിങ്ങളുടെ ഇഷ്ടമാണ്. കൃത്യമായ സ്ഥലം മറ്റുള്ളവർക്ക് ഒരിക്കലും കാണിക്കില്ല.", shakeEnable: "സമീപത്തുള്ളവരെ കണ്ടെത്തുക", shakeDisable: "Location പങ്കിടൽ നിർത്തുക", shakeRefresh: "സമീപത്തുള്ളവരെ തിരയുക", shakeLoading: "50 km ചുറ്റളവിൽ തിരയുന്നു…", shakeNoPeople: "സമീപത്ത് അനുയോജ്യരായ അംഗങ്ങൾ ഇപ്പോൾ ലഭ്യമല്ല.", shakePermission: "തുടരാൻ browser-ൽ location അനുമതി നൽകുക.", shakeEnabled: "Nearby discovery പ്രവർത്തനക്ഷമമാണ്. കൃത്യമായ സ്ഥലം സ്വകാര്യമാണ്.", shakeLike: "താൽപര്യമുണ്ട്", shakeLikeBack: "തിരിച്ചും താൽപര്യമുണ്ട്", shakeWaiting: "താൽപര്യം അയച്ചു. മറുവശത്തുനിന്നുള്ള താൽപര്യം കാത്തിരിക്കുന്നു.", shakeMatched: "പരസ്പര താൽപര്യം ലഭിച്ചു! Messages-ൽ chat തുടങ്ങാം.", shakeDistance: "km അകലെ", shakeError: "Shake & Chat തുറക്കാനായില്ല. വീണ്ടും ശ്രമിക്കുക.", shakeConsent: "50 km ചുറ്റളവിൽ അനുയോജ്യരായ അംഗങ്ങളെ കണ്ടെത്താൻ നിങ്ങളുടെ location സ്വകാര്യമായി ഉപയോഗിക്കാൻ NIVORA-യെ അനുവദിക്കുന്നു. എപ്പോൾ വേണമെങ്കിലും ഇത് നിർത്താം.", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
+      myspace: "എന്റെ ഇടം", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "നിങ്ങളുടെ സജീവ സംഭാഷണങ്ങൾ ഇവിടെ കാണാം.", noConversations: "ഇതുവരെ സംഭാഷണങ്ങളില്ല. Match കണ്ടെത്തി chat തുടങ്ങാം.", shakeIntro: "50 km ചുറ്റളവിൽ പരിചയപ്പെടാൻ താൽപര്യമുള്ളവരെ കണ്ടെത്താം.", shakeComing: "Shake & Chat ഉടൻ വരുന്നു", shakePrivacy: "Location പങ്കിടൽ നിങ്ങളുടെ ഇഷ്ടമാണ്. കൃത്യമായ സ്ഥലം മറ്റുള്ളവർക്ക് ഒരിക്കലും കാണിക്കില്ല.", shakeEnable: "സമീപത്തുള്ളവരെ കണ്ടെത്തുക", shakeDisable: "Location പങ്കിടൽ നിർത്തുക", shakeRefresh: "സമീപത്തുള്ളവരെ തിരയുക", shakeLoading: "50 km ചുറ്റളവിൽ തിരയുന്നു…", shakeNoPeople: "സമീപത്ത് അനുയോജ്യരായ അംഗങ്ങൾ ഇപ്പോൾ ലഭ്യമല്ല.", shakePermission: "തുടരാൻ browser-ൽ location അനുമതി നൽകുക.", shakeEnabled: "Nearby discovery പ്രവർത്തനക്ഷമമാണ്. കൃത്യമായ സ്ഥലം സ്വകാര്യമാണ്.", shakeLike: "താൽപര്യമുണ്ട്", shakeLikeBack: "തിരിച്ചും താൽപര്യമുണ്ട്", shakeWaiting: "താൽപര്യം അയച്ചു. മറുവശത്തുനിന്നുള്ള താൽപര്യം കാത്തിരിക്കുന്നു.", shakeMatched: "പരസ്പര താൽപര്യം ലഭിച്ചു! Messages-ൽ chat തുടങ്ങാം.", shakeAnonymousTitle: "നിങ്ങൾ ഇപ്പോൾ അജ്ഞാതരായി chat ചെയ്യുന്നു", shakeAnonymousInfo: "നിങ്ങൾ രണ്ടുപേരും സമ്മതിക്കുന്നതുവരെ പേര്, ഫോട്ടോ, profile വിവരങ്ങൾ മറച്ചുവെക്കും.", shakeReveal: "എന്റെ profile വെളിപ്പെടുത്താൻ എനിക്ക് സമ്മതമാണ്", shakeWaitingReveal: "നിങ്ങളുടെ സമ്മതം സേവ് ചെയ്തു. മറ്റേയാളുടെ സമ്മതം കാത്തിരിക്കുന്നു.", shakeRevealDone: "രണ്ടുപേരും സമ്മതിച്ചു. ഇപ്പോൾ profile കാണാം.", shakeRevealCheck: "Reveal നില പരിശോധിക്കുക", shakeDistance: "km അകലെ", shakeError: "Shake & Chat തുറക്കാനായില്ല. വീണ്ടും ശ്രമിക്കുക.", shakeConsent: "50 km ചുറ്റളവിൽ അനുയോജ്യരായ അംഗങ്ങളെ കണ്ടെത്താൻ നിങ്ങളുടെ location സ്വകാര്യമായി ഉപയോഗിക്കാൻ NIVORA-യെ അനുവദിക്കുന്നു. എപ്പോൾ വേണമെങ്കിലും ഇത് നിർത്താം.", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
       noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", staffAccount: "ഇത് NIVORA staff account ആണ്. Staff അംഗങ്ങൾക്ക് customer profile അല്ലെങ്കിൽ matching ലഭ്യമല്ല.", staffConsole: "Staff console തുറക്കുക", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
       status_pending: "Staff review കാത്തിരിക്കുന്നു", status_approved: "അംഗീകരിച്ചു", status_rejected: "അംഗീകരിച്ചില്ല", status_changes_requested: "മാറ്റങ്ങൾ ആവശ്യപ്പെട്ടിട്ടുണ്ട്",
       suspended: "നിങ്ങളുടെ account suspend ചെയ്തിരിക്കുന്നു. Support-നെ ബന്ധപ്പെടുക.", incomplete: "Profile-ൽ ചില വിവരങ്ങൾ കുറവാണ് (gender, preferences, values). Matching-ന് മുമ്പ് edit ചെയ്യുക.",
@@ -303,7 +303,7 @@
     if (!active.length) inboxList.innerHTML = "<p class='modal-description'>" + p("noConversations") + "</p>";
     active.forEach((item) => {
       const button = document.createElement("button"); button.type = "button"; button.className = "dashboard-conversation";
-      const name = item.partner?.first_name || (L() === "ml" ? "പുതിയ match" : "New match");
+      const name = item.is_shake_match && !item.reveal?.revealed ? (L() === "ml" ? "അജ്ഞാത match" : "Anonymous match") : (item.partner?.first_name || (L() === "ml" ? "പുതിയ match" : "New match"));
       const status = item.status === "proposed" ? (L() === "ml" ? "മറുപടി കാത്തിരിക്കുന്നു" : "Awaiting response") : (L() === "ml" ? "സജീവ സംഭാഷണം" : "Active conversation");
       button.innerHTML = "<span class='dashboard-avatar'>♡</span><span><b>" + esc(name) + "</b><small>" + status + "</small></span><span class='dashboard-arrow'>›</span>";
       button.onclick = () => { match = item; selectedMatchId = item.id; render(); };
@@ -482,7 +482,10 @@
       box.innerHTML = header + find + `<div class="nv-msg" id="mMsg"></div>`;
     } else {
       const m = match;
-      let h = header + tabs + find + partnerHtml(m.partner);
+      const anonymousBlock = m.is_shake_match && !m.reveal?.revealed
+        ? `<div class="summary-box"><b>${p("shakeAnonymousTitle")}</b><p>${p("shakeAnonymousInfo")}</p><p id="shakeRevealStatus">${m.reveal?.my_consented ? p("shakeWaitingReveal") : p("shakeReveal")}</p><button class="outline-btn" id="shakeReveal" type="button">${m.reveal?.my_consented ? p("shakeRevealCheck") : p("shakeReveal")}</button></div>`
+        : (m.is_shake_match && m.reveal?.revealed ? `<p class="modal-description">${p("shakeRevealDone")}</p>` : "");
+      let h = header + tabs + find + anonymousBlock + partnerHtml(m.partner);
       if (["proposed", "active"].includes(m.status)) {
         h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
           <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
@@ -524,6 +527,19 @@
     };
     if (!match) return;
     const m = match, $ = (s) => box.querySelector(s);
+    $("#shakeReveal") && ($("#shakeReveal").onclick = async () => {
+      const button = $("#shakeReveal"), status = $("#shakeRevealStatus");
+      button.disabled = true;
+      try {
+        if (!m.reveal?.my_consented) {
+          await api(`/api/shake/${encodeURIComponent(m.id)}/reveal`, { method: "POST" });
+        }
+        await loadAll(); render();
+      } catch (e) {
+        if (status) status.textContent = e.message || p("shakeError");
+        button.disabled = false;
+      }
+    });
     const respond = async (accept) => { try { await api(`/api/match/${m.id}/respond`, { method: "POST", body: { accept } }); await loadAll(); render(); } catch (e) { $("#mMsg").textContent = e.message; } };
     $("#mContinue") && ($("#mContinue").onclick = () => respond(true));
     $("#mStop") && ($("#mStop").onclick = () => respond(false));
