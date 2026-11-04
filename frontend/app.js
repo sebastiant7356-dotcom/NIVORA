@@ -41,30 +41,17 @@ const modal = $('#profileModal');
 function openWizard(){currentStep=1;done=false;profile={name:'',age:'',place:'',gender:'',job:'',lookingFor:'',relationship:'marriage',minAge:'',maxAge:'',values:[],about:'',agree:false,privacyAgree:false};modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderStep();}
 function closeWizard(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';}
 async function startFlow(){try{if(window.NV&&await window.NV.session()){window.NivoraPortal.openPortal(openWizard);return;}}catch(e){}openWizard();}
-// Dark / light mode. With no saved choice, the device's own setting (prefers-color-scheme)
-// is used automatically via CSS; the button lets someone override and remembers that choice.
-(function themeToggle(){
-  const btn=$('#themeBtn'); if(!btn) return;
-  const sysDark=()=>window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const current=()=>document.documentElement.getAttribute('data-theme')||(sysDark()?'dark':'light');
-  const paint=()=>{ btn.textContent = current()==='dark' ? '☀️' : '🌙'; };
-  paint();
-  btn.addEventListener('click',()=>{
-    const next = current()==='dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try{ localStorage.setItem('nv_theme', next); }catch(_){}
-    paint();
-  });
-})();
 ['#openProfile','#heroStart','#previewStart'].forEach(s=>$(s)?.addEventListener('click',startFlow));
 $('#openPortal').addEventListener('click',()=>window.NivoraPortal.openPortal(openWizard));
 async function beginGoogleAuth(button){
   const original=button.textContent;
   button.disabled=true;
   try{
+    try { sessionStorage.setItem('nivora_pending_portal', '1'); } catch (_) {}
     if(!window.NV||typeof window.NV.signInWithGoogle!=='function') throw new Error('Google sign-in is not ready. Please try again in a moment.');
     await window.NV.signInWithGoogle();
   }catch(e){
+    try { sessionStorage.removeItem('nivora_pending_portal'); } catch (_) {}
     toast(e.message||'Google sign-in failed. Please try again.');
     button.disabled=false;
     button.textContent=original;
