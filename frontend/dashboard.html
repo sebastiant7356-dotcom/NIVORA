@@ -27,6 +27,10 @@
       try {
         const s = await window.NV.session();
         if (!s) { window.location.replace("index.html"); return; }
+        const staff = await window.NV.api("/api/admin/me").then(() => true).catch(() => false);
+        if (staff) { window.location.replace("admin.html"); return; }
+        const profile = await window.NV.api("/api/profile").catch(() => ({ profile: null }));
+        if (!profile.profile) { window.location.replace("index.html"); return; }
         document.getElementById("dashboardLoading")?.remove();
         await window.NivoraPortal.openPortal();
       } catch (_) {
