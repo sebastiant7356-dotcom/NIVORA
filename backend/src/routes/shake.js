@@ -89,14 +89,14 @@ router.get("/discover", discoverLimit, async (req, res) => {
       db.from("blocks").select("blocker_id,blocked_id").or("blocker_id.eq." + req.user.id + ",blocked_id.eq." + req.user.id),
       db.from("shake_interests").select("to_user").eq("from_user", req.user.id),
       db.from("shake_interests").select("from_user").eq("to_user", req.user.id),
-      db.from("match_members").select("user_id").in("user_id", [req.user.id, ...ids])
+      db.from("match_history").select("user_one,user_two").in("status", ["proposed", "active"]).gt("expires_at", new Date().toISOString()).limit(2000)
     ]);
     if (profileError || blockError || outgoingError || incomingError || activeError) return res.status(500).json({ success: false, message: "Nearby member privacy checks failed." });
     const hidden = new Set();
     for (const b of blocks || []) hidden.add(b.blocker_id === req.user.id ? b.blocked_id : b.blocker_id);
     const sent = new Set((outgoing || []).map((x) => x.to_user));
     const received = new Set((incoming || []).map((x) => x.from_user));
-    const busy = new Set((activeMembers || []).map((x) => x.user_id));
+    const busy = new Set((activeMembers || []).flatMap((x) => [x.user_one, x.user_two]));
     const byId = new Map((profiles || []).map((p) => [p.id, p]));
     const people = nearby.filter((n) => !hidden.has(n.id) && !busy.has(n.id) && !sent.has(n.id))
       .map((n) => {
