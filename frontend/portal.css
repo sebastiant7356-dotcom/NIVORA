@@ -88,3 +88,6 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
 .dashboard-page .customer-bottom-nav{position:fixed;left:0;right:0;bottom:0;margin:0;padding:10px max(10px,calc((100vw - 760px)/2)) calc(10px + env(safe-area-inset-bottom));}
 .dashboard-page .dashboard-panel{max-width:760px;margin-left:auto;margin-right:auto}
 .dashboard-page .dashboard-panel .nv-row{align-items:flex-start}
+
+/* The full-screen dashboard has no dismiss/close control. */
+.dashboard-page .modal-close{display:none!important}
