@@ -127,3 +127,13 @@ test("SECURITY DEFINER RLS helpers live outside the public API schema", () => {
   assert.match(migration, /revoke all on function public\.nivora_is_staff\(\) from public, anon, authenticated/);
   assert.match(migration, /voice_messages_sender_created_idx/);
 });
+
+
+test("account deletion fails closed when cleanup or audit steps fail", () => {
+  const account = text(path.join(ROOT, "backend", "src", "routes", "account.js"));
+  assert.match(account, /if \(feedbackDeleteError\) throw feedbackDeleteError/);
+  assert.match(account, /if \(memberDeleteError\) throw memberDeleteError/);
+  assert.match(account, /if \(paymentDetachError\) throw paymentDetachError/);
+  assert.match(account, /if \(!auditOk\) throw new Error/);
+  assert.match(account, /if \(error\) throw error;[\s\S]*?res\.json\(\{ success: true, message: "Your account and personal data have been deleted\." \}\)/);
+});
