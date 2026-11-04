@@ -4,7 +4,7 @@
   const { api, client, session, authPanel, esc } = window.NV;
   const $ = (s) => document.querySelector(s);
   let tab = "reports", role = null;
-  const TABS = [["reports", "Open reports"], ["history", "Moderation history"], ["audit", "Audit log"]];
+  const TABS = [["reports", "Open reports"], ["photos", "Pending photos"], ["history", "Moderation history"], ["audit", "Audit log"]];
   const msg = (t, ok) => { const m = $("#msg"); m.textContent = t || ""; m.className = "nv-msg" + (ok ? " ok" : ""); };
   const fmt = (i) => (i ? new Date(i).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "—");
 
@@ -32,11 +32,40 @@
     msg(""); $("#list").innerHTML = `<p>Loading…</p>`;
     try {
       if (tab === "reports") return renderReports((await api("/api/admin/reports?status=open")).reports);
+      if (tab === "photos") return renderPendingPhotos((await api("/api/admin/pending-photos")).photos || []);
       if (tab === "history") return renderHistory((await api("/api/admin/moderation-history?limit=100")).events);
       if (tab === "audit") return renderAudit((await api("/api/admin/audit?limit=100")).entries);
       const r = await api(`/api/admin/profiles?status=${tab}&limit=50`);
       renderProfiles(r.profiles, r.total);
     } catch (e) { $("#list").innerHTML = ""; msg(e.message); }
+  }
+
+  function renderPendingPhotos(photos) {
+    if (!photos.length) { $("#list").innerHTML = `<p>No photos are waiting for approval.</p>`; return; }
+    $("#list").innerHTML = photos.map((ph) => `
+      <div class="card" data-photo-id="${esc(ph.id)}">
+        <h3>Pending profile photo</h3>
+        <small>Member reference: ${esc(ph.user_id)} · submitted ${fmt(ph.created_at)}</small>
+        <div class="photo-review"><img src="${esc(ph.url || "")}" alt="Photo awaiting staff approval"></div>
+        <textarea placeholder="Reason (required when rejecting)" rows="2" maxlength="500"></textarea>
+        <div class="admin-actions"><button data-pending-photo-decision="approved" type="button">Approve photo</button>
+          <button data-pending-photo-decision="rejected" class="bad" type="button">Reject photo</button></div>
+      </div>`).join("");
+    $("#list").onclick = async (e) => {
+      const button = e.target.closest("[data-pending-photo-decision]");
+      if (!button) return;
+      const card = button.closest("[data-photo-id]");
+      const photoId = card?.dataset.photoId, decision = button.dataset.pendingPhotoDecision;
+      const reason = card.querySelector("textarea")?.value || "";
+      if (decision === "rejected" && reason.trim().length < 5) { msg("Enter a rejection reason (at least 5 characters)."); return; }
+      if (!confirm(`Confirm photo ${decision}?`)) return;
+      button.disabled = true;
+      try {
+        await api(`/api/admin/pending-photos/${encodeURIComponent(photoId)}/decision`, { method: "POST", body: { decision, reason } });
+        msg("Photo decision saved.", true);
+        load();
+      } catch (e) { msg(e.message); button.disabled = false; }
+    };
   }
 
   const flags = (p) => `${(p.ai_flags || []).map((f) => `<span class="flag ${esc(f.severity)}" title="${esc(f.detail)}">${esc(f.code)}</span>`).join("") || "<small>No flags</small>"}
