@@ -252,3 +252,42 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
   .dashboard-page .dashboard-panel{animation:none}
   .dashboard-page .dashboard-panel *{transition:none!important}
 }
+
+
+/* Premium dashboard layout: wide, calm, light-only workspace */
+.dashboard-page .profile-modal.portal-modal{
+  padding:clamp(22px,4vw,48px) max(16px,calc((100vw - 1120px)/2)) calc(112px + env(safe-area-inset-bottom));
+}
+.dashboard-page .dashboard-panel{
+  width:100%;max-width:1120px;min-height:460px;margin:0 auto 22px;
+  padding:clamp(22px,3.5vw,42px);border-radius:28px;
+  background:rgba(255,255,255,.88);border:1px solid #e4e9df;
+  box-shadow:0 22px 65px rgba(31,67,48,.075);
+}
+.dashboard-page .dashboard-welcome{
+  width:100%;max-width:1120px;margin:0 auto 22px;padding:clamp(24px,4vw,42px);
+  display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:24px;align-items:center;
+  border-radius:30px;color:#fff;background:linear-gradient(120deg,#123f33 0%,#245d4b 58%,#6c8c69 100%);
+  box-shadow:0 22px 55px rgba(18,63,51,.18);position:relative;overflow:hidden;
+}
+.dashboard-page .dashboard-welcome:after{content:"♡";position:absolute;right:28%;top:-72px;font-size:260px;line-height:1;color:rgba(255,255,255,.055);pointer-events:none}
+.dashboard-page .dashboard-welcome-copy{position:relative;z-index:1}
+.dashboard-page .dashboard-eyebrow{font-size:10px;letter-spacing:.2em;font-weight:800;color:#d9e8d6}
+.dashboard-page .dashboard-welcome h1{font-size:clamp(28px,5vw,46px);letter-spacing:-.05em;line-height:1.08;margin:14px 0 10px;color:#fff}
+.dashboard-page .dashboard-welcome p{font-size:13px;line-height:1.7;color:rgba(255,255,255,.8);margin:0}
+.dashboard-page .dashboard-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:1}
+.dashboard-page .dashboard-stat{padding:17px 15px;border:1px solid rgba(255,255,255,.2);border-radius:19px;background:rgba(255,255,255,.12);backdrop-filter:blur(12px);display:grid;gap:5px}
+.dashboard-page .dashboard-stat>span{font-size:19px;color:#f3dfb6}
+.dashboard-page .dashboard-stat>b{font-size:30px;line-height:1;color:#fff}
+.dashboard-page .dashboard-stat>small{font-size:10px;line-height:1.4;color:rgba(255,255,255,.82)}
+.dashboard-page .dashboard-panel>.modal-title{font-size:clamp(27px,4vw,38px)}
+.dashboard-page .customer-bottom-nav{max-width:760px}
+@media(min-width:900px){
+ .dashboard-page .profile-modal.portal-modal{padding-bottom:132px}
+ .dashboard-page .dashboard-panel{min-height:520px}
+}
+@media(max-width:680px){
+ .dashboard-page .dashboard-welcome{grid-template-columns:1fr;gap:20px;border-radius:23px;padding:23px 20px}
+ .dashboard-page .dashboard-stat-grid{max-width:100%}
+ .dashboard-page .dashboard-panel{min-height:calc(100dvh - 220px);padding:22px 18px;border-radius:23px}
+}
