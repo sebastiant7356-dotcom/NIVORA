@@ -170,6 +170,47 @@ router.get("/audit", async (req, res) => {
 
 
 const PHOTO_BUCKET = "profile-photos";
+// Pending photo review is separate from reported-account investigation.
+router.get("/pending-photos", async (req, res) => {
+  const db = serviceClient();
+  const { data, error } = await db.from("profile_photos")
+    .select("id, user_id, object_path, sort_order, approval_status, created_at")
+    .eq("approval_status", "pending").order("created_at", { ascending: true }).limit(100);
+  if (error) return res.status(500).json({ success: false, message: "Could not load pending photos." });
+  try {
+    const photos = await Promise.all((data || []).map(async (photo) => {
+      const { data: signed, error: signError } = await db.storage.from(PHOTO_BUCKET).createSignedUrl(photo.object_path, 600);
+      return signError ? { id: photo.id, user_id: photo.user_id, approval_status: photo.approval_status, error: "preview_unavailable" }
+        : { id: photo.id, user_id: photo.user_id, sort_order: photo.sort_order, approval_status: photo.approval_status, created_at: photo.created_at, url: signed.signedUrl };
+    }));
+    for (const photo of photos) {
+      if (!(await audit(req.user.id, "viewed_pending_profile_photo", "profile_photo", photo.id))
+        return res.status(503).json({ success: false, message: "Audit logging is unavailable; photo previews were not returned." });
+    }
+    res.json({ success: true, photos });
+  } catch { res.status(500).json({ success: false, message: "Could not prepare pending photo previews." }); }
+});
+
+router.post("/pending-photos/:photoId/decision", async (req, res) => {
+  const { decision, reason } = req.body || {};
+  if (!isUuid(req.params.photoId) || !["approved", "rejected"].includes(decision))
+    return res.status(400).json({ success: false, message: "Invalid photo review request." });
+  const note = typeof reason === "string" ? clean(reason).slice(0, 500) : "";
+  if (decision === "rejected" && note.length < 5)
+    return res.status(400).json({ success: false, message: "A rejection reason (at least 5 characters) is required." });
+  const db = serviceClient();
+  const { data: photo, error: lookupError } = await db.from("profile_photos")
+    .select("id, user_id, approval_status").eq("id", req.params.photoId).eq("approval_status", "pending").maybeSingle();
+  if (lookupError) return res.status(500).json({ success: false, message: "Could not load pending photo." });
+  if (!photo) return res.status(404).json({ success: false, message: "Pending photo not found." });
+  const { error } = await db.from("profile_photos").update({
+    approval_status: decision, review_reason: note || null, reviewed_by: req.user.id, reviewed_at: new Date().toISOString()
+  }).eq("id", photo.id).eq("approval_status", "pending");
+  if (error) return res.status(500).json({ success: false, message: "Photo review could not be saved." });
+  await audit(req.user.id, "pending_profile_photo_decision", "profile_photo", photo.id, { decision, from: "pending" });
+  res.json({ success: true, approval_status: decision });
+});
+
 router.get("/profiles/:id/photos", async (req, res) => {
   if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id." });
   const db = serviceClient();
