@@ -359,9 +359,8 @@
             const response = await api("/api/shake/interest", { method: "POST", body: { target_user_id: person.user_id } });
             if (response.mutual) {
               status.textContent = p("shakeMatched");
+              selectedMatchId = response.match_id;
               await loadAll(); render();
-              const matched = matches.find((m) => m.id === response.match_id);
-              if (matched) { match = matched; selectedMatchId = matched.id; }
               return;
             }
             status.textContent = p("shakeWaiting"); action.textContent = p("shakeWaiting");
