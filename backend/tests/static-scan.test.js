@@ -97,7 +97,8 @@ test("voice messages stay private, size-limited and restricted to match members"
 
 test("staff accounts cannot become customer profiles or receive matches", () => {
   const profile = text(path.join(ROOT, "backend", "src", "routes", "profile.js"));
-  const migration = text(path.join(ROOT, "backend", "migrations", "20261102011000_staff_separation_security_performance.sql"));
+  // This is the migration actually present in the repository and applied to Supabase.
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261101184824_staff_separation_security_performance.sql"));
   const account = text(path.join(ROOT, "backend", "src", "routes", "account.js"));
   assert.match(profile, /Staff accounts do not use customer profiles/);
   assert.match(migration, /staff_not_customer/);
