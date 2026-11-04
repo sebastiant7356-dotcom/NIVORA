@@ -291,3 +291,78 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
  .dashboard-page .dashboard-stat-grid{max-width:100%}
  .dashboard-page .dashboard-panel{min-height:calc(100dvh - 220px);padding:22px 18px;border-radius:23px}
 }
+
+
+/* NIVORA signature dashboard — refined editorial layout */
+.dashboard-page .profile-modal.portal-modal{
+  max-width:none;
+  padding:24px max(18px,calc((100vw - 1080px)/2)) calc(116px + env(safe-area-inset-bottom));
+}
+.dashboard-page .dashboard-topbar{
+  width:100%;max-width:1080px;margin:0 auto 22px;padding:4px 2px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+}
+.dashboard-page .dashboard-brand{display:inline-flex;align-items:center;gap:11px;color:#18392f;text-decoration:none}
+.dashboard-page .dashboard-brand-mark{
+  width:43px;height:43px;border-radius:15px 15px 15px 5px;
+  display:grid;place-items:center;background:#123f33;color:#fff8e9;
+  font:700 27px Georgia,serif;box-shadow:0 7px 17px rgba(18,63,51,.16);
+}
+.dashboard-page .dashboard-brand>span:last-child{display:flex;flex-direction:column;gap:1px}
+.dashboard-page .dashboard-brand b{font:700 19px Georgia,serif;letter-spacing:.09em}
+.dashboard-page .dashboard-brand small{font-size:8px;font-weight:800;letter-spacing:.14em;color:#718075}
+.dashboard-page .dashboard-top-note{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:650;color:#718075}
+.dashboard-page .dashboard-top-note i{width:7px;height:7px;border-radius:50%;background:#72a27a;box-shadow:0 0 0 4px #72a27a20}
+.dashboard-page .dashboard-welcome{
+  min-height:290px;padding:clamp(28px,5vw,54px);
+  grid-template-columns:minmax(0,1.2fr) minmax(250px,.72fr);
+  background:linear-gradient(115deg,#103d32 0%,#1d5745 55%,#78906c 100%);
+  border:1px solid rgba(255,255,255,.16);
+}
+.dashboard-page .dashboard-welcome-copy{max-width:610px}
+.dashboard-page .dashboard-eyebrow{font-size:9px;letter-spacing:.19em;color:#d5e4d1}
+.dashboard-page .dashboard-welcome h1{font-size:clamp(34px,5vw,54px);line-height:1.13;margin:17px 0 12px}
+.dashboard-page .dashboard-welcome p{max-width:440px;font-size:14px}
+.dashboard-page .dashboard-hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
+.dashboard-page .dashboard-hero-actions button{
+  min-height:44px;padding:0 17px;border-radius:13px;font-size:12px;font-weight:750;
+  transition:transform .18s ease,background .18s ease;
+}
+.dashboard-page .dashboard-hero-primary{border:1px solid #f5e8c8;background:#f5e8c8;color:#173e32}
+.dashboard-page .dashboard-hero-primary span{font-size:16px;margin-left:8px}
+.dashboard-page .dashboard-hero-secondary{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.08);color:#fff}
+.dashboard-page .dashboard-hero-actions button:active{transform:scale(.97)}
+.dashboard-page .dashboard-hero-orbit{
+  position:absolute;right:36%;bottom:-160px;width:300px;height:300px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.12);color:transparent;pointer-events:none;
+  box-shadow:0 0 0 24px rgba(255,255,255,.025),0 0 0 48px rgba(255,255,255,.02);
+}
+.dashboard-page .dashboard-stat-grid{align-self:center}
+.dashboard-page .dashboard-stat{min-height:125px;justify-content:center;padding:20px;border-radius:22px;background:rgba(255,255,255,.13)}
+.dashboard-page .dashboard-stat>b{font-size:38px}
+.dashboard-page .dashboard-panel{
+  max-width:1080px;min-height:480px;padding:clamp(24px,4vw,44px);
+  border-radius:27px;background:rgba(255,255,255,.94);
+  box-shadow:0 20px 60px rgba(31,67,48,.065);
+}
+.dashboard-page .dashboard-panel>.modal-title{font-size:clamp(28px,4vw,40px)}
+.dashboard-page .customer-bottom-nav{width:min(100% - 32px,720px);max-width:720px}
+.dashboard-page .customer-bottom-nav button.active{background:#e5eddf}
+@media(min-width:900px){
+ .dashboard-page .profile-modal.portal-modal{padding-top:30px}
+ .dashboard-page .dashboard-welcome{min-height:310px}
+ .dashboard-page .dashboard-panel{min-height:520px}
+}
+@media(max-width:620px){
+ .dashboard-page .profile-modal.portal-modal{padding:15px 12px calc(106px + env(safe-area-inset-bottom))}
+ .dashboard-page .dashboard-topbar{margin-bottom:14px;padding:2px 5px}
+ .dashboard-page .dashboard-brand-mark{width:39px;height:39px}
+ .dashboard-page .dashboard-top-note{font-size:9px}
+ .dashboard-page .dashboard-welcome{min-height:0;padding:25px 21px;gap:22px}
+ .dashboard-page .dashboard-welcome h1{font-size:35px}
+ .dashboard-page .dashboard-stat{min-height:105px;padding:15px}
+ .dashboard-page .dashboard-stat>b{font-size:32px}
+ .dashboard-page .dashboard-hero-actions{margin-top:20px}
+ .dashboard-page .dashboard-hero-actions button{flex:1}
+ .dashboard-page .dashboard-panel{min-height:calc(100dvh - 270px);padding:22px 17px}
+}
