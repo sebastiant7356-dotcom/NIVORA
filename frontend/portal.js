@@ -1,4 +1,4 @@
-/* NIVORA member portal: profile status/edit, matching, chat, voice, payment, safety, account. Depends on common.js */
+/* NIVORA member portal: profile, matching, chat, voice messages, safety and account. Depends on common.js */
 (function () {
   "use strict";
   const { api, client, session, signInWithGoogle, esc } = window.NV;
@@ -14,19 +14,17 @@
       rejectedNote: "This profile was not approved and cannot be edited here.",
       matching: "Your match", findMatch: "Find my match", finding: "Searching…", noMatchNow: "No suitable profile is available right now. Please check again later.",
       dailyMatchesUsed: "Daily matches used", activeConversations: "Active conversations", dailyLimitReached: "You have used all five recommendations for today.", chatTab: "Chat",
-      needApproval: "Save your profile details to activate matching.", payNeeded: "A paid ₹50 credit is needed to get a match.",
+      needApproval: "Save your profile details to activate matching.",
       accept: "Accept", decline: "Decline", continueMatch: "Continue", stopMatch: "Stop", waitingPartner: "You chose Continue. Waiting for the other person.", waitingYou: "Choose Continue or Stop to proceed.",
       proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and voice messages will close.",
       timeLeft: "Chat window left", closed: "Closed", chat: "Chat", typeMsg: "Write a message…", send: "Send", live: "Live", reconnecting: "Reconnecting…",
-      chatClosed: "This conversation is closed (match ended or 72 hours are over).", voiceRecord: "Record voice message", voiceStop: "Stop recording", voiceUploading: "Uploading voice message…", voiceSent: "Voice message sent.", voiceError: "Voice message could not be sent.", voiceUnsupported: "Voice recording is not supported in this browser.", call: "Voice call", hangup: "End call", incoming: "Incoming voice call", answer: "Answer",
-      calling: "Calling…", inCall: "In call", noMic: "Microphone is unavailable or permission was denied.", noWebrtc: "Voice calls need HTTPS (or localhost) and a modern browser.",
-      callFailed: "Call could not connect. A TURN server may be needed on this network.",
+      chatClosed: "This conversation is closed (match ended or 72 hours are over).", voiceRecord: "Record voice message", voiceStop: "Stop recording", voiceUploading: "Uploading voice message…", voiceSent: "Voice message sent.", voiceError: "Voice message could not be sent.", voiceUnsupported: "Voice recording is not supported in this browser.",
       report: "Report", block: "Block", blockConfirm: "Block this person? The match ends and you will never be matched again.",
       reportTitle: "Report this person", reportSend: "Send report", reportThanks: "Report received. Our team will review it.",
       r_harassment: "Harassment", r_fake_profile: "Fake profile", r_scam: "Scam / money request", r_inappropriate_content: "Inappropriate content", r_underage: "Looks underage", r_other: "Other",
       details: "Details (optional)", feedback: "Feedback", wantContinue: "I would like to continue getting to know them", dontContinue: "I do not want to continue", sendFeedback: "Send feedback", feedbackThanks: "Thank you for your feedback.",
       pastMatches: "Past matches", none: "None yet.", from: "Started",
-      payment: "Match credit (₹50)", payOff: "Payments are not enabled on this server yet.", pay: "Pay ₹50", hasCredit: "You have a paid credit ready.", payVerifying: "Confirming payment…", paid: "Payment confirmed.", payFail: "Payment could not be confirmed.",
+      
       account: "Account & privacy", export: "Download my data", del: "Delete my account", delWarn: "This permanently deletes your profile, matches and chats. Type DELETE to confirm.", delDone: "Your account was deleted.",
       photos: "Profile photos", photoHelp: "Upload up to 4 clear photos (JPEG, PNG or WebP, max 5 MB each). Photos become visible to other members only after staff approval. Account reviews are otherwise report-led.", addPhoto: "Choose photo", photoPending: "Awaiting review", photoApproved: "Approved", photoRejected: "Not approved", photoDelete: "Remove", photoLimit: "You have reached the 4-photo limit.", photoUpload: "Uploading…", photoError: "Photo upload failed.", values: "Values", intention: "Intention", sharedValues: "Shared values",
       v_family: "Family", v_kindness: "Kindness & respect", v_career: "Career", v_faith: "Faith / culture", v_communication: "Open communication", v_lifestyle: "Lifestyle",
@@ -42,19 +40,17 @@
       rejectedNote: "ഈ profile അംഗീകരിച്ചിട്ടില്ല; ഇവിടെ edit ചെയ്യാനാകില്ല.",
       matching: "നിങ്ങളുടെ match", findMatch: "എന്റെ match കണ്ടെത്തുക", finding: "തിരയുന്നു…", noMatchNow: "ഇപ്പോൾ അനുയോജ്യമായ profile ഇല്ല. പിന്നീട് നോക്കുക.",
       dailyMatchesUsed: "ഇന്ന് ലഭിച്ച matches", activeConversations: "സജീവ സംഭാഷണങ്ങൾ", dailyLimitReached: "ഇന്നത്തെ അഞ്ച് matching-ഉം ഉപയോഗിച്ചു.", chatTab: "Chat",
-      needApproval: "Matching തുടങ്ങാൻ profile details save ചെയ്യുക.", payNeeded: "Match ലഭിക്കാൻ ₹50 credit ആവശ്യമാണ്.",
+      needApproval: "Matching തുടങ്ങാൻ profile details save ചെയ്യുക.",
       accept: "സ്വീകരിക്കുക", decline: "നിരസിക്കുക", continueMatch: "തുടരാം", stopMatch: "നിർത്താം", waitingPartner: "നിങ്ങൾ Continue തിരഞ്ഞെടുത്തു. മറ്റേയാളുടെ തീരുമാനം കാത്തിരിക്കുന്നു.", waitingYou: "തുടരാൻ Continue അല്ലെങ്കിൽ Stop തിരഞ്ഞെടുക്കുക.",
       proposalEnds: "ഇതിനുമുമ്പ് മറുപടി നൽകുക", endMatch: "Match അവസാനിപ്പിക്കുക", endConfirm: "ഈ match അവസാനിപ്പിക്കണോ? Chat, voice messages അടയും.",
       timeLeft: "Chat സമയം ബാക്കി", closed: "അടച്ചു", chat: "Chat", typeMsg: "സന്ദേശം എഴുതുക…", send: "അയയ്ക്കുക", live: "ലൈവ്", reconnecting: "വീണ്ടും ബന്ധിപ്പിക്കുന്നു…",
-      chatClosed: "ഈ സംഭാഷണം അടച്ചു (match അവസാനിച്ചു / 72 മണിക്കൂർ കഴിഞ്ഞു).", voiceRecord: "Voice message റെക്കോർഡ് ചെയ്യുക", voiceStop: "റെക്കോർഡിംഗ് നിർത്തുക", voiceUploading: "Voice message upload ചെയ്യുന്നു…", voiceSent: "Voice message അയച്ചു.", voiceError: "Voice message അയയ്ക്കാനായില്ല.", voiceUnsupported: "ഈ browser-ൽ voice recording ലഭ്യമല്ല.", call: "Voice call", hangup: "Call അവസാനിപ്പിക്കുക", incoming: "Voice call വരുന്നു", answer: "എടുക്കുക",
-      calling: "വിളിക്കുന്നു…", inCall: "Call-ൽ", noMic: "Microphone ലഭ്യമല്ല അല്ലെങ്കിൽ അനുമതി നിഷേധിച്ചു.", noWebrtc: "Voice call-ന് HTTPS (അല്ലെങ്കിൽ localhost) ഉം പുതിയ browser ഉം വേണം.",
-      callFailed: "Call connect ആയില്ല. ഈ network-ൽ TURN server വേണ്ടിവന്നേക്കാം.",
+      chatClosed: "ഈ സംഭാഷണം അടച്ചു (match അവസാനിച്ചു / 72 മണിക്കൂർ കഴിഞ്ഞു).", voiceRecord: "Voice message റെക്കോർഡ് ചെയ്യുക", voiceStop: "റെക്കോർഡിംഗ് നിർത്തുക", voiceUploading: "Voice message upload ചെയ്യുന്നു…", voiceSent: "Voice message അയച്ചു.", voiceError: "Voice message അയയ്ക്കാനായില്ല.", voiceUnsupported: "ഈ browser-ൽ voice recording ലഭ്യമല്ല.",
       report: "Report", block: "Block", blockConfirm: "ഇവരെ block ചെയ്യണോ? Match അവസാനിക്കും, വീണ്ടും match ചെയ്യില്ല.",
       reportTitle: "ഇവരെ report ചെയ്യുക", reportSend: "Report അയയ്ക്കുക", reportThanks: "Report ലഭിച്ചു. ഞങ്ങളുടെ ടീം പരിശോധിക്കും.",
       r_harassment: "ശല്യപ്പെടുത്തൽ", r_fake_profile: "വ്യാജ profile", r_scam: "തട്ടിപ്പ് / പണം ആവശ്യപ്പെടൽ", r_inappropriate_content: "അനുചിതമായ ഉള്ളടക്കം", r_underage: "പ്രായപൂർത്തിയായില്ലെന്ന് തോന്നുന്നു", r_other: "മറ്റുള്ളവ",
       details: "വിശദാംശങ്ങൾ (ഓപ്ഷണൽ)", feedback: "Feedback", wantContinue: "കൂടുതൽ പരിചയപ്പെടാൻ താൽപര്യമുണ്ട്", dontContinue: "തുടരാൻ താൽപര്യമില്ല", sendFeedback: "Feedback അയയ്ക്കുക", feedbackThanks: "Feedback-ന് നന്ദി.",
       pastMatches: "മുൻ match-കൾ", none: "ഇതുവരെ ഇല്ല.", from: "തുടങ്ങിയത്",
-      payment: "Match credit (₹50)", payOff: "ഈ server-ൽ payment ഇതുവരെ enable ചെയ്തിട്ടില്ല.", pay: "₹50 അടയ്ക്കുക", hasCredit: "Paid credit തയ്യാറാണ്.", payVerifying: "Payment സ്ഥിരീകരിക്കുന്നു…", paid: "Payment സ്ഥിരീകരിച്ചു.", payFail: "Payment സ്ഥിരീകരിക്കാനായില്ല.",
+      
       account: "Account & സ്വകാര്യത", export: "എന്റെ data download ചെയ്യുക", del: "എന്റെ account delete ചെയ്യുക", delWarn: "Profile, match, chat എല്ലാം സ്ഥിരമായി മായും. സ്ഥിരീകരിക്കാൻ DELETE എന്ന് ടൈപ്പ് ചെയ്യുക.", delDone: "നിങ്ങളുടെ account delete ചെയ്തു.",
       photos: "Profile photos", photoHelp: "പരമാവധി 4 വ്യക്തമായ ഫോട്ടോകൾ ചേർക്കാം (JPEG, PNG, WebP; ഓരോന്നും 5 MB വരെ). Staff അംഗീകരിച്ച ശേഷമേ മറ്റുള്ളവർക്ക് ഫോട്ടോകൾ കാണാനാകൂ. മറ്റ് account പരിശോധനകൾ Report ലഭിക്കുമ്പോൾ മാത്രമായിരിക്കും.", addPhoto: "ഫോട്ടോ തിരഞ്ഞെടുക്കുക", photoPending: "Review കാത്തിരിക്കുന്നു", photoApproved: "അംഗീകരിച്ചു", photoRejected: "അംഗീകരിച്ചില്ല", photoDelete: "നീക്കം ചെയ്യുക", photoLimit: "4 ഫോട്ടോ പരിധി കഴിഞ്ഞു.", photoUpload: "Upload ചെയ്യുന്നു…", photoError: "ഫോട്ടോ upload ചെയ്യാനായില്ല.", values: "മൂല്യങ്ങൾ", intention: "ലക്ഷ്യം", sharedValues: "പൊതുവായ മൂല്യങ്ങൾ",
       v_family: "കുടുംബം", v_kindness: "ദയയും ബഹുമാനവും", v_career: "കരിയർ", v_faith: "വിശ്വാസം / സംസ്കാരം", v_communication: "തുറന്ന സംഭാഷണം", v_lifestyle: "ജീവിതശൈലി",
