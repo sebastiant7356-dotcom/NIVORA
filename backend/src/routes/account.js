@@ -113,8 +113,9 @@ router.delete("/", limit, async (req, res) => {
     // IT Intermediary Rules require registration information to be retained for
     // 180 days after cancellation. Keep only Google registration identifiers,
     // not the profile, photos, conversations or voice content being deleted.
-    retentionCancellationAt = new Date().toISOString();
-    const purgeAfter = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString();
+    const cancellationDate = new Date();
+    retentionCancellationAt = cancellationDate.toISOString();
+    const purgeAfter = new Date(cancellationDate.getTime() + 180 * 24 * 60 * 60 * 1000).toISOString();
     const { error: retentionError } = await db.from("account_deletion_retention").upsert({
       ...registrationRecord,
       cancelled_at: retentionCancellationAt,
