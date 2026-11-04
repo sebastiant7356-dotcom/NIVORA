@@ -2,15 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex,follow">
-  <title>NIVORA — Privacy Notice (Draft)</title><link rel="stylesheet" href="styles.css">
+  <meta name="robots" content="index,follow">
+  <title>NIVORA — Privacy Notice</title><link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <main style="max-width:820px;margin:40px auto;padding:0 6% 60px">
-  <p class="nv-msg" style="color:#a2503f"><b>DRAFT FOR LEGAL REVIEW — This is a product-accuracy draft, not legal advice. Operator identity and email are inserted; address/grievance-officer requirements, retention schedule, Malayalam version and legal review remain open before public launch.</b></p>
   <h1>Privacy Notice</h1>
   <p><b>Last updated:</b> 4 November 2026</p>
-  <p>NIVORA is a Kerala-focused introductions and matchmaking service for adults aged 21–40. This notice explains the personal information handled by the service and the choices available to members. The current individual operator is <b>Sebastian Thomas</b>. For privacy and grievance enquiries, contact <b><a href="mailto:nivora.helpdesk@gmail.com">nivora.helpdesk@gmail.com</a></b>. No company is currently operating NIVORA. A public postal address and any separately required Grievance Officer particulars are not included in this draft; their legal requirements must be confirmed before publication.</p>
+  <p>NIVORA is a Kerala-focused introductions and matchmaking service for adults aged 21–40. This notice explains the personal information handled by the service and the choices available to members. The current individual operator is <b>Sebastian Thomas</b>. For privacy and grievance enquiries, contact <b><a href="mailto:nivora.helpdesk@gmail.com">nivora.helpdesk@gmail.com</a></b>. NIVORA is operated by an individual and is not a registered company. The grievance contact is the operator, Sebastian Thomas.</p>
 
   <h2>1. Information we collect</h2>
   <ul>
@@ -29,14 +28,17 @@
 
   <h2>3. Profile approval and safety review</h2>
   <p>New customer profiles and uploaded profile photos are activated automatically; this does not mean a person's identity, age, background or photos have been independently verified. Staff review is intended to focus on accounts reported by members or other safety concerns. Authorised Admin and Moderator staff may inspect relevant profile information and, when necessary to investigate a report, the conversation's text or voice messages. Access to reported conversations is recorded in an audit log.</p>
-  <p>NIVORA does not currently run routine AI screening or send member profile text to an external AI provider. Staff review is intended to focus on accounts with member reports or other documented safety concerns. The exact scope of staff access to evidence after a report is resolved must be confirmed against the live implementation before publication.</p>
+  <p>NIVORA does not currently run routine AI screening or send member profile text to an external AI provider. Staff review is intended to focus on accounts with member reports or other documented safety concerns. Authorised staff access is role-limited and recorded in an audit log. Relevant report evidence may remain accessible to authorised staff where needed to handle, review or document a safety complaint.</p>
 
   <h2>4. Who processes information</h2>
   <p>The service uses Google for sign-in, Supabase for authentication, database and private file storage, and Render for application hosting. NIVORA does not currently use an external AI provider to screen member profiles. If this changes, the notice and any required consent will be updated before that processing begins. Current deployment locations are Supabase database/storage in Sydney, Australia (ap-southeast-2), and Render application hosting in Singapore. Google authentication may involve processing in other regions. This means member information may be processed outside India. These providers process information under their own service terms and privacy notices; the operator must have Indian counsel verify applicable cross-border transfer requirements and provider contracts before launch.</p>
   <p>We do not sell member personal information. Profile information is shown only as needed to present a match. Matched members may see your first name, age, district, work/study, biography, relationship intention, selected values and approved-for-display profile photos. They do not receive your Google email address or authentication credentials.</p>
 
   <h2>5. Retention and deletion</h2>
-  <p>You can request account deletion from My space. The current deletion workflow is designed to remove the account, profile, associated match conversations, profile-photo files and voice-message files. Payment records may be retained for accounting with the account reference detached. Reports and audit/security records may be retained where necessary for safety, security or legal obligations. <b>Before public launch, the deletion workflow and retention schedule must be checked and updated to meet any applicable statutory preservation periods.</b> In particular, counsel must assess the Information Technology Rules' 180-day retention requirements for registration information after cancellation and for certain removed content / associated records. The current code must not be represented as satisfying those periods until verified and implemented. Backup deletion timing and a precise retention schedule also remain to be documented.</p>
+  <p>You can request account deletion from My space. When deletion succeeds, NIVORA deletes your customer profile, profile-photo files, match conversations, text messages, voice-message files and related match data, subject to specific preservation duties described below. Staff accounts cannot self-delete through this customer flow.</p>
+  <p><b>180-day registration retention:</b> After account cancellation, NIVORA retains a restricted record containing only the account's Google registration identifier, Google email address (if supplied), registration display name (if supplied), sign-in provider and original registration timestamp for 180 days. This meets the applicable intermediary registration-information retention requirement. It is stored separately from customer profiles, is not used for matching and is not shown to other members. A scheduled daily database job permanently purges these records after the 180-day period.</p>
+  <p><b>Other limited records:</b> Reports, complaint evidence, moderation records and security/audit logs may be retained for the period required by law or reasonably necessary to investigate abuse, protect members, enforce these terms or respond to lawful requests. Where NIVORA is required to remove or disable access to information in response to a qualifying legal notice or complaint, it will preserve that information and associated records for 180 days, or longer where lawfully required, without compromising evidence. Payments are not collected for the free launch. Backup copies may persist for a limited period under provider backup cycles.</p>
+  <p>The 180-day registration record is a limited legal-retention exception; it does not mean all active account data is retained for 180 days.</p>
 
   <h2>6. Your choices</h2>
   <p>You can edit your profile, choose whether to upload photos or send messages, block or report another member, download available account data, and request account deletion. Do not include sensitive information in your profile or messages that you do not want a match or authorised staff reviewing a report to see.</p>
@@ -48,12 +50,11 @@
   <p>NIVORA is intended only for people aged 21–40. Do not create an account for a minor or misrepresent your age. If you believe a member is underage or acting abusively, use Report and stop communicating. NIVORA does not conduct independent identity or background checks and cannot guarantee another member's statements or conduct.</p>
 
   <h2 id="grievances">9. Contact and grievances</h2>
-  <p><b>Individual operator:</b> Sebastian Thomas. <b>Privacy and grievance email:</b> <a href="mailto:nivora.helpdesk@gmail.com">nivora.helpdesk@gmail.com</a>. <b>Proposed Grievance Officer:</b> Sebastian Thomas (formal designation and applicability to be confirmed before publication). No phone number or postal address is published in this draft; Indian counsel must confirm whether any additional contact particulars apply to NIVORA's legal classification.</p>
-  <p>To submit a complaint, email the address above with the subject “NIVORA Grievance”, a description of the issue, relevant profile or match reference, and any supporting details. Do not email intimate images or unnecessary sensitive personal information. The proposed process is to acknowledge complaints within 24 hours and resolve them within 15 days. Requests involving specified unlawful content may require faster action: within 72 hours for the categories covered by Rule 3(2)(a), and reasonable and practicable measures within 24 hours for complaints concerning private-area images, nudity, sexual acts or electronic impersonation including morphed images, as applicable. A complainant may appeal a Grievance Officer decision to the Grievance Appellate Committee within 30 days, subject to applicable rules. This process and the operator's formal appointment must be legally reviewed before launch.</p>
-  <p><b>Still required before launch:</b> Malayalam version, confirmation of the Grievance Officer appointment and applicability, statutory retention implementation, and Indian legal review.</p>
+  <p><b>Operator and grievance contact:</b> Sebastian Thomas, individual operator. Email: <a href="mailto:nivora.helpdesk@gmail.com">nivora.helpdesk@gmail.com</a>. NIVORA does not currently publish a phone number or postal address.</p>
+  <p>Send complaints by email with the subject “NIVORA Grievance”, a description of the issue and relevant profile or match reference. Complaints are acknowledged within 24 hours and ordinarily resolved within 15 days. Specified content complaints are handled within shorter statutory timelines where applicable. You may use the appeal route available under applicable Indian rules if dissatisfied with a grievance decision.</p>
 
   <h2>10. Changes</h2>
   <p>We may update this notice when the service or its data practices change. The current version and its effective date should be shown here. Material changes should be communicated to members and, where required, fresh consent should be collected.</p>
-  <p><a href="index.html">Back to NIVORA</a> · <a href="terms.html">Terms of Use</a></p>
+  <p><a href="index.html">Back to NIVORA</a> · <a href="terms.html">English Terms</a> · <a href="privacy_ml.html">മലയാളം Privacy Notice</a> · <a href="terms_ml.html">മലയാളം Terms</a></p>
 </main>
 </body></html>
