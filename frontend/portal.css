@@ -366,3 +366,46 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
  .dashboard-page .dashboard-hero-actions button{flex:1}
  .dashboard-page .dashboard-panel{min-height:calc(100dvh - 270px);padding:22px 17px}
 }
+
+
+/* Small dashboard polish — preserve the current layout and palette */
+.dashboard-page .dashboard-panel > .modal-title{
+  line-height:1.18;
+  letter-spacing:-.025em;
+}
+.dashboard-page .dashboard-panel .nv-h{
+  margin-top:24px;
+  margin-bottom:12px;
+}
+.dashboard-page .dashboard-panel .card,
+.dashboard-page .dashboard-panel .summary-box{
+  transition:border-color .18s ease, box-shadow .18s ease;
+}
+.dashboard-page .dashboard-panel .card:hover,
+.dashboard-page .dashboard-panel .summary-box:hover{
+  border-color:#d5dfd1;
+  box-shadow:0 10px 25px rgba(31,67,48,.07);
+}
+.dashboard-page .dashboard-panel .primary-btn,
+.dashboard-page .dashboard-panel .outline-btn{
+  letter-spacing:.015em;
+}
+.dashboard-page .dashboard-panel button:focus-visible,
+.dashboard-page .customer-bottom-nav button:focus-visible{
+  outline:3px solid rgba(87,132,99,.38);
+  outline-offset:3px;
+}
+.dashboard-page .customer-bottom-nav button.active{
+  box-shadow:inset 0 0 0 1px rgba(38,86,62,.07);
+}
+.dashboard-page .dashboard-conversation:hover{
+  border-color:#d5dfd1;
+  box-shadow:0 9px 22px rgba(25,55,42,.07);
+}
+@media(hover:none){
+  .dashboard-page .dashboard-panel .card:hover,
+  .dashboard-page .dashboard-panel .summary-box:hover,
+  .dashboard-page .dashboard-conversation:hover{
+    box-shadow:inherit;
+  }
+}
