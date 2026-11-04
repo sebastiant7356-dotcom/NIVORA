@@ -136,4 +136,46 @@ router.post("/interest", interestLimit, async (req, res) => {
   res.json({ success: true, ...data });
 });
 
+// Both members must consent before matchView returns any Shake & Chat identity.
+router.post("/:matchId/reveal", interestLimit, async (req, res) => {
+  if (!isUuid(req.params.matchId)) return res.status(400).json({ success: false, message: "Invalid match." });
+  const { data, error } = await serviceClient().rpc("nivora_shake_set_reveal_consent", {
+    p_user: req.user.id, p_match: req.params.matchId, p_consent: true
+  });
+  if (error) {
+    const code = String(error.message || "").trim();
+    const map = {
+      match_not_found: [404, "Shake & Chat match not found."],
+      match_not_live: [409, "This Shake & Chat conversation is closed."],
+      blocked: [403, "This connection is unavailable."],
+      account_unavailable: [403, "This account is unavailable."]
+    };
+    if (map[code]) return res.status(map[code][0]).json({ success: false, code, message: map[code][1] });
+    console.error("Shake reveal consent failed:", error.code || "unknown");
+    return res.status(500).json({ success: false, message: "Reveal consent could not be saved." });
+  }
+  res.json({ success: true, ...data });
+});
+
+router.delete("/:matchId/reveal", interestLimit, async (req, res) => {
+  if (!isUuid(req.params.matchId)) return res.status(400).json({ success: false, message: "Invalid match." });
+  const { data, error } = await serviceClient().rpc("nivora_shake_set_reveal_consent", {
+    p_user: req.user.id, p_match: req.params.matchId, p_consent: false
+  });
+  if (error) {
+    const code = String(error.message || "").trim();
+    const map = {
+      match_not_found: [404, "Shake & Chat match not found."],
+      match_not_live: [409, "This Shake & Chat conversation is closed."],
+      blocked: [403, "This connection is unavailable."],
+      account_unavailable: [403, "This account is unavailable."],
+      reveal_already_completed: [409, "Both members have already revealed their profiles."]
+    };
+    if (map[code]) return res.status(map[code][0]).json({ success: false, code, message: map[code][1] });
+    console.error("Shake reveal consent withdrawal failed:", error.code || "unknown");
+    return res.status(500).json({ success: false, message: "Reveal choice could not be updated." });
+  }
+  res.json({ success: true, ...data });
+});
+
 module.exports = router;
