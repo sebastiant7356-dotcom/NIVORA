@@ -100,9 +100,11 @@ async function matchView(match, userId) {
   const mine = match.user_one === userId;
   const partnerId = mine ? match.user_two : match.user_one;
   const live = ["proposed", "active"].includes(match.status);
+  const shakeMatch = match.match_source === "shake";
   const view = {
     id: match.id,
     status: match.status,
+    is_shake_match: shakeMatch,
     i_accepted: mine ? match.user_one_accepted : match.user_two_accepted,
     partner_accepted: mine ? match.user_two_accepted : match.user_one_accepted,
     proposal_expires_at: match.proposal_expires_at,
@@ -116,20 +118,46 @@ async function matchView(match, userId) {
   };
   if (live) {
     const db = serviceClient();
-    const [{ data: partner }, { data: me }, { data: photos }] = await Promise.all([
+    const [{ data: partner }, { data: me }, { data: consentRows, error: consentError }] = await Promise.all([
       db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values, is_active, suspended_at").eq("id", partnerId).maybeSingle(),
       db.from("profiles").select("core_values, is_active, suspended_at").eq("id", userId).maybeSingle(),
-      db.from("profile_photos").select("id, object_path, sort_order").eq("user_id", partnerId).eq("approval_status", "approved").order("sort_order")
+      shakeMatch
+        ? db.from("shake_reveal_consents").select("user_id").eq("match_id", match.id)
+        : Promise.resolve({ data: [], error: null })
     ]);
-    const visiblePhotos = [];
-    for (const photo of photos || []) {
-      const { data: signed } = await db.storage.from("profile-photos").createSignedUrl(photo.object_path, 600);
-      if (signed?.signedUrl) visiblePhotos.push({ id: photo.id, url: signed.signedUrl, sort_order: photo.sort_order });
+    if (consentError) throw consentError;
+
+    const consented = new Set((consentRows || []).map((row) => row.user_id));
+    const myConsented = consented.has(userId);
+    const partnerConsented = consented.has(partnerId);
+    const revealed = !shakeMatch || (myConsented && partnerConsented);
+    if (shakeMatch) {
+      view.reveal = {
+        my_consented: myConsented,
+        partner_consented: partnerConsented,
+        revealed
+      };
     }
+
     const accountsActive = Boolean(partner?.is_active && !partner.suspended_at && me?.is_active && !me.suspended_at);
     view.chat_open = Boolean(view.chat_open && accountsActive);
     view.can_voice_message = Boolean(view.can_voice_message && accountsActive);
-    view.partner = partner && accountsActive ? partnerView(partner, me?.core_values || [], visiblePhotos) : null;
+
+    // For Shake & Chat, fail closed: do not return profile fields or signed photos
+    // until BOTH members have recorded consent on the server.
+    if (partner && accountsActive && revealed) {
+      const { data: photos } = await db.from("profile_photos")
+        .select("id, object_path, sort_order").eq("user_id", partnerId)
+        .eq("approval_status", "approved").order("sort_order");
+      const visiblePhotos = [];
+      for (const photo of photos || []) {
+        const { data: signed } = await db.storage.from("profile-photos").createSignedUrl(photo.object_path, 600);
+        if (signed?.signedUrl) visiblePhotos.push({ id: photo.id, url: signed.signedUrl, sort_order: photo.sort_order });
+      }
+      view.partner = partnerView(partner, me?.core_values || [], visiblePhotos);
+    } else {
+      view.partner = null;
+    }
   }
   return view;
 }
