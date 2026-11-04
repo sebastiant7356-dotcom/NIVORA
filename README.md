@@ -19,7 +19,7 @@ The app is deployed on Render and uses Supabase for Google OAuth, database and p
 - Up to five daily recommendations per user, based on the Kerala calendar day.
 - Multiple concurrent match conversations are supported.
 - Active conversations last up to 72 hours and include text chat and voice messages only. There are no live voice or video calls.
-- Shake & Chat is optional and searches compatible opted-in members within 50 km. Exact coordinates are not shown. A mutual interest creates an anonymous chat; names, photos and profile details remain hidden until both members consent to reveal.
+- Shake & Chat is optional, separate from the Daily 5 quota, and searches compatible opted-in members within 50 km. Exact coordinates are not shown. A mutual interest creates an anonymous chat; names, photos and profile details remain hidden until both members consent to reveal.
 - Customer profile photos (up to four, JPEG/PNG/WebP, 5 MB each) remain hidden from other members until staff approval.
 - Staff can review pending photos. Account investigations are limited to accounts with member reports; sensitive access is audit-logged.
 - Blocking, reporting, account export and account deletion are available.
