@@ -1,6 +1,7 @@
 "use strict";
 const { serviceClient } = require("./clients");
 const { firstName } = require("./validation");
+const { shakeRevealState } = require("./shake-reveal");
 
 const ERROR_MAP = {
   profile_missing: [404, "Create your profile first."],
@@ -127,14 +128,12 @@ async function matchView(match, userId) {
     ]);
     if (consentError) throw consentError;
 
-    const consented = new Set((consentRows || []).map((row) => row.user_id));
-    const myConsented = consented.has(userId);
-    const partnerConsented = consented.has(partnerId);
-    const revealed = !shakeMatch || (myConsented && partnerConsented);
+    const revealState = shakeRevealState(match, userId, partnerId, consentRows);
+    const revealed = revealState.revealed;
     if (shakeMatch) {
       view.reveal = {
-        my_consented: myConsented,
-        partner_consented: partnerConsented,
+        my_consented: revealState.my_consented,
+        partner_consented: revealState.partner_consented,
         revealed
       };
     }
