@@ -47,9 +47,10 @@
         <h3>Pending profile photo</h3>
         <small>Member reference: ${esc(ph.user_id)} · submitted ${fmt(ph.created_at)}</small>
         <div class="photo-review"><img src="${esc(ph.url || "")}" alt="Photo awaiting staff approval"></div>
+        ${ph.url ? "" : "<small>Preview unavailable; review actions are disabled.</small>"}
         <textarea placeholder="Reason (required when rejecting)" rows="2" maxlength="500"></textarea>
-        <div class="admin-actions"><button data-pending-photo-decision="approved" type="button">Approve photo</button>
-          <button data-pending-photo-decision="rejected" class="bad" type="button">Reject photo</button></div>
+        <div class="admin-actions"><button data-pending-photo-decision="approved" type="button" ${ph.url ? "" : "disabled"}>Approve photo</button>
+          <button data-pending-photo-decision="rejected" class="bad" type="button" ${ph.url ? "" : "disabled"}>Reject photo</button></div>
       </div>`).join("");
     $("#list").onclick = async (e) => {
       const button = e.target.closest("[data-pending-photo-decision]");
