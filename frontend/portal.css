@@ -54,3 +54,26 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
 
 .partner-photos{display:flex;gap:8px;overflow-x:auto;margin:10px 0;padding-bottom:4px}
 .partner-photos img{width:min(46%,180px);aspect-ratio:4/5;object-fit:cover;border-radius:9px;background:var(--line);flex:0 0 auto}
+
+
+/* Customer dashboard bottom navigation */
+.portal-modal{padding-bottom:86px;position:relative}
+.dashboard-panel[hidden]{display:none!important}
+.customer-bottom-nav{position:sticky;bottom:-24px;z-index:8;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:24px -16px -70px;padding:10px 8px max(10px,env(safe-area-inset-bottom));background:var(--paper);border-top:1px solid var(--line);box-shadow:0 -8px 22px #102d2510}
+.customer-bottom-nav button{border:0;background:transparent;color:var(--muted);border-radius:10px;min-width:0;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.customer-bottom-nav button span{font-size:21px;line-height:1.2}
+.customer-bottom-nav button small{font-size:10px;white-space:nowrap}
+.customer-bottom-nav button.active{color:var(--green);background:#e9edde;font-weight:700}
+.dashboard-inbox{display:flex;flex-direction:column;gap:8px}
+.dashboard-conversation{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink)}
+.dashboard-conversation>span:nth-child(2){display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.dashboard-conversation b{font-size:13px}
+.dashboard-conversation small{font-size:10px;color:var(--muted)}
+.dashboard-avatar{height:38px;width:38px;border-radius:50%;display:grid;place-items:center;background:#e9edde;color:var(--green);font-size:20px}
+.dashboard-arrow{font-size:23px;color:var(--muted)}
+.shake-coming{border:1px dashed var(--line);border-radius:14px;padding:26px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--paper)}
+.shake-coming>span{font-size:42px;color:var(--green)}
+.shake-coming b{font-size:14px}
+.shake-coming small{max-width:310px;color:var(--muted);font-size:11px;line-height:1.7}
+.dashboard-account{margin-top:18px}
+@media(max-width:700px){.portal-modal{padding-bottom:82px}.customer-bottom-nav{margin-left:-16px;margin-right:-16px}.customer-bottom-nav button small{font-size:9px}}
