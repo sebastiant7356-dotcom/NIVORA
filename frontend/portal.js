@@ -478,9 +478,9 @@
       box.innerHTML = header + find + `<div class="nv-msg" id="mMsg"></div>`;
     } else {
       const m = match;
-      const anonymousBlock = m.is_shake_match && !m.reveal?.revealed
+      const anonymousBlock = m.is_shake_match && m.status === "active" && !m.reveal?.revealed
         ? `<div class="summary-box"><b>${p("shakeAnonymousTitle")}</b><p>${p("shakeAnonymousInfo")}</p><p id="shakeRevealStatus">${m.reveal?.my_consented ? p("shakeWaitingReveal") : p("shakeReveal")}</p><div class="nv-row"><button class="outline-btn" id="shakeReveal" type="button">${m.reveal?.my_consented ? p("shakeRevealCheck") : p("shakeReveal")}</button>${m.reveal?.my_consented ? `<button class="nv-link" id="shakeWithdraw" type="button">${p("shakeWithdraw")}</button>` : ""}</div></div>`
-        : (m.is_shake_match && m.reveal?.revealed ? `<p class="modal-description">${p("shakeRevealDone")}</p>` : "");
+        : (m.is_shake_match && m.status === "active" && m.reveal?.revealed ? `<p class="modal-description">${p("shakeRevealDone")}</p>` : "");
       let h = header + tabs + find + anonymousBlock + partnerHtml(m.partner);
       if (["proposed", "active"].includes(m.status)) {
         h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
