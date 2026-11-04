@@ -276,7 +276,28 @@
         <div class="dashboard-stat"><span>♡</span><b>${remaining}</b><small>${ml ? "ഇന്നത്തെ matches ബാക്കി" : "Matches left today"}</small></div>
         <div class="dashboard-stat"><span>✉</span><b>${matches.filter(x => ["proposed","active"].includes(x.status)).length}</b><small>${ml ? "സജീവ സംഭാഷണങ്ങൾ" : "Active conversations"}</small></div>
       </div>`;
+    welcome.innerHTML = `
+      <div class="dashboard-welcome-copy">
+        <span class="dashboard-eyebrow">A LITTLE CLOSER TO SOMETHING MEANINGFUL</span>
+        <h1>${ml ? "സന്തോഷം, വീണ്ടും കണ്ടതിൽ" : "Good to see you"},<br>${esc((profile.full_name || "").split(" ")[0])}</h1>
+        <p>${ml ? "നിങ്ങളുടെ അടുത്ത മനോഹരമായ സംഭാഷണം ഇവിടെ തുടങ്ങാം." : "Your next meaningful connection could begin with one simple hello."}</p>
+        <div class="dashboard-hero-actions">
+          <button type="button" class="dashboard-hero-primary" data-open-tab="match">${ml ? "Match കണ്ടെത്താം" : "Discover matches"} <span>↗</span></button>
+          <button type="button" class="dashboard-hero-secondary" data-open-tab="shake">${ml ? "Shake & Chat" : "Explore nearby"} </button>
+        </div>
+      </div>
+      <div class="dashboard-stat-grid">
+        <div class="dashboard-stat"><span>♡</span><b>${remaining}</b><small>${ml ? "ഇന്നത്തെ matches ബാക്കി" : "Daily matches remaining"}</small></div>
+        <div class="dashboard-stat"><span>✉</span><b>${matches.filter(x => ["proposed","active"].includes(x.status)).length}</b><small>${ml ? "സജീവ സംഭാഷണങ്ങൾ" : "Your conversations"}</small></div>
+      </div>
+      <span class="dashboard-hero-orbit" aria-hidden="true">N</span>`;
+    const topbar = document.createElement("header");
+    topbar.className = "dashboard-topbar";
+    topbar.innerHTML = `
+      <a class="dashboard-brand" href="dashboard.html" aria-label="NIVORA home"><span class="dashboard-brand-mark">N</span><span><b>NIVORA</b><small>${ml ? "ബന്ധങ്ങൾ അർത്ഥവത്താകട്ടെ" : "MEANINGFUL CONNECTIONS"}</small></span></a>
+      <span class="dashboard-top-note"><i></i>${ml ? "നിങ്ങളുടെ സുരക്ഷിത ഇടം" : "Your space, your pace"}</span>`;
     body.prepend(welcome);
+    body.prepend(topbar);
     const inbox = document.createElement("section"); inbox.className = "dashboard-panel"; inbox.id = "dashboard-messages";
     inbox.innerHTML = "<h2 class='modal-title'>" + p("messagesTab") + "</h2><p class='modal-description'>" + p("inboxIntro") + "</p><div class='dashboard-inbox'></div>";
     const inboxList = inbox.querySelector(".dashboard-inbox");
@@ -307,6 +328,7 @@
       if (id === "shake") loadShakePanel();
     };
     nav.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => activate(button.dataset.dashboard)));
+    welcome.querySelectorAll("[data-open-tab]").forEach((button) => button.addEventListener("click", () => activate(button.dataset.openTab)));
     activate("match");
     const accountHeading = [...body.querySelectorAll(".nv-h")].find((n) => n.textContent.trim() === p("account"));
     const accountRow = q("#pExport")?.parentElement, accountMsg = q("#pMsg");
