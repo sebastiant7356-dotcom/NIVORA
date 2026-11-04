@@ -6,7 +6,7 @@
 
   const P = {
     en: {
-      myspace: "My space", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Find a match to start chatting.", shakeIntro: "Discover people who are also looking to connect within 50 km.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Location sharing will be optional. Your exact location will never be shown to other members.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
+      myspace: "My space", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Find a match to start chatting.", shakeIntro: "Discover people who are also looking to connect within 50 km.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Location sharing is optional. Your exact location is private and is never shown to other members.", shakeEnable: "Enable nearby discovery", shakeDisable: "Turn off location sharing", shakeRefresh: "Find people nearby", shakeLoading: "Finding people within 50 km…", shakeNoPeople: "No compatible members are available nearby yet.", shakePermission: "Allow location access in your browser to continue.", shakeEnabled: "Nearby discovery is enabled. Your exact location stays private.", shakeLike: "Interested", shakeLikeBack: "Like back", shakeWaiting: "Interest sent. Waiting for a mutual interest.", shakeMatched: "It’s a mutual interest! Your chat is ready in Messages.", shakeDistance: "km away", shakeError: "Could not load Shake & Chat. Please try again.", shakeConsent: "By enabling, you allow NIVORA to use your location privately to find compatible members within 50 km. You can turn this off anytime.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
       noProfile: "You have not created a profile yet.", staffAccount: "This is a NIVORA staff account. Customer profiles and matching are disabled for staff.", staffConsole: "Open staff console", createProfile: "Create my profile",
       status_pending: "Awaiting staff review", status_approved: "Approved", status_rejected: "Not approved", status_changes_requested: "Changes requested",
       suspended: "Your account is suspended. Please contact support.", incomplete: "Your profile is missing some details (gender, preferences, values). Please edit it before matching.",
@@ -34,7 +34,7 @@
       name: "Name", age: "Age", place: "Location", job: "Work / study", about: "About you", lookingFor: "I'm looking for", relationship: "Relationship intention", minAge: "Partner min age", maxAge: "Partner max age"
     },
     ml: {
-      myspace: "എന്റെ ഇടം", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "നിങ്ങളുടെ സജീവ സംഭാഷണങ്ങൾ ഇവിടെ കാണാം.", noConversations: "ഇതുവരെ സംഭാഷണങ്ങളില്ല. Match കണ്ടെത്തി chat തുടങ്ങാം.", shakeIntro: "50 km ചുറ്റളവിൽ പരിചയപ്പെടാൻ താൽപര്യമുള്ളവരെ കണ്ടെത്താം.", shakeComing: "Shake & Chat ഉടൻ വരുന്നു", shakePrivacy: "Location പങ്കിടൽ ഓപ്ഷണൽ ആയിരിക്കും. കൃത്യമായ സ്ഥലം മറ്റുള്ളവർക്ക് കാണിക്കില്ല.", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
+      myspace: "എന്റെ ഇടം", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "നിങ്ങളുടെ സജീവ സംഭാഷണങ്ങൾ ഇവിടെ കാണാം.", noConversations: "ഇതുവരെ സംഭാഷണങ്ങളില്ല. Match കണ്ടെത്തി chat തുടങ്ങാം.", shakeIntro: "50 km ചുറ്റളവിൽ പരിചയപ്പെടാൻ താൽപര്യമുള്ളവരെ കണ്ടെത്താം.", shakeComing: "Shake & Chat ഉടൻ വരുന്നു", shakePrivacy: "Location പങ്കിടൽ നിങ്ങളുടെ ഇഷ്ടമാണ്. കൃത്യമായ സ്ഥലം മറ്റുള്ളവർക്ക് ഒരിക്കലും കാണിക്കില്ല.", shakeEnable: "സമീപത്തുള്ളവരെ കണ്ടെത്തുക", shakeDisable: "Location പങ്കിടൽ നിർത്തുക", shakeRefresh: "സമീപത്തുള്ളവരെ തിരയുക", shakeLoading: "50 km ചുറ്റളവിൽ തിരയുന്നു…", shakeNoPeople: "സമീപത്ത് അനുയോജ്യരായ അംഗങ്ങൾ ഇപ്പോൾ ലഭ്യമല്ല.", shakePermission: "തുടരാൻ browser-ൽ location അനുമതി നൽകുക.", shakeEnabled: "Nearby discovery പ്രവർത്തനക്ഷമമാണ്. കൃത്യമായ സ്ഥലം സ്വകാര്യമാണ്.", shakeLike: "താൽപര്യമുണ്ട്", shakeLikeBack: "തിരിച്ചും താൽപര്യമുണ്ട്", shakeWaiting: "താൽപര്യം അയച്ചു. മറുവശത്തുനിന്നുള്ള താൽപര്യം കാത്തിരിക്കുന്നു.", shakeMatched: "പരസ്പര താൽപര്യം ലഭിച്ചു! Messages-ൽ chat തുടങ്ങാം.", shakeDistance: "km അകലെ", shakeError: "Shake & Chat തുറക്കാനായില്ല. വീണ്ടും ശ്രമിക്കുക.", shakeConsent: "50 km ചുറ്റളവിൽ അനുയോജ്യരായ അംഗങ്ങളെ കണ്ടെത്താൻ നിങ്ങളുടെ location സ്വകാര്യമായി ഉപയോഗിക്കാൻ NIVORA-യെ അനുവദിക്കുന്നു. എപ്പോൾ വേണമെങ്കിലും ഇത് നിർത്താം.", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
       noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", staffAccount: "ഇത് NIVORA staff account ആണ്. Staff അംഗങ്ങൾക്ക് customer profile അല്ലെങ്കിൽ matching ലഭ്യമല്ല.", staffConsole: "Staff console തുറക്കുക", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
       status_pending: "Staff review കാത്തിരിക്കുന്നു", status_approved: "അംഗീകരിച്ചു", status_rejected: "അംഗീകരിച്ചില്ല", status_changes_requested: "മാറ്റങ്ങൾ ആവശ്യപ്പെട്ടിട്ടുണ്ട്",
       suspended: "നിങ്ങളുടെ account suspend ചെയ്തിരിക്കുന്നു. Support-നെ ബന്ധപ്പെടുക.", incomplete: "Profile-ൽ ചില വിവരങ്ങൾ കുറവാണ് (gender, preferences, values). Matching-ന് മുമ്പ് edit ചെയ്യുക.",
@@ -274,7 +274,7 @@
       inboxList.appendChild(button);
     });
     const shake = document.createElement("section"); shake.className = "dashboard-panel"; shake.id = "dashboard-shake";
-    shake.innerHTML = "<h2 class='modal-title'>" + p("shakeTab") + "</h2><p class='modal-description'>" + p("shakeIntro") + "</p><div class='shake-coming'><span>⌖</span><b>" + p("shakeComing") + "</b><small>" + p("shakePrivacy") + "</small></div>";
+    shake.innerHTML = "<h2 class='modal-title'>" + p("shakeTab") + "</h2><p class='modal-description'>" + p("shakeIntro") + "</p><div class='shake-coming'><span>⌖</span><b>50 km</b><small>" + p("shakePrivacy") + "</small><p class='modal-description'>" + p("shakeConsent") + "</p><div class='nv-row'><button class='primary-btn' id='shakeEnable' type='button'>" + p("shakeEnable") + "</button><button class='outline-btn' id='shakeRefresh' type='button' hidden>" + p("shakeRefresh") + "</button><button class='outline-btn' id='shakeDisable' type='button' hidden>" + p("shakeDisable") + "</button></div><div class='nv-msg' id='shakeStatus' role='status'></div></div><div id='shakePeople' class='shake-people' aria-live='polite'></div>";
     const nav = document.createElement("nav"); nav.className = "customer-bottom-nav"; nav.setAttribute("aria-label", "Customer navigation");
     const tabData = [["messages","✉",p("messagesTab")],["match","♡",p("matchTab")],["shake","⌖",p("shakeTab")],["profile","◉",p("profileTab")]];
     nav.innerHTML = tabData.map((t) => "<button type='button' data-dashboard='" + t[0] + "' aria-pressed='false'><span>" + t[1] + "</span><small>" + t[2] + "</small></button>").join("");
@@ -287,6 +287,7 @@
       });
       if (id === "match" && match && ["proposed", "active"].includes(match.status)) startChat(match);
       else { stopRealtime(); clearInterval(tickTimer); }
+      if (id === "shake") loadShakePanel();
     };
     nav.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => activate(button.dataset.dashboard)));
     activate("match");
@@ -295,6 +296,80 @@
     if (accountHeading) profilePanel.appendChild(accountHeading);
     if (accountRow) profilePanel.appendChild(accountRow);
     if (accountMsg) profilePanel.appendChild(accountMsg);
+  }
+
+  async function loadShakePanel() {
+    const status = body.querySelector("#shakeStatus"), people = body.querySelector("#shakePeople");
+    const enable = body.querySelector("#shakeEnable"), refresh = body.querySelector("#shakeRefresh"), disable = body.querySelector("#shakeDisable");
+    if (!status || !people) return;
+    status.textContent = p("loading"); people.innerHTML = "";
+    try {
+      const state = await api("/api/shake/status");
+      enable.hidden = state.enabled; refresh.hidden = !state.enabled; disable.hidden = !state.enabled;
+      status.textContent = state.enabled ? p("shakeEnabled") : p("shakePrivacy");
+      if (state.enabled) await discoverShakePeople();
+    } catch (e) { status.textContent = e.message || p("shakeError"); }
+    enable.onclick = enableShakeLocation;
+    refresh.onclick = discoverShakePeople;
+    disable.onclick = disableShakeLocation;
+  }
+
+  function enableShakeLocation() {
+    const status = body.querySelector("#shakeStatus");
+    if (!navigator.geolocation) { if (status) status.textContent = p("shakePermission"); return; }
+    if (status) status.textContent = p("loading");
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      try {
+        await api("/api/shake/location", { method: "POST", body: {
+          latitude: position.coords.latitude, longitude: position.coords.longitude
+        } });
+        await loadShakePanel();
+      } catch (e) { if (status) status.textContent = e.message || p("shakeError"); }
+    }, () => { if (status) status.textContent = p("shakePermission"); }, {
+      enableHighAccuracy: false, maximumAge: 300000, timeout: 15000
+    });
+  }
+
+  async function disableShakeLocation() {
+    const status = body.querySelector("#shakeStatus");
+    try { await api("/api/shake/location", { method: "DELETE" }); await loadShakePanel(); }
+    catch (e) { if (status) status.textContent = e.message || p("shakeError"); }
+  }
+
+  async function discoverShakePeople() {
+    const status = body.querySelector("#shakeStatus"), people = body.querySelector("#shakePeople");
+    if (!people) return;
+    status.textContent = p("shakeLoading"); people.innerHTML = "";
+    try {
+      const result = await api("/api/shake/discover");
+      if (!result.people?.length) { status.textContent = p("shakeNoPeople"); return; }
+      status.textContent = p("shakeEnabled");
+      result.people.forEach((person) => {
+        const card = document.createElement("article"); card.className = "shake-person";
+        const heading = document.createElement("h3");
+        heading.textContent = [person.first_name, person.age].filter(Boolean).join(", ");
+        const meta = document.createElement("p");
+        meta.textContent = [person.district, person.job_title, person.distance_km + " " + p("shakeDistance")].filter(Boolean).join(" · ");
+        const about = document.createElement("p"); about.textContent = person.bio || "";
+        const action = document.createElement("button"); action.type = "button"; action.className = "primary-btn";
+        action.textContent = person.interested_in_you ? p("shakeLikeBack") : p("shakeLike");
+        action.onclick = async () => {
+          action.disabled = true;
+          try {
+            const response = await api("/api/shake/interest", { method: "POST", body: { target_user_id: person.user_id } });
+            if (response.mutual) {
+              status.textContent = p("shakeMatched");
+              await loadAll(); render();
+              const matched = matches.find((m) => m.id === response.match_id);
+              if (matched) { match = matched; selectedMatchId = matched.id; }
+              return;
+            }
+            status.textContent = p("shakeWaiting"); action.textContent = p("shakeWaiting");
+          } catch (e) { status.textContent = e.message || p("shakeError"); action.disabled = false; }
+        };
+        card.append(heading, meta); if (about.textContent) card.appendChild(about); card.appendChild(action); people.appendChild(card);
+      });
+    } catch (e) { status.textContent = e.message || p("shakeError"); }
   }
 
   function msg(text, ok) { const el = body.querySelector("#pMsg"); if (el) { el.textContent = text; el.className = "nv-msg" + (ok ? " ok" : ""); } }
