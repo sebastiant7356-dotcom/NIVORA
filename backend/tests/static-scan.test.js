@@ -135,7 +135,7 @@ test("account deletion fails closed when cleanup or audit steps fail", () => {
   assert.match(account, /if \(memberDeleteError\) throw memberDeleteError/);
   assert.match(account, /if \(paymentDetachError\) throw paymentDetachError/);
   assert.match(account, /if \(!auditOk\) throw new Error/);
-  assert.match(account, /if \(error\) throw error;[\s\S]*?res\.json\(\{ success: true, message: "Your account and personal data have been deleted\." \}\)/);
+  assert.match(account, /if \(error\) \{[\s\S]*?throw error;[\s\S]*?Limited registration details are retained for 180 days/);
 });
 
 
