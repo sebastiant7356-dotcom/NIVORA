@@ -6,7 +6,7 @@
 
   const P = {
     en: {
-      myspace: "My space", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
+      myspace: "My space", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Find a match to start chatting.", shakeIntro: "Discover people who are also looking to connect within 50 km.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Location sharing will be optional. Your exact location will never be shown to other members.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
       noProfile: "You have not created a profile yet.", staffAccount: "This is a NIVORA staff account. Customer profiles and matching are disabled for staff.", staffConsole: "Open staff console", createProfile: "Create my profile",
       status_pending: "Awaiting staff review", status_approved: "Approved", status_rejected: "Not approved", status_changes_requested: "Changes requested",
       suspended: "Your account is suspended. Please contact support.", incomplete: "Your profile is missing some details (gender, preferences, values). Please edit it before matching.",
@@ -34,7 +34,7 @@
       name: "Name", age: "Age", place: "Location", job: "Work / study", about: "About you", lookingFor: "I'm looking for", relationship: "Relationship intention", minAge: "Partner min age", maxAge: "Partner max age"
     },
     ml: {
-      myspace: "എന്റെ ഇടം", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
+      myspace: "എന്റെ ഇടം", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "നിങ്ങളുടെ സജീവ സംഭാഷണങ്ങൾ ഇവിടെ കാണാം.", noConversations: "ഇതുവരെ സംഭാഷണങ്ങളില്ല. Match കണ്ടെത്തി chat തുടങ്ങാം.", shakeIntro: "50 km ചുറ്റളവിൽ പരിചയപ്പെടാൻ താൽപര്യമുള്ളവരെ കണ്ടെത്താം.", shakeComing: "Shake & Chat ഉടൻ വരുന്നു", shakePrivacy: "Location പങ്കിടൽ ഓപ്ഷണൽ ആയിരിക്കും. കൃത്യമായ സ്ഥലം മറ്റുള്ളവർക്ക് കാണിക്കില്ല.", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
       noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", staffAccount: "ഇത് NIVORA staff account ആണ്. Staff അംഗങ്ങൾക്ക് customer profile അല്ലെങ്കിൽ matching ലഭ്യമല്ല.", staffConsole: "Staff console തുറക്കുക", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
       status_pending: "Staff review കാത്തിരിക്കുന്നു", status_approved: "അംഗീകരിച്ചു", status_rejected: "അംഗീകരിച്ചില്ല", status_changes_requested: "മാറ്റങ്ങൾ ആവശ്യപ്പെട്ടിട്ടുണ്ട്",
       suspended: "നിങ്ങളുടെ account suspend ചെയ്തിരിക്കുന്നു. Support-നെ ബന്ധപ്പെടുക.", incomplete: "Profile-ൽ ചില വിവരങ്ങൾ കുറവാണ് (gender, preferences, values). Matching-ന് മുമ്പ് edit ചെയ്യുക.",
@@ -209,6 +209,7 @@
       <button class="outline-btn" id="pSignOut" type="button">${p("signOut")}</button>
     </div><div class="nv-msg" id="pMsg" role="status"></div>`;
     body.innerHTML = h;
+    if (profile && !isStaff) buildCustomerDashboard();
 
     const $ = (s) => body.querySelector(s);
     $("#pCreate") && ($("#pCreate").onclick = () => { close(); window.openWizard && window.openWizard(); });
@@ -221,6 +222,69 @@
     if (photoInput) photoInput.onchange = async () => { const file = photoInput.files?.[0]; if (!file) return; await uploadPhoto(file); };
     body.querySelectorAll("[data-photo-delete]").forEach((b) => (b.onclick = async () => { if (!confirm(p("photoDelete") + "?")) return; try { await api("/api/profile/photos/" + encodeURIComponent(b.dataset.photoDelete), { method: "DELETE" }); await loadAll(); render(); } catch (e) { const out = $("#photoMsg"); if (out) out.textContent = e.message; } }));
     if (profile) renderMatch();
+  }
+
+
+  function buildCustomerDashboard() {
+    const q = (selector) => body.querySelector(selector);
+    const profileNodes = [], matchNodes = [];
+    const add = (selector, list) => { const node = q(selector); if (node && !list.includes(node)) list.push(node); };
+    add(".modal-topline", profileNodes); add(".modal-title", profileNodes); add(".badge", profileNodes);
+    add("#pEdit", profileNodes);
+    const editRow = q("#pEdit")?.parentElement; if (editRow) profileNodes.push(editRow);
+    const photoHeading = [...body.querySelectorAll(".nv-h")].find((n) => n.textContent.trim() === p("photos"));
+    if (photoHeading) profileNodes.push(photoHeading);
+    add("#photoBox", profileNodes);
+    const matchHeading = [...body.querySelectorAll(".nv-h")].find((n) => n.textContent.trim() === p("matching"));
+    if (matchHeading) matchNodes.push(matchHeading);
+    add("#matchBox", matchNodes);
+    const pastHeading = [...body.querySelectorAll(".nv-h")].find((n) => n.textContent.trim() === p("pastMatches"));
+    if (pastHeading) matchNodes.push(pastHeading);
+    add(".nv-list", matchNodes); add("#fbBox", matchNodes);
+    const wrap = (id, label, list) => {
+      const panel = document.createElement("section"); panel.className = "dashboard-panel"; panel.id = id; panel.setAttribute("aria-label", label);
+      const first = list.find((n) => n.parentElement === body);
+      if (first) body.insertBefore(panel, first);
+      list.forEach((n) => { if (n.parentElement === body) panel.appendChild(n); });
+      return panel;
+    };
+    const profilePanel = wrap("dashboard-profile", p("profileTab"), profileNodes);
+    const matchPanel = wrap("dashboard-match", p("matchTab"), matchNodes);
+    const inbox = document.createElement("section"); inbox.className = "dashboard-panel"; inbox.id = "dashboard-messages";
+    inbox.innerHTML = "<h2 class='modal-title'>" + p("messagesTab") + "</h2><p class='modal-description'>" + p("inboxIntro") + "</p><div class='dashboard-inbox'></div>";
+    const inboxList = inbox.querySelector(".dashboard-inbox");
+    const active = matches.filter((item) => ["proposed", "active"].includes(item.status));
+    if (!active.length) inboxList.innerHTML = "<p class='modal-description'>" + p("noConversations") + "</p>";
+    active.forEach((item) => {
+      const button = document.createElement("button"); button.type = "button"; button.className = "dashboard-conversation";
+      const name = item.partner?.first_name || (L() === "ml" ? "പുതിയ match" : "New match");
+      const status = item.status === "proposed" ? (L() === "ml" ? "മറുപടി കാത്തിരിക്കുന്നു" : "Awaiting response") : (L() === "ml" ? "സജീവ സംഭാഷണം" : "Active conversation");
+      button.innerHTML = "<span class='dashboard-avatar'>♡</span><span><b>" + esc(name) + "</b><small>" + status + "</small></span><span class='dashboard-arrow'>›</span>";
+      button.onclick = () => { match = item; selectedMatchId = item.id; render(); };
+      inboxList.appendChild(button);
+    });
+    const shake = document.createElement("section"); shake.className = "dashboard-panel"; shake.id = "dashboard-shake";
+    shake.innerHTML = "<h2 class='modal-title'>" + p("shakeTab") + "</h2><p class='modal-description'>" + p("shakeIntro") + "</p><div class='shake-coming'><span>⌖</span><b>" + p("shakeComing") + "</b><small>" + p("shakePrivacy") + "</small></div>";
+    const nav = document.createElement("nav"); nav.className = "customer-bottom-nav"; nav.setAttribute("aria-label", "Customer navigation");
+    const tabData = [["messages","✉",p("messagesTab")],["match","♡",p("matchTab")],["shake","⌖",p("shakeTab")],["profile","◉",p("profileTab")]];
+    nav.innerHTML = tabData.map((t) => "<button type='button' data-dashboard='" + t[0] + "' aria-pressed='false'><span>" + t[1] + "</span><small>" + t[2] + "</small></button>").join("");
+    body.append(inbox, shake, nav);
+    const panels = [inbox, matchPanel, shake, profilePanel];
+    const activate = (id) => {
+      panels.forEach((panel) => { panel.hidden = panel.id !== "dashboard-" + id; });
+      nav.querySelectorAll("button").forEach((button) => {
+        const on = button.dataset.dashboard === id; button.classList.toggle("active", on); button.setAttribute("aria-pressed", String(on));
+      });
+      if (id === "match" && match && ["proposed", "active"].includes(match.status)) startChat(match);
+      else { stopRealtime(); clearInterval(tickTimer); }
+    };
+    nav.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => activate(button.dataset.dashboard)));
+    activate("match");
+    const accountHeading = [...body.querySelectorAll(".nv-h")].find((n) => n.textContent.trim() === p("account"));
+    const accountRow = q("#pExport")?.parentElement, accountMsg = q("#pMsg");
+    if (accountHeading) profilePanel.appendChild(accountHeading);
+    if (accountRow) profilePanel.appendChild(accountRow);
+    if (accountMsg) profilePanel.appendChild(accountMsg);
   }
 
   function msg(text, ok) { const el = body.querySelector("#pMsg"); if (el) { el.textContent = text; el.className = "nv-msg" + (ok ? " ok" : ""); } }
