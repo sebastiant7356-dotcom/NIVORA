@@ -91,3 +91,12 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
 
 /* The full-screen dashboard has no dismiss/close control. */
 .dashboard-page .modal-close{display:none!important}
+
+
+/* Shake & Chat nearby discovery cards */
+.shake-people{display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0 24px}
+.shake-person{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:14px;display:flex;flex-direction:column;gap:7px}
+.shake-person h3{font-size:16px;margin:0;color:var(--ink)}
+.shake-person p{font-size:12px;line-height:1.55;margin:0;color:var(--muted);overflow-wrap:anywhere}
+.shake-person .primary-btn{align-self:flex-start;margin-top:4px}
+.shake-coming .modal-description{max-width:420px}
