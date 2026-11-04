@@ -288,7 +288,7 @@
           <small>${ml ? "ഓരോ ദിവസവും പുതിയ സാധ്യതകൾ" : "A fresh chance to connect, every day."}</small>
         </div>
       </div>
-      <span class="dashboard-hero-orbit" aria-hidden="true"></span><span class="dashboard-hero-spark" aria-hidden="true">✦</span>;
+      <span class="dashboard-hero-orbit" aria-hidden="true"></span><span class="dashboard-hero-spark" aria-hidden="true">✦</span>`;
     const topbar = document.createElement("header");
     topbar.className = "dashboard-topbar";
     topbar.innerHTML = `
