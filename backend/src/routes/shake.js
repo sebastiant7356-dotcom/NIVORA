@@ -103,7 +103,7 @@ router.get("/discover", discoverLimit, async (req, res) => {
         const person = byId.get(n.id);
         if (!person || !compatible(customer.profile, person) || person.suspended_at) return null;
         return {
-          first_name: String(person.full_name || "").trim().split(/\s+/)[0],
+          user_id: person.id, first_name: String(person.full_name || "").trim().split(/\s+/)[0],
           age: person.age, district: person.district, job_title: person.job_title,
           bio: person.bio, relationship_intention: person.relationship_intention,
           core_values: person.core_values || [], distance_km: Math.max(1, Math.round(n.distance)),
