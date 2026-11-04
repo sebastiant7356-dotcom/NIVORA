@@ -184,7 +184,7 @@ router.get("/pending-photos", async (req, res) => {
         : { id: photo.id, user_id: photo.user_id, sort_order: photo.sort_order, approval_status: photo.approval_status, created_at: photo.created_at, url: signed.signedUrl };
     }));
     for (const photo of photos) {
-      if (!(await audit(req.user.id, "viewed_pending_profile_photo", "profile_photo", photo.id))
+      if (!(await audit(req.user.id, "viewed_pending_profile_photo", "profile_photo", photo.id)))
         return res.status(503).json({ success: false, message: "Audit logging is unavailable; photo previews were not returned." });
     }
     res.json({ success: true, photos });
