@@ -87,7 +87,7 @@ Severity:
 
 ## 6. Small Instagram pilot measurement
 
-Do not judge the campaign by reach or likes alone. Track aggregate counts only:
+Paid advertising for an online dating/matchmaking service on Meta platforms (including Instagram) requires Meta's prior written permission. Submit the dating-service advertiser application and wait for written approval before creating or boosting a paid ad. Do not try to disguise the service category or bypass review. Organic posts are a separate route, but must still be truthful and follow platform rules.\n\nDo not judge the campaign by reach or likes alone. Track aggregate counts only:
 
 - Ad spend and impressions
 - Link clicks / landing-page visits
