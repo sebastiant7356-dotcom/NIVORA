@@ -51,3 +51,15 @@ GitHub Actions is configured to run backend syntax checks, backend tests and fro
 - No service can guarantee a match or uninterrupted availability.
 
 Do not publish secrets, Google credentials, access tokens or Supabase service-role keys.
+
+
+## Buyer due-diligence and handover
+
+See [Buyer Handover Guide](docs/BUYER-HANDOVER.md) for the proposed source-code,
+database, hosting, credential-rotation and transition process. The backend environment
+variable template is [backend/.env.example](backend/.env.example). It contains
+placeholders only; never commit real secrets.
+
+The repository's [LICENSE](LICENSE) is a proprietary-use notice for evaluation.
+Any acquisition or IP assignment must be documented in a separate written agreement.
+Third-party dependencies and assets remain under their own licenses.
