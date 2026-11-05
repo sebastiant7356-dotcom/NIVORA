@@ -758,3 +758,137 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
   .dashboard-page .dashboard-brand b { font-size: 15px; }
   .dashboard-page .dashboard-stat > small { font-size: 8px; }
 }
+
+
+/* Distinct mobile dashboard visual system */
+@media (max-width: 760px) {
+  .dashboard-page {
+    background: #f5f5ed;
+  }
+  .dashboard-page .dashboard-topbar {
+    padding: 4px 3px 10px;
+    border-bottom: 1px solid rgba(31,67,48,.08);
+  }
+  .dashboard-page .dashboard-brand-mark {
+    width: 42px;
+    height: 42px;
+    font-size: 25px;
+  }
+  .dashboard-page .dashboard-brand b {
+    font-size: 19px;
+    letter-spacing: .12em;
+  }
+  .dashboard-page .dashboard-brand small {
+    font-size: 7px;
+    letter-spacing: .13em;
+  }
+  .dashboard-page .dashboard-welcome {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 23px 17px 16px;
+    background:
+      radial-gradient(circle at 100% 0%, rgba(239,216,169,.2), transparent 48%),
+      linear-gradient(145deg, #103d32 0%, #1d5945 62%, #47765a 100%);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 23px;
+    box-shadow: 0 13px 30px rgba(19,61,47,.14);
+  }
+  .dashboard-page .dashboard-welcome-copy {
+    position: relative;
+    z-index: 2;
+  }
+  .dashboard-page .dashboard-eyebrow {
+    font-size: 8px;
+    letter-spacing: .1em;
+  }
+  .dashboard-page .dashboard-welcome h1 {
+    margin: 13px 0 8px;
+    font-size: clamp(32px, 8.2vw, 39px);
+    line-height: 1.05;
+    letter-spacing: -.045em;
+  }
+  .dashboard-page .dashboard-welcome p {
+    max-width: 30rem;
+    margin-bottom: 0;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .dashboard-page .dashboard-hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .dashboard-page .dashboard-hero-actions button {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 11px;
+  }
+  .dashboard-page .dashboard-hero-footnote {
+    margin-top: 12px;
+    font-size: 9px;
+  }
+  .dashboard-page .dashboard-hero-side {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .dashboard-page .dashboard-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .dashboard-page .dashboard-stat,
+  .dashboard-page .dashboard-stat-featured {
+    min-width: 0;
+    min-height: 91px;
+    padding: 12px 11px;
+    gap: 3px;
+    color: #173e32;
+    background: #f8f7ef;
+    border: 1px solid rgba(255,255,255,.65);
+    border-radius: 15px;
+    box-shadow: 0 5px 14px rgba(4,28,21,.1);
+  }
+  .dashboard-page .dashboard-stat > span {
+    color: #a58a54;
+    font-size: 17px;
+  }
+  .dashboard-page .dashboard-stat > b {
+    color: #173e32;
+    font-size: 30px;
+    line-height: 1.05;
+  }
+  .dashboard-page .dashboard-stat > small {
+    color: #627168;
+    font-size: 9px;
+  }
+  .dashboard-page .dashboard-daily-card {
+    padding: 12px 13px;
+    background: rgba(5,34,27,.25);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 14px;
+  }
+  .dashboard-page .dashboard-daily-card > div:first-child {
+    font-size: 9px;
+  }
+  .dashboard-page .dashboard-daily-card > small {
+    font-size: 9px;
+  }
+  .dashboard-page .dashboard-panel {
+    background: #fffefa;
+    border: 1px solid #e8eade;
+    box-shadow: 0 8px 24px rgba(31,67,48,.045);
+  }
+  .dashboard-page .customer-bottom-nav {
+    background: rgba(255,255,250,.97);
+    border: 1px solid #e2e8dd;
+    box-shadow: 0 -8px 28px rgba(20,48,36,.1);
+    backdrop-filter: blur(16px);
+  }
+}
