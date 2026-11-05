@@ -63,3 +63,5 @@ placeholders only; never commit real secrets.
 The repository's [LICENSE](LICENSE) is a proprietary-use notice for evaluation.
 Any acquisition or IP assignment must be documented in a separate written agreement.
 Third-party dependencies and assets remain under their own licenses.
+
+Use the [Controlled User Test Plan](docs/TEST-PLAN.md) before running an invited pilot or paid promotion. It defines safety release gates, two-account test cases, bug-reporting guidance and aggregate campaign metrics; it is a plan, not a passed test report.
