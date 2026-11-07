@@ -3,11 +3,19 @@ const express = require("express");
 const { serviceClient } = require("../lib/clients");
 const { requireAuth } = require("../middleware");
 const { createLimiter, byUser } = require("../lib/ratelimit");
-const { clean } = require("../lib/validation");
+const { clean, isKeralaDistrict } = require("../lib/validation");
 
 const router = express.Router();
 router.use(requireAuth);
 const postLimit = createLimiter({ windowMs: 60 * 60_000, max: 10, keyFn: byUser });
+
+async function eligibleKeralaMember(db, userId) {
+  const { data, error } = await db.from("profiles")
+    .select("district,approval_status,is_active,suspended_at")
+    .eq("id", userId).maybeSingle();
+  return !error && data && data.approval_status === "approved" && data.is_active &&
+    !data.suspended_at && isKeralaDistrict(data.district);
+}
 
 function distanceKm(aLat, aLon, bLat, bLon) {
   const rad = (n) => n * Math.PI / 180;
