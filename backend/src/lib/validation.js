@@ -1,6 +1,6 @@
 "use strict";
 
-const VALUES = ["music", "movies", "gaming", "sports", "travel", "food", "art", "books", "technology", "fitness", "nature", "languages", "photography", "culture", "learning"];
+const VALUES = ["music", "movies", "gaming", "sports", "travel", "food", "art", "books", "technology", "fitness", "nature", "languages", "photography", "culture", "learning", "family", "kindness", "career", "faith", "communication", "lifestyle"];
 const REVIEW_FIELDS = ["full_name", "age", "district", "job_title", "bio"];
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
