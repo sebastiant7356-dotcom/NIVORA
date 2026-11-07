@@ -3,7 +3,8 @@ const express = require("express");
 const { serviceClient } = require("../lib/clients");
 const { requireAuth } = require("../middleware");
 const { createLimiter, byUser } = require("../lib/ratelimit");
-const { clean, isKeralaDistrict } = require("../lib/validation");
+const { clean, isKeralaDistrict, isUuid } = require("../lib/validation");
+const { audit } = require("../lib/audit");
 
 const router = express.Router();
 router.use(requireAuth);
@@ -70,6 +71,30 @@ router.post("/posts", postLimit, async (req, res) => {
   }).select("id,body,audience,created_at").single();
   if (error) return res.status(500).json({ success: false, message: "Your anonymous post could not be published." });
   res.status(201).json({ success: true, post: data });
+});
+
+router.post("/posts/:id/report", postLimit, async (req, res) => {
+  if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid post." });
+  const reasons = ["harassment", "fake_profile", "scam", "inappropriate_content", "underage", "other"];
+  const reason = req.body?.reason || "inappropriate_content";
+  const details = req.body?.details;
+  if (!reasons.includes(reason)) return res.status(400).json({ success: false, message: "Choose a valid report reason." });
+  if (details !== undefined && details !== null && (typeof details !== "string" || details.length > 1000)) {
+    return res.status(400).json({ success: false, message: "Details must be at most 1000 characters." });
+  }
+  const db = serviceClient();
+  const { data: post, error: postError } = await db.from("anonymous_posts")
+    .select("id,author_id,status").eq("id", req.params.id).eq("status", "published").maybeSingle();
+  if (postError || !post) return res.status(404).json({ success: false, message: "Post not found." });
+  if (post.author_id === req.user.id) return res.status(400).json({ success: false, message: "You cannot report your own post." });
+  const note = "Anonymous post " + post.id + (details ? " — " + clean(details) : "");
+  const { data, error } = await db.from("reports").insert({
+    reporter_id: req.user.id, reported_id: post.author_id, match_id: null,
+    reason, details: note
+  }).select("id").single();
+  if (error) return res.status(500).json({ success: false, message: "Report could not be submitted." });
+  await audit(req.user.id, "anonymous_post_reported", "report", data.id, { post_id: post.id, reason });
+  res.status(201).json({ success: true, message: "Report received. Our team will review it." });
 });
 
 router.delete("/posts/:id", postLimit, async (req, res) => {
