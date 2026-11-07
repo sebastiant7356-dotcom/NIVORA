@@ -11,8 +11,8 @@ const { persistReport, exportSafetyRecords } = require("./moderation-api");
 const router = express.Router();
 router.use(requireAuth);
 
-// Profiles, locations, matches, chats, posts, friend state and blocks live only in
-// process memory and expire after 12 hours of inactivity. Safety reports are written
+// Session content lives only in this process; profiles, locations, matches, chats,
+// posts, friend state and blocks expire after 12 hours of inactivity. Safety reports are written
 // separately by moderation-api.js with limited fields and a 90-day retention period.
 const TTL = 12 * 60 * 60 * 1000;
 const state = new EphemeralStore({ defaultTtlMs: TTL, maxEntries: 50000 });
