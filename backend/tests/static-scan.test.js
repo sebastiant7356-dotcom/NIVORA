@@ -106,6 +106,10 @@ test("staff moderation is limited to reported accounts", () => {
   assert.match(safetyApi, /90 \* 86400000/);
   assert.match(safetyApi, /365 \* 86400000/);
   assert.match(safetyApi, /requireStaff\("admin"\)/);
+  assert.match(safetyApi, /account_appeals/);
+  assert.match(safetyApi, /router\.post\("\/account\/appeal"/);
+  assert.match(safetyApi, /appealLimited/);
+  assert.match(ui, /renderAppeals/);
 });
 
 
