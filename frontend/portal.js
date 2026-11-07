@@ -608,7 +608,7 @@
         : (m.is_shake_match && m.status === "active" && m.reveal?.revealed ? `<p class="modal-description">${p("shakeRevealDone")}</p>` : "");
       let h = header + tabs + anonymousBlock + partnerHtml(m.partner);
       if (["proposed", "active"].includes(m.status)) {
-        h += `${m.is_shake_match ? "" : `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>`}
+        h += `${m.is_persistent_chat ? "" : `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>`}
           <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
           <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div><div class="voice-messages" id="voiceLog" aria-live="polite"></div><div class="voice-controls"><button class="outline-btn" id="voiceRecord" type="button">${p("voiceRecord")}</button><span class="nv-msg" id="voiceStatus" role="status"></span></div></div>`;
         if (m.status === "proposed") {
@@ -803,7 +803,7 @@
       el.textContent = s > 0 ? `${Math.floor(s / 3600)}h ${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}m ${String(s % 60).padStart(2, "0")}s` : p("closed");
       if (s <= 0) { clearInterval(tickTimer); closeChat(); loadAll().then(render).catch(() => {}); }
     };
-    if (!m.is_shake_match) { tick(); tickTimer = setInterval(tick, 1000); }
+    if (!m.is_persistent_chat) { tick(); tickTimer = setInterval(tick, 1000); }
 
     const pull = async () => {
       try {
