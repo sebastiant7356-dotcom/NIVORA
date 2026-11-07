@@ -3,7 +3,7 @@ const express = require("express");
 const { serviceClient } = require("../lib/clients");
 const { requireAuth } = require("../middleware");
 const { createLimiter, byUser } = require("../lib/ratelimit");
-const { isUuid } = require("../lib/validation");
+const { isUuid, isKeralaDistrict } = require("../lib/validation");
 
 const router = express.Router();
 router.use(requireAuth);
@@ -23,11 +23,11 @@ function compatible() {
 async function currentCustomer(db, userId) {
   const [{ data: staff, error: staffError }, { data: profile, error }] = await Promise.all([
     db.from("staff_roles").select("user_id").eq("user_id", userId).maybeSingle(),
-    db.from("profiles").select("id,age,gender,looking_for,min_partner_age,max_partner_age,approval_status,is_active,suspended_at,profile_visibility").eq("id", userId).maybeSingle()
+    db.from("profiles").select("id,age,gender,looking_for,min_partner_age,max_partner_age,approval_status,is_active,suspended_at,profile_visibility,district").eq("id", userId).maybeSingle()
   ]);
   if (staffError || error) throw new Error("account_check_failed");
   if (staff) return { error: "staff_not_customer" };
-  if (!profile || profile.approval_status !== "approved" || !profile.is_active || profile.suspended_at) return { error: "profile_unavailable" };
+  if (!profile || profile.approval_status !== "approved" || !profile.is_active || profile.suspended_at) return { error: "profile_unavailable" };\n  if (!isKeralaDistrict(profile.district)) return { error: "kerala_only" };
   return { profile };
 }
 
@@ -41,13 +41,13 @@ router.get("/status", async (req, res) => {
 router.post("/location", locationLimit, async (req, res) => {
   const lat = Number(req.body?.latitude), lon = Number(req.body?.longitude);
   const radius = Number(req.body?.radius_km ?? 25);
-  if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180 || !Number.isInteger(radius) || radius < 1 || radius > 100) {
-    return res.status(400).json({ success: false, message: "Valid location coordinates are required." });
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < 8 || lat > 13 || lon < 74.5 || lon > 77.8 || !Number.isInteger(radius) || radius < 1 || radius > 100) {
+    return res.status(400).json({ success: false, message: "NIVORA Shake & Chat is currently available only in Kerala. Allow location access while you are in Kerala." });
   }
   const db = serviceClient();
   try {
     const customer = await currentCustomer(db, req.user.id);
-    if (customer.error) return res.status(403).json({ success: false, code: customer.error, message: "Your customer profile is not eligible for Shake & Chat." });
+    if (customer.error) return res.status(403).json({ success: false, code: customer.error, message: customer.error === "kerala_only" ? "NIVORA is currently for members in Kerala only." : "Your customer profile is not eligible for Shake & Chat." });
     const { error } = await db.from("shake_locations").upsert({
       user_id: req.user.id, latitude: lat, longitude: lon, radius_km: radius, enabled: true, updated_at: new Date().toISOString()
     }, { onConflict: "user_id" });
