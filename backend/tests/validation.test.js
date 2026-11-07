@@ -4,43 +4,51 @@ const assert = require("node:assert/strict");
 const { parseProfileInput, needsReview, isUuid, firstName } = require("../src/lib/validation");
 
 const good = () => ({
-  full_name: "Ananya Nair", age: 26, district: "Kochi", gender: "woman", job_title: "Designer", bio: "I like books and long walks by the sea.",
-  looking_for: "man", relationship_intention: "marriage", core_values: ["family", "kindness"],
-  min_partner_age: 24, max_partner_age: 32, consents: { terms: true, privacy: true }
+  full_name: "Ananya Nair", age: 26, district: "Toronto, Canada", job_title: "Designer",
+  bio: "I like books and long walks by the sea.", core_values: ["music", "travel"],
+  consents: { terms: true, privacy: true }
 });
 
-test("valid create payload passes and ignores unknown/privileged fields", () => {
+test("global adult profile create payload passes and ignores privileged fields", () => {
   const r = parseProfileInput({ ...good(), approval_status: "approved", id: "x", role: "admin", is_active: false }, { create: true });
   assert.ok(r.value);
   assert.equal(r.value.approval_status, undefined);
   assert.equal(r.value.id, undefined);
   assert.equal(r.value.role, undefined);
   assert.equal(r.value.is_active, undefined);
+  assert.equal(r.value.district, "Toronto, Canada");
 });
-test("age outside 21-40 rejected", () => {
-  for (const age of [20, 41, 25.5, "abc", null, undefined]) assert.ok(parseProfileInput({ ...good(), age }, { create: true }).error, String(age));
+test("age below 18 or invalid age is rejected; adult ages are accepted", () => {
+  for (const age of [17, 101, 25.5, "abc", null, undefined]) assert.ok(parseProfileInput({ ...good(), age }, { create: true }).error, String(age));
+  assert.equal(parseProfileInput({ ...good(), age: 18 }, { create: true }).value.age, 18);
+  assert.equal(parseProfileInput({ ...good(), age: 100 }, { create: true }).value.age, 100);
 });
 test("consents are mandatory on create", () => {
   assert.ok(parseProfileInput({ ...good(), consents: { terms: true } }, { create: true }).error);
   const g = good(); delete g.consents;
   assert.ok(parseProfileInput(g, { create: true }).error);
 });
-test("values: 1..3, unique, from allow-list", () => {
-  for (const core_values of [[], ["family", "kindness", "career", "faith"], ["family", "family"], ["hacking"], "family"]) {
-    assert.ok(parseProfileInput({ ...good(), core_values }, { create: true }).error);
-  }
+test("interests: 1..5, unique, from global allow-list", () => {
+  assert.ok(parseProfileInput({ ...good(), core_values: [] }, { create: true }).error);
+  assert.ok(parseProfileInput({ ...good(), core_values: ["music","movies","gaming","sports","travel","food"] }, { create: true }).error);
+  assert.ok(parseProfileInput({ ...good(), core_values: ["music","music"] }, { create: true }).error);
+  assert.ok(parseProfileInput({ ...good(), core_values: ["not-a-valid-interest"] }, { create: true }).error);
+  assert.ok(parseProfileInput({ ...good(), core_values: "music" }, { create: true }).error);
+  assert.ok(parseProfileInput({ ...good(), core_values: ["music","movies","gaming","sports","travel"] }, { create: true }).value);
 });
-test("partner age range validated", () => {
-  assert.ok(parseProfileInput({ ...good(), min_partner_age: 35, max_partner_age: 30 }, { create: true }).error);
-  assert.ok(parseProfileInput({ ...good(), min_partner_age: 18 }, { create: true }).error);
-  const r = parseProfileInput({ ...good(), min_partner_age: undefined, max_partner_age: undefined }, { create: true });
-  assert.equal(r.value.min_partner_age, 21); assert.equal(r.value.max_partner_age, 40);
+test("legacy dating fields are ignored and not required", () => {
+  const r = parseProfileInput(good(), { create: true });
+  assert.ok(r.value);
+  assert.equal(r.value.gender, undefined);
+  assert.equal(r.value.looking_for, undefined);
+  assert.equal(r.value.relationship_intention, undefined);
+  assert.equal(r.value.min_partner_age, undefined);
 });
-test("enums and lengths enforced", () => {
-  assert.ok(parseProfileInput({ ...good(), gender: "robot" }, { create: true }).error);
+test("lengths and required fields enforced", () => {
   assert.ok(parseProfileInput({ ...good(), bio: "x".repeat(1001) }, { create: true }).error);
   assert.ok(parseProfileInput({ ...good(), full_name: "A" }, { create: true }).error);
   assert.ok(parseProfileInput({ ...good(), full_name: 123 }, { create: true }).error);
+  assert.ok(parseProfileInput({ ...good(), district: "x".repeat(121) }, { create: true }).error);
 });
 test("control characters are stripped", () => {
   const r = parseProfileInput({ ...good(), full_name: "Ana\u0000nya" }, { create: true });
@@ -49,7 +57,7 @@ test("control characters are stripped", () => {
 test("update: partial ok, empty rejected, status never accepted", () => {
   assert.ok(parseProfileInput({ bio: "hello there friend" }, { create: false }).value);
   assert.ok(parseProfileInput({}, { create: false }).error);
-  assert.ok(parseProfileInput({ approval_status: "approved" }, { create: false }).error); // nothing editable -> error
+  assert.ok(parseProfileInput({ approval_status: "approved" }, { create: false }).error);
 });
 test("needsReview only for identity/content fields", () => {
   assert.equal(needsReview({ bio: "x" }), true);

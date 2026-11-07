@@ -52,25 +52,28 @@ test("SQL: RLS enabled and matching functions not callable by browser roles", ()
   assert.ok(!/grant (insert|update|delete)[^;]*to (anon|authenticated)/i.test(sql));
 });
 
-test("daily five matching and multiple live match UI are wired together", () => {
-  const migration = text(path.join(ROOT, "backend", "migrations", "20261101182853_daily_five_multiple_matches.sql"));
+test("MELVO global social app uses persistent Shake chats, radius discovery and friends", () => {
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261107000000_social_app_foundation.sql"));
   const route = text(path.join(ROOT, "backend", "src", "routes", "match.js"));
-  const portal = text(path.join(ROOT, "frontend", "portal.js"));
-  assert.match(migration, /create table if not exists public\.match_daily_usage/);
-  assert.match(migration, /time zone 'Asia\/Kolkata'/);
-  assert.match(migration, /matches_count between 0 and 5/);
-  assert.match(migration, /pg_advisory_xact_lock/);
-  assert.match(migration, /daily_match_limit_reached/);
-  assert.match(migration, /primary key \(user_id, match_id\)/);
-  assert.match(migration, /match_history_pair_unique_idx/);
-  assert.match(migration, /grant execute on function public\.nivora_find_partner\(uuid, boolean\) to service_role/);
-  assert.match(route, /dailyUsage\(req\.user\.id\)/);
-  assert.match(route, /matches, match: matches\[0\] \|\| null/);
-  assert.match(portal, /dailyQuota\.daily_used/);
-  assert.match(portal, /data-match-id/);
-  assert.match(portal, /matches\.map/);
+  const shake = text(path.join(ROOT, "backend", "src", "routes", "shake.js"));
+  const matches = text(path.join(ROOT, "backend", "src", "lib", "matches.js"));
+  const friends = text(path.join(ROOT, "backend", "src", "routes", "friends.js"));
+  const community = text(path.join(ROOT, "backend", "src", "routes", "community.js"));
+  assert.match(migration, /radius_km integer not null default 25/);
+  assert.match(migration, /profile_visibility/);
+  assert.match(migration, /create table if not exists public\.friendships/);
+  assert.match(migration, /create table if not exists public\.anonymous_posts/);
+  assert.match(migration, /values\(p_user,p_partner,\x27active\x27,now\(\),null,true,true,\x27friend\x27\)/);
+  assert.match(route, /daily_matching_disabled/);
+  assert.match(shake, /mine\.radius_km/);
+  assert.doesNotMatch(shake, /isKeralaDistrict|kerala_only/);
+  assert.match(matches, /is_persistent_chat: persistentMatch/);
+  assert.match(matches, /\["shake", "friend"\]/);
+  assert.match(friends, /nivora_open_friend_chat/);
+  assert.match(community, /anonymous_post_reported/);
+  assert.match(community, /anonymous_post_author_blocked/);
+  assert.match(community, /audience === "global"/);
 });
-
 
 test("voice messages stay private, size-limited and restricted to match members", () => {
   const migration = text(path.join(ROOT, "backend", "migrations", "20261101184818_voice_messages.sql"));

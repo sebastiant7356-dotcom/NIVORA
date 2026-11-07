@@ -109,15 +109,13 @@ test("chat send is refused after expiry and never inserts", async () => {
   assert.equal(r.code, 403); assert.equal(inserted, false);
 });
 
-test("matching: unapproved user gets 403 from the DB function's error; only verified id is passed", async () => {
-  let args;
-  when((c) => { if (c.rpc === "nivora_find_partner") { args = c.args; return { data: null, error: { message: "not_approved" } }; } return { data: null, error: null }; });
+test("Daily 5 matching is retired and no legacy match RPC is called", async () => {
+  let called = false;
+  when((c) => { if (c.rpc === "nivora_find_partner") called = true; return { data: null, error: null }; });
   const r = await call(require("../src/routes/match"), "POST", "/find", { body: { user_id: OTHER, p_user: OTHER } });
-  assert.equal(r.code, 403); assert.equal(args.p_user, UID, "client-supplied id ignored");
-});
-test("matching: second active match maps to 409", async () => {
-  when((c) => (c.rpc === "nivora_find_partner" ? { data: null, error: { message: "duplicate", code: "23505" } } : { data: null, error: null }));
-  assert.equal((await call(require("../src/routes/match"), "POST", "/find")).code, 409);
+  assert.equal(r.code, 410);
+  assert.equal(r.body.code, "daily_matching_disabled");
+  assert.equal(called, false, "the legacy daily matching RPC is never invoked");
 });
 test("match response never contains phone, email or last name", async () => {
   const { partnerView } = require("../src/lib/matches");
@@ -128,7 +126,7 @@ test("match response never contains phone, email or last name", async () => {
 
 test("profile: duplicate create -> 409; rejected profiles cannot edit; approved edit remains approved", async () => {
   const router = require("../src/routes/profile");
-  const body = { full_name: "Ananya Nair", age: 26, district: "Kochi", gender: "woman", looking_for: "man", relationship_intention: "marriage", core_values: ["family"], consents: { terms: true, privacy: true } };
+  const body = { full_name: "Ananya Nair", age: 26, district: "Kochi, India", core_values: ["music"], consents: { terms: true, privacy: true } };
   when((c) => (c.table === "profiles" ? { data: { id: UID }, error: null } : { data: null, error: null }));
   assert.equal((await call(router, "POST", "/", { body })).code, 409);
   when((c) => (c.table === "staff_roles" ? { data: null, error: null } : { data: { approval_status: "rejected" }, error: null }));
@@ -151,7 +149,7 @@ test("profile create stores verified id, forced approved status and consent time
     if (c.ops.find((o) => o[0] === "maybeSingle")) return { data: null, error: null };
     return { data: null, error: null };
   });
-  const r = await call(router, "POST", "/", { body: { full_name: "Ananya Nair", age: 26, district: "Kochi", gender: "woman", looking_for: "man", relationship_intention: "marriage", core_values: ["family"], consents: { terms: true, privacy: true }, id: OTHER, approval_status: "approved" } });
+  const r = await call(router, "POST", "/", { body: { full_name: "Ananya Nair", age: 26, district: "Kochi, India", core_values: ["music"], consents: { terms: true, privacy: true }, id: OTHER, approval_status: "approved" } });
   assert.equal(r.code, 201); assert.equal(row.id, UID); assert.equal(row.approval_status, "approved");
   assert.ok(row.consent_terms_at && row.consent_privacy_at && row.consent_version);
 });

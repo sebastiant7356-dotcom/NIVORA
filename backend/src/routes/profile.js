@@ -13,12 +13,12 @@ router.use(requireAuth);
 // Columns a user may see about THEIR OWN profile. AI scores/flags are staff-only.
 const OWN_COLUMNS = "id, full_name, age, district, gender, job_title, bio, looking_for, relationship_intention, " +
   "min_partner_age, max_partner_age, core_values, approval_status, review_reason, is_active, suspended_at, " +
-  "consent_terms_at, consent_privacy_at, consent_version, created_at, updated_at";
+  "consent_terms_at, consent_privacy_at, consent_version, profile_visibility, created_at, updated_at";
 
 const writeLimit = createLimiter({ windowMs: 60 * 60_000, max: 30, keyFn: byUser });
 
 function isComplete(p) {
-  return Boolean(p.gender && p.looking_for && p.relationship_intention && p.core_values?.length && p.district);
+  return Boolean(p.full_name && Number(p.age) >= 18 && p.district && p.core_values?.length);
 }
 function present(p) {
   if (!p) return null;
@@ -75,6 +75,19 @@ router.post("/", writeLimit, async (req, res) => {
   }
   await audit(req.user.id, "profile_created", "profile", req.user.id);
   res.status(201).json({ success: true, message: "Profile saved and activated.", profile: present(data) });
+});
+
+router.put("/visibility", writeLimit, async (req, res) => {
+  const visibility = req.body?.visibility;
+  if (!["public", "hidden"].includes(visibility)) {
+    return res.status(400).json({ success: false, message: "Choose public or hidden profile visibility." });
+  }
+  const { data, error } = await serviceClient().from("profiles")
+    .update({ profile_visibility: visibility }).eq("id", req.user.id)
+    .select("profile_visibility").maybeSingle();
+  if (error || !data) return res.status(404).json({ success: false, message: "Profile visibility could not be updated." });
+  await audit(req.user.id, "profile_visibility_changed", "profile", req.user.id, { visibility });
+  res.json({ success: true, visibility: data.profile_visibility });
 });
 
 router.put("/", writeLimit, async (req, res) => {

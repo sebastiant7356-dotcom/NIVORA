@@ -70,6 +70,37 @@ router.get("/reports", async (req, res) => {
   res.json({ success: true, total: count, reports: data || [] });
 });
 
+router.get("/reports/:id/anonymous-post", async (req, res) => {
+  if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid report." });
+  const db = serviceClient();
+  const { data: report, error: reportError } = await db.from("reports").select("id,details").eq("id", req.params.id).maybeSingle();
+  if (reportError) return res.status(500).json({ success: false, message: "Could not load report." });
+  if (!report) return res.status(404).json({ success: false, message: "Report not found." });
+  const postId = String(report.details || "").match(/Anonymous post ([0-9a-f-]{36})/i)?.[1];
+  if (!postId) return res.status(404).json({ success: false, message: "This report is not linked to an anonymous post." });
+  const { data: post, error } = await db.from("anonymous_posts")
+    .select("id,author_id,body,audience,radius_km,status,created_at")
+    .eq("id", postId).maybeSingle();
+  if (error) return res.status(500).json({ success: false, message: "Could not load the reported post." });
+  if (!post) return res.status(404).json({ success: false, message: "Reported post not found." });
+  if (!(await audit(req.user.id, "viewed_reported_anonymous_post", "report", report.id, { post_id: post.id }))) {
+    return res.status(503).json({ success: false, message: "Audit logging is unavailable; post preview was not returned." });
+  }
+  res.json({ success: true, post });
+});
+
+router.post("/anonymous-posts/:id/remove", async (req, res) => {
+  if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid post." });
+  const note = typeof req.body?.reason === "string" ? clean(req.body.reason).slice(0, 500) : "";
+  if (note.length < 5) return res.status(400).json({ success: false, message: "A removal reason (at least 5 characters) is required." });
+  const { data, error } = await serviceClient().from("anonymous_posts")
+    .update({ status: "removed" }).eq("id", req.params.id).select("id,author_id").maybeSingle();
+  if (error) return res.status(500).json({ success: false, message: "Post could not be removed." });
+  if (!data) return res.status(404).json({ success: false, message: "Post not found." });
+  await audit(req.user.id, "anonymous_post_removed", "anonymous_post", data.id, { reason: note, author_id: data.author_id });
+  res.json({ success: true });
+});
+
 // Reading a reported conversation is a sensitive action: explicit opt-in and always audit-logged.
 router.get("/reports/:id/messages", async (req, res) => {
   if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid id." });

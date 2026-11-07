@@ -26,6 +26,17 @@ router.post("/block", blockLimit, async (req, res) => {
   const { error } = await serviceClient().from("blocks")
     .upsert({ blocker_id: req.user.id, blocked_id: ctx.partnerId }, { onConflict: "blocker_id,blocked_id", ignoreDuplicates: true });
   if (error) return res.status(500).json({ success: false, message: "Could not block this person." });
+  const lowId = req.user.id < ctx.partnerId ? req.user.id : ctx.partnerId;
+  const highId = req.user.id < ctx.partnerId ? ctx.partnerId : req.user.id;
+  await serviceClient().from("friendships").delete().eq("user_low", lowId).eq("user_high", highId);
+  await serviceClient().from("friend_requests").update({ status: "cancelled", responded_at: new Date().toISOString() })
+    .eq("status", "pending").or(`and(sender_id.eq.${req.user.id},recipient_id.eq.${ctx.partnerId}),and(sender_id.eq.${ctx.partnerId},recipient_id.eq.${req.user.id})`);
+  const { data: friendChats } = await serviceClient().from("match_history").select("id")
+    .eq("match_source", "friend").eq("status", "active")
+    .or(`and(user_one.eq.${req.user.id},user_two.eq.${ctx.partnerId}),and(user_one.eq.${ctx.partnerId},user_two.eq.${req.user.id})`);
+  for (const chat of (Array.isArray(friendChats) ? friendChats : [])) {
+    await serviceClient().rpc("nivora_end_match", { p_user: req.user.id, p_match: chat.id, p_reason: "blocked" });
+  }
   // Close any live match with that person immediately (chat/voice stop with it).
   if (["proposed", "active"].includes(ctx.match.status)) {
     await serviceClient().rpc("nivora_end_match", { p_user: req.user.id, p_match: ctx.match.id, p_reason: "blocked" });

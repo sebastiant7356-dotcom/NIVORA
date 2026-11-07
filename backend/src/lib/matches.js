@@ -7,7 +7,7 @@ const ERROR_MAP = {
   profile_missing: [404, "Create your profile first."],
   not_approved: [403, "Your profile must be approved by staff first."],
   inactive: [403, "Your account is not active."],
-  profile_incomplete: [409, "Please complete your profile (gender, preferences, values) first."],
+  profile_incomplete: [409, "Please complete your profile and choose interests first."],
   staff_not_customer: [403, "Staff accounts do not use customer matching."],
   daily_match_limit_reached: [429, "You have used all five match recommendations for today. Come back tomorrow."],
   active_match_exists: [409, "You already have an active match."],
@@ -43,8 +43,8 @@ async function assertLiveMatch(matchId, userId) {
   await expire();
   const match = await getMatchFor(matchId, userId);
   if (!match) return { status: 404, code: "match_not_found", message: "Match not found." };
-  if (match.status !== "active" || !match.expires_at || new Date(match.expires_at) <= new Date()) {
-    return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
+  if (match.status !== "active" || (!["shake", "friend"].includes(match.match_source) && (!match.expires_at || new Date(match.expires_at) <= new Date()))) {
+    return { status: 403, code: "match_not_live", message: "This conversation is closed or has been ended." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
   const { data: accountStates, error: stateError } = await serviceClient().from("profiles")
@@ -65,8 +65,8 @@ async function assertChatMatch(matchId, userId) {
   const match = await getMatchFor(matchId, userId);
   if (!match) return { status: 404, code: "match_not_found", message: "Match not found." };
   if (!["proposed", "active"].includes(match.status) ||
-      !match.expires_at || new Date(match.expires_at) <= new Date()) {
-    return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
+      (!["shake", "friend"].includes(match.match_source) && (!match.expires_at || new Date(match.expires_at) <= new Date()))) {
+    return { status: 403, code: "match_not_live", message: "This conversation is closed or has been ended." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
   const { data: accountStates, error: stateError } = await serviceClient().from("profiles")
@@ -88,10 +88,8 @@ function partnerView(p, myValues = [], photos = []) {
     first_name: firstName(p.full_name),
     age: p.age,
     district: p.district,
-    gender: p.gender,
     job_title: p.job_title,
     bio: p.bio,
-    relationship_intention: p.relationship_intention,
     core_values: p.core_values || [],
     shared_values: (p.core_values || []).filter((v) => myValues.includes(v))
   };
@@ -102,25 +100,27 @@ async function matchView(match, userId) {
   const partnerId = mine ? match.user_two : match.user_one;
   const live = ["proposed", "active"].includes(match.status);
   const shakeMatch = match.match_source === "shake";
+  const persistentMatch = shakeMatch || match.match_source === "friend";
   const view = {
     id: match.id,
     status: match.status,
     is_shake_match: shakeMatch,
+    is_persistent_chat: persistentMatch,
     i_accepted: mine ? match.user_one_accepted : match.user_two_accepted,
     partner_accepted: mine ? match.user_two_accepted : match.user_one_accepted,
     proposal_expires_at: match.proposal_expires_at,
     started_at: match.started_at,
     expires_at: match.expires_at,
     ended_reason: match.ended_reason,
-    chat_open: live && match.expires_at && new Date(match.expires_at) > new Date(),
-    can_voice_message: match.status === "active" && match.expires_at && new Date(match.expires_at) > new Date(),
-    seconds_left: live && match.expires_at
+    chat_open: live && (persistentMatch || (match.expires_at && new Date(match.expires_at) > new Date())),
+    can_voice_message: match.status === "active" && (persistentMatch || (match.expires_at && new Date(match.expires_at) > new Date())),
+    seconds_left: !persistentMatch && live && match.expires_at
       ? Math.max(0, Math.floor((new Date(match.expires_at) - Date.now()) / 1000)) : null
   };
   if (live) {
     const db = serviceClient();
     const [{ data: partner }, { data: me }, { data: consentRows, error: consentError }] = await Promise.all([
-      db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values, is_active, suspended_at").eq("id", partnerId).maybeSingle(),
+      db.from("profiles").select("full_name, age, district, job_title, bio, core_values, is_active, suspended_at, profile_visibility").eq("id", partnerId).maybeSingle(),
       db.from("profiles").select("core_values, is_active, suspended_at").eq("id", userId).maybeSingle(),
       shakeMatch
         ? db.from("shake_reveal_consents").select("user_id").eq("match_id", match.id)
@@ -129,12 +129,14 @@ async function matchView(match, userId) {
     if (consentError) throw consentError;
 
     const revealState = shakeRevealState(match, userId, partnerId, consentRows);
-    const revealed = revealState.revealed;
+    const partnerHidden = partner?.profile_visibility === "hidden";
+    const revealed = revealState.revealed && !partnerHidden;
     if (shakeMatch) {
       view.reveal = {
         my_consented: revealState.my_consented,
         partner_consented: revealState.partner_consented,
-        revealed
+        revealed,
+        partner_hidden: Boolean(partnerHidden)
       };
     }
 
@@ -144,7 +146,7 @@ async function matchView(match, userId) {
 
     // For Shake & Chat, fail closed: do not return profile fields or signed photos
     // until BOTH members have recorded consent on the server.
-    if (partner && accountsActive && revealed) {
+    if (partner && accountsActive && revealed && !partnerHidden) {
       const { data: photos } = await db.from("profile_photos")
         .select("id, object_path, sort_order").eq("user_id", partnerId)
         .eq("approval_status", "approved").order("sort_order");

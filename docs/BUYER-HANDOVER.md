@@ -1,6 +1,6 @@
-# NIVORA — Buyer Handover Guide
+# MELVO — Buyer Handover Guide
 
-Last updated: 2026-11-05
+Last updated: 2026-11-07
 
 This document describes the handover package that can be prepared for a successful
 acquisition. It is not confirmation that provider accounts or credentials have
@@ -8,9 +8,9 @@ already been transferred.
 
 ## 1. Source code and intellectual property
 
-- Repository: https://github.com/sebastiant7356-dotcom/NIVORA
+- Repository: https://github.com/sebastiant7356-dotcom/MELVO
 - Default branch: main
-- Frontend: static HTML, CSS and browser JavaScript in `frontend/`.
+- Android app: Capacitor wrapper; UI source in `frontend/` is bundled inside the Android package. A separate public frontend website is not required.
 - Backend: Node.js / Express API in `backend/`.
 - Database schema and migrations: `backend/migrations/`.
 - Tests and syntax checks: `backend/tests/` and `backend/scripts/`.
@@ -26,7 +26,7 @@ The application uses Supabase PostgreSQL and Supabase Auth with Google OAuth.
 The buyer should receive:
 - SQL schema and migration files in the repository.
 - Guidance to create or take control of a Supabase project, subject to provider rules.
-- Google OAuth callback and redirect configuration instructions.
+- Google OAuth callback and redirect configuration instructions, including `in.melvo.social://auth/callback` for Android.
 - Storage bucket and access-policy configuration guidance.
 
 Database contents containing personal/member data must be handled separately from
@@ -36,7 +36,7 @@ member data is included in an asset sale.
 
 ## 3. Hosting and environment configuration
 
-The application is currently deployed using Render and Supabase. Provider account
+The backend uses Render and Supabase. The new Android app embeds its frontend assets and does not require a separate public website. Provider account
 ownership and service transfer are subject to each provider's current policies.
 
 Preferred handover:
@@ -70,15 +70,14 @@ free launch. Live voice/video calling is not part of the current product.
 
 Before accepting final handover:
 - Run `npm ci`, `npm test`, and `npm run check` from `backend/`.
-- Deploy frontend and backend under buyer-controlled accounts.
+- Build and sign the Android app under buyer-controlled accounts; keep the Render backend and Supabase project under buyer control.
 - Verify `/api/health`.
 - Configure Google OAuth and test with two independent customer accounts.
-- Test profile creation, Daily 5, multiple matches, 72-hour chat, voice messages,
-  Shake & Chat, consent/reveal, blocking, reporting, export and deletion.
+- Test Android Google OAuth, profile creation, 1–100 km global Shake discovery, persistent anonymous chat, mutual reveal, mutual friend acceptance, anonymous posts, report/block, staff moderation, voice messages, export and deletion.
 - Verify privacy notice, terms, data retention and grievance process with qualified
   Indian legal counsel before broad public operation.
 
-The repository README and `docs/SETUP-EXTERNAL.md` list known outstanding checks.
+The repository README and `docs/SETUP-EXTERNAL.md` list known outstanding checks, including the Supabase migration, Android redirect allow-list, signed AAB and Play Console testing.
 
 ## 6. Commercial and transition terms
 
