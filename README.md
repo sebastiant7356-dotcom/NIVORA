@@ -4,13 +4,11 @@ NIVORA is a Malayalam-first Android social discovery app for adults aged 21–40
 
 ## Live services
 
-- Frontend: https://nivora-g878.onrender.com
 - Backend health: https://nivora-backend.onrender.com/api/health
-- Privacy Notice: https://nivora-g878.onrender.com/privacy_ml.html
-- Terms: https://nivora-g878.onrender.com/terms_ml.html
+- Privacy Notice and Terms are included in the Android app.
 - Support / grievance contact: nivora.helpdesk@gmail.com
 
-The app is deployed on Render and uses Supabase for Google OAuth, database and private storage. Render and Supabase free-tier quotas, sleeping/cold starts and provider limits apply.
+The Android app embeds the frontend assets and connects to the existing Render backend. Supabase provides Google OAuth, database and private storage. The frontend is not deployed as a separate website for this new app. Render and Supabase free-tier quotas, sleeping/cold starts and provider limits apply.
 
 ## Current product behaviour
 
