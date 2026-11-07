@@ -20,7 +20,7 @@ const key = (type, id) => type + ":" + id;
 const get = (k) => { const v = state.get(k); if (v !== undefined) state.set(k, v, TTL); return v; };
 const put = (k, v) => state.set(k, v, TTL);
 const list = (k) => get(k) || [];
-const addUnique = (k, value) => { const a = list(k); if (!a.includes(value)) a.push(value); put(k, a); };
+const addUnique = (k, value) => { const a = list(k); if (!a.includes(value)) a.push(value); put(k, a.slice(-500)); };
 const removeValue = (k, value) => put(k, list(k).filter(x => x !== value));
 const now = () => new Date().toISOString();
 const fail = (res, status, code, message) => res.status(status).json({ success: false, ...(code ? { code } : {}), message });
@@ -189,7 +189,7 @@ router.post("/match/:id/respond", (req, res) => {
 });
 router.post("/match/:id/end", (req, res) => {
   const m = matchOf(req.params.id, req.user.id); if (!m) return fail(res, 404, "match_not_live", "Conversation not found.");
-  m.status = "ended"; put(key("match", m.id), m);
+  m.status = "ended"; put(key("match", m.id), m); state.delete(key("messages", m.id));
   res.json({ success: true, status: "ended" });
 });
 
@@ -205,7 +205,7 @@ router.post("/chat/:matchId/messages", limited, (req, res) => {
   const body = clean(req.body?.body || "");
   if (!body || body.length > 2000) return fail(res, 400, "invalid_message", "Message must be 1–2000 characters.");
   const msg = { id: randomUUID(), sender_id: req.user.id, body, created_at: now(), mine: true };
-  const messages = list(key("messages", m.id)); messages.push(msg); put(key("messages", m.id), messages);
+  const messages = list(key("messages", m.id)); messages.push(msg); put(key("messages", m.id), messages.slice(-200));
   res.status(201).json({ success: true, message: msg });
 });
 router.get("/chat/:matchId/voice", (req, res) => {
@@ -218,12 +218,12 @@ router.post("/chat/:matchId/voice", (_req, res) => fail(res, 410, "voice_disable
 router.get("/community/feed", (req, res) => {
   if (!requireProfile(req, res)) return;
   const mineLoc = get(key("location", req.user.id));
-  const posts = list("community:posts").filter(p => {
+  const posts = list("community:posts").filter(p => Date.now() - Date.parse(p.created_at) < TTL && (() => {
     if (isBlocked(req.user.id, p.author_id)) return false;
     if (p.audience !== "radius" || p.author_id === req.user.id) return true;
     const authorLoc = get(key("location", p.author_id));
     return Boolean(mineLoc && authorLoc && distanceKm(mineLoc, authorLoc) <= p.radius_km);
-  }).map(p => ({ id:p.id, body:p.body, audience:p.audience, created_at:p.created_at, mine:p.author_id === req.user.id }));
+  })()).map(p => ({ id:p.id, body:p.body, audience:p.audience, created_at:p.created_at, mine:p.author_id === req.user.id }));
   res.json({ success: true, posts });
 });
 router.post("/community/posts", limited, (req, res) => {
@@ -234,7 +234,7 @@ router.post("/community/posts", limited, (req, res) => {
   const radius_km = Number(req.body?.radius_km ?? 25);
   if (audience === "radius" && (!Number.isInteger(radius_km) || radius_km < 1 || radius_km > 100 || !get(key("location", req.user.id)))) return fail(res, 409, "location_required", "Enable nearby discovery before publishing to a radius.");
   const post = { id: randomUUID(), author_id:req.user.id, body, audience, radius_km: audience === "radius" ? radius_km : null, created_at:now() };
-  const posts = list("community:posts"); posts.unshift(post); put("community:posts", posts);
+  const posts = list("community:posts").filter(p => Date.now() - Date.parse(p.created_at) < TTL); posts.unshift(post); put("community:posts", posts.slice(0, 500));
   res.status(201).json({ success:true, post:{ id:post.id, body:post.body, audience:post.audience, created_at:post.created_at } });
 });
 router.delete("/community/posts/:id", (req,res) => {
@@ -246,7 +246,7 @@ router.post("/community/posts/:id/report", (req,res) => {
   const post = list("community:posts").find(p => p.id === req.params.id);
   if (!post || post.author_id === req.user.id) return fail(res,404,"post_not_found","Post not found.");
   if (!REASONS.includes(req.body?.reason)) return fail(res,400,"invalid_reason","Choose a valid report reason.");
-  const reports = list("safety:reports"); reports.push({ id:randomUUID(), reporter_id:req.user.id, reported_id:post.author_id, reason:req.body.reason, details:clean(req.body.details || "").slice(0,1000), created_at:now() }); put("safety:reports",reports);
+  const reports = list("safety:reports"); reports.push({ id:randomUUID(), reporter_id:req.user.id, reported_id:post.author_id, reason:req.body.reason, details:clean(req.body.details || "").slice(0,1000), created_at:now() }); put("safety:reports",reports.slice(-1000));
   res.status(201).json({success:true,message:"Report received for this active server session."});
 });
 router.post("/community/posts/:id/block", (req,res) => {
@@ -268,7 +268,7 @@ router.post("/friends/request", (req,res) => {
   const partner=m.user_one===req.user.id?m.user_two:m.user_one;
   if(isBlocked(req.user.id,partner)) return fail(res,403,"blocked","This connection is unavailable.");
   const id=randomUUID(), request={id,sender_id:req.user.id,recipient_id:partner,created_at:now()};
-  const incoming=list(key("friend-in",partner)); incoming.push(request); put(key("friend-in",partner),incoming);
+  const incoming=list(key("friend-in",partner)); if (incoming.length >= 100) return fail(res,429,"request_limit","This member has too many pending requests."); incoming.push(request); put(key("friend-in",partner),incoming);
   const outgoing=list(key("friend-out",req.user.id)); outgoing.push(request); put(key("friend-out",req.user.id),outgoing);
   res.status(201).json({success:true,request_id:id});
 });
@@ -300,13 +300,13 @@ router.post("/safety/report", (req,res) => {
   const m=matchOf(req.body?.match_id,req.user.id); if(!m) return fail(res,404,"match_not_found","Match not found.");
   if(!REASONS.includes(req.body?.reason)) return fail(res,400,"invalid_reason","Choose a valid report reason.");
   const partner=m.user_one===req.user.id?m.user_two:m.user_one;
-  const reports=list("safety:reports"); reports.push({id:randomUUID(),reporter_id:req.user.id,reported_id:partner,reason:req.body.reason,details:clean(req.body.details||"").slice(0,1000),created_at:now()}); put("safety:reports",reports);
+  const reports=list("safety:reports"); reports.push({id:randomUUID(),reporter_id:req.user.id,reported_id:partner,reason:req.body.reason,details:clean(req.body.details||"").slice(0,1000),created_at:now()}); put("safety:reports",reports.slice(-1000));
   res.status(201).json({success:true,message:"Report received for this active server session."});
 });
 router.post("/feedback", (req,res) => {
   const feedback=clean(req.body?.feedback||req.body?.message||"");
   if(!feedback || feedback.length>1000) return fail(res,400,"invalid_feedback","Feedback must be 1–1000 characters.");
-  const rows=list("feedback"); rows.push({user_id:req.user.id,feedback,created_at:now()}); put("feedback",rows);
+  const rows=list("feedback"); rows.push({user_id:req.user.id,feedback,created_at:now()}); put("feedback",rows.slice(-500));
   res.status(201).json({success:true});
 });
 
