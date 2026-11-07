@@ -3,7 +3,7 @@ import { Browser } from "@capacitor/browser";
 import { Capacitor } from "@capacitor/core";
 import { Geolocation } from "@capacitor/geolocation";
 
-const REDIRECT_URI = "in.nivora.social://auth/callback";
+const REDIRECT_URI = "in.melvo.social://auth/callback";
 let pendingUrl = null;
 
 async function finishOAuth(url) {
@@ -18,7 +18,7 @@ async function finishOAuth(url) {
     await Browser.close().catch(() => {});
     window.location.replace("index.html");
   } catch (error) {
-    console.error("NIVORA Google sign-in callback failed:", error?.message || "unknown");
+    console.error("MELVO Google sign-in callback failed:", error?.message || "unknown");
     document.dispatchEvent(new CustomEvent("nivora-auth-error", { detail: "Google sign-in could not be completed. Please try again." }));
   }
 }
