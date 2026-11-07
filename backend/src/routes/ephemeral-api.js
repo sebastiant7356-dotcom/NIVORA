@@ -171,7 +171,7 @@ function reveal(req, res, consent) {
   const field = m.user_one === req.user.id ? "one" : "two";
   m.reveal[field] = consent; put(key("match", m.id), m);
   res.json({ success: true, revealed: Boolean(m.reveal.one && m.reveal.two), my_consented: m.reveal[field], partner_consented: m.reveal[field === "one" ? "two" : "one"] });
-});
+}
 
 // Match list is current-session only. There is deliberately no match history.
 router.get("/match/current", (req, res) => {
