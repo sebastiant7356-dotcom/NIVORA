@@ -42,7 +42,7 @@
     $("#list").innerHTML = reports.map(r => `
       <section class="card" data-id="${esc(r.id)}" data-user="${esc(r.reported_id || "")}">
         <h3>${esc(r.reason)}</h3>
-        <small>Filed ${fmt(r.created_at)} · Reporter ${esc(r.reporter_id || "deleted account")} · Reported account ${esc(r.reported_id || "deleted account")}</small>
+        <small>Filed ${fmt(r.created_at)} · Reporter ${esc(r.reporter_id || "deleted account")} · Reported account ${esc(r.reported_id || "deleted account")} · Reports in this queue: ${esc(r.repeat_report_count || 1)}</small>
         <p>${esc(r.details || "No additional details supplied.")}</p>
         ${status === "open" ? `
           <textarea rows="2" maxlength="500" placeholder="Required moderation note (at least 5 characters)"></textarea>
