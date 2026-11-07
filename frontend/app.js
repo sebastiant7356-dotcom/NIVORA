@@ -101,14 +101,14 @@ function wizardAuth(){
   content.innerHTML = `
     <h2 class="modal-title">${t('signInTitle')}</h2>
     <p class="modal-description">${language==='ml'?'Google അക്കൗണ്ട് ഉപയോഗിച്ച് സുരക്ഷിതമായി തുടരുക.':'Continue securely with your Google account.'}</p>
-    <button class="primary-btn" id="nvGoogleLogin" type="button">Google ഉപയോഗിച്ച് തുടരുക / Continue with Google</button>
+    <button class="primary-btn" id="nvGoogleLogin" type="button">Continue with Google</button>
     <button class="back-btn" id="nvGoogleCancel" type="button">${t('cancel')}</button>`;
   return new Promise((resolve,reject)=>{
     content.querySelector('#nvGoogleLogin').onclick = async ()=>{
       const btn = content.querySelector('#nvGoogleLogin');
       btn.disabled = true; btn.textContent = 'Opening Google…';
       try { await window.NV.signInWithGoogle(); }
-      catch(e) { $('#wizardError').textContent = e.message || 'Google sign-in failed.'; btn.disabled=false; btn.textContent='Google ഉപയോഗിച്ച് തുടരുക / Continue with Google'; }
+      catch(e) { $('#wizardError').textContent = e.message || 'Google sign-in failed.'; btn.disabled=false; btn.textContent='Continue with Google'; }
     };
     content.querySelector('#nvGoogleCancel').onclick = ()=>{
       try { sessionStorage.removeItem('nivora_pending_profile'); } catch (_) {}
