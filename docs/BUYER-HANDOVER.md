@@ -73,8 +73,7 @@ Before accepting final handover:
 - Build and sign the Android app under buyer-controlled accounts; keep the Render backend and Supabase project under buyer control.
 - Verify `/api/health`.
 - Configure Google OAuth and test with two independent customer accounts.
-- Test profile creation, Daily 5, multiple matches, 72-hour chat, voice messages,
-  Shake & Chat, consent/reveal, blocking, reporting, export and deletion.
+- Test Android Google OAuth, profile creation, 1–100 km Shake discovery, persistent anonymous chat, mutual reveal, mutual friend acceptance, anonymous posts, report/block, staff moderation, voice messages, export and deletion.
 - Verify privacy notice, terms, data retention and grievance process with qualified
   Indian legal counsel before broad public operation.
 
