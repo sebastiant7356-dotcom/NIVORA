@@ -86,7 +86,7 @@
         try { await signInWithGoogle(); }
         catch (e) {
           container.querySelector("#nvMsg").textContent = e.message || t("generic");
-          btn.disabled = false; btn.textContent = "Google ഉപയോഗിച്ച് തുടരുക / Continue with Google";
+          btn.disabled = false; btn.textContent = "Continue with Google";
         }
       };
       container.querySelector("#nvCancel").onclick = () => { onCancel && onCancel(); reject(new Error("cancelled")); };
