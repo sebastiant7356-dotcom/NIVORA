@@ -43,7 +43,7 @@ async function assertLiveMatch(matchId, userId) {
   await expire();
   const match = await getMatchFor(matchId, userId);
   if (!match) return { status: 404, code: "match_not_found", message: "Match not found." };
-  if (match.status !== "active" || (match.match_source !== "shake" && (!match.expires_at || new Date(match.expires_at) <= new Date()))) {
+  if (match.status !== "active" || (!["shake", "friend"].includes(match.match_source) && (!match.expires_at || new Date(match.expires_at) <= new Date()))) {
     return { status: 403, code: "match_not_live", message: "This conversation is closed or has been ended." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
@@ -102,19 +102,21 @@ async function matchView(match, userId) {
   const partnerId = mine ? match.user_two : match.user_one;
   const live = ["proposed", "active"].includes(match.status);
   const shakeMatch = match.match_source === "shake";
+  const persistentMatch = shakeMatch || match.match_source === "friend";
   const view = {
     id: match.id,
     status: match.status,
     is_shake_match: shakeMatch,
+    is_persistent_chat: persistentMatch,
     i_accepted: mine ? match.user_one_accepted : match.user_two_accepted,
     partner_accepted: mine ? match.user_two_accepted : match.user_one_accepted,
     proposal_expires_at: match.proposal_expires_at,
     started_at: match.started_at,
     expires_at: match.expires_at,
     ended_reason: match.ended_reason,
-    chat_open: live && (shakeMatch || (match.expires_at && new Date(match.expires_at) > new Date())),
-    can_voice_message: match.status === "active" && (shakeMatch || (match.expires_at && new Date(match.expires_at) > new Date())),
-    seconds_left: !shakeMatch && live && match.expires_at
+    chat_open: live && (persistentMatch || (match.expires_at && new Date(match.expires_at) > new Date())),
+    can_voice_message: match.status === "active" && (persistentMatch || (match.expires_at && new Date(match.expires_at) > new Date())),
+    seconds_left: !persistentMatch && live && match.expires_at
       ? Math.max(0, Math.floor((new Date(match.expires_at) - Date.now()) / 1000)) : null
   };
   if (live) {
