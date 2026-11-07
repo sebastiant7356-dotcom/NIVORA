@@ -550,7 +550,7 @@
     const vs = ["family", "kindness", "career", "faith", "communication", "lifestyle"];
     body.innerHTML = `<h2 class="modal-title">${p("editProfile")}</h2><p class="modal-description">Update the details shown on your NIVORA profile. Your visibility is controlled separately.</p>
       <div class="field-grid"><div class="field"><label>${p("name")}</label><input id="eName" value="${esc(val("full_name"))}"></div><div class="field"><label>${p("age")}</label><input id="eAge" type="number" min="21" max="40" value="${esc(val("age"))}"></div></div>
-      <div class="field"><label>${p("place")}</label><input id="ePlace" value="${esc(val("district"))}"></div>
+      <div class="field"><label>Kerala district</label><select id="ePlace">${["Thiruvananthapuram","Kollam","Pathanamthitta","Alappuzha","Kottayam","Idukki","Ernakulam","Thrissur","Palakkad","Malappuram","Kozhikode","Wayanad","Kannur","Kasaragod"].map((d) => `<option value="${d}" ${String(val("district")).toLowerCase()===d.toLowerCase() || (d==="Ernakulam" && ["kochi","cochin"].includes(String(val("district")).toLowerCase())) ? "selected" : ""}>${d}</option>`).join("")}</select></div>
       <div class="field"><label>${p("job")}</label><input id="eJob" value="${esc(val("job_title"))}"></div>
       <label class="field-label">Interests (up to 3)</label><div class="choice-grid">${vs.map((v) => `<label class="choice"><input type="checkbox" name="eVals" value="${v}" ${(profile.core_values || []).includes(v) ? "checked" : ""}> ${valName(v)}</label>`).join("")}</div>
       <div class="field"><label>${p("about")}</label><textarea id="eAbout" rows="4" maxlength="1000">${esc(val("bio"))}</textarea></div>
