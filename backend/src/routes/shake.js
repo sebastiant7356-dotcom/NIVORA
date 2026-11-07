@@ -23,7 +23,7 @@ function compatible() {
 async function currentCustomer(db, userId) {
   const [{ data: staff, error: staffError }, { data: profile, error }] = await Promise.all([
     db.from("staff_roles").select("user_id").eq("user_id", userId).maybeSingle(),
-    db.from("profiles").select("id,age,gender,looking_for,min_partner_age,max_partner_age,approval_status,is_active,suspended_at,profile_visibility,district").eq("id", userId).maybeSingle()
+    db.from("profiles").select("id,age,approval_status,is_active,suspended_at,profile_visibility,district").eq("id", userId).maybeSingle()
   ]);
   if (staffError || error) throw new Error("account_check_failed");
   if (staff) return { error: "staff_not_customer" };
@@ -85,7 +85,7 @@ router.get("/discover", discoverLimit, async (req, res) => {
 
     const ids = nearby.map((x) => x.id);
     const [{ data: profiles, error: profileError }, { data: blocks, error: blockError }, { data: outgoing, error: outgoingError }, { data: incoming, error: incomingError }, { data: activeMatches, error: activeError }] = await Promise.all([
-      db.from("profiles").select("id,full_name,age,district,gender,looking_for,min_partner_age,max_partner_age,job_title,bio,relationship_intention,core_values,is_active,suspended_at,approval_status,profile_visibility").in("id", ids).eq("approval_status", "approved").eq("is_active", true).eq("profile_visibility", "public"),
+      db.from("profiles").select("id,full_name,age,district,job_title,bio,core_values,is_active,suspended_at,approval_status,profile_visibility").in("id", ids).eq("approval_status", "approved").eq("is_active", true).eq("profile_visibility", "public"),
       db.from("blocks").select("blocker_id,blocked_id").or("blocker_id.eq." + req.user.id + ",blocked_id.eq." + req.user.id),
       db.from("shake_interests").select("to_user").eq("from_user", req.user.id),
       db.from("shake_interests").select("from_user").eq("to_user", req.user.id),
