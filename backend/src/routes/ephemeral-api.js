@@ -50,7 +50,7 @@ function matchView(m, userId) {
   return {
     id: m.id, status: m.status, started_at: m.started_at, expires_at: null,
     is_shake_match: m.source === "shake", is_persistent_chat: true,
-    match_source: m.source, partner_id: partnerId,
+    match_source: m.source,
     reveal: { my_consented: Boolean(mine), partner_consented: Boolean(theirs), revealed: Boolean(mine && theirs), partner_hidden: !(mine && theirs) || profileOf(partnerId)?.profile_visibility === "hidden" },
     partner: mine && theirs && profileOf(partnerId)?.profile_visibility !== "hidden" ? profileOf(partnerId) : null
   };
@@ -142,15 +142,17 @@ router.get("/shake/discover", (req, res) => {
     if (dist > loc.radius_km || dist > otherLoc.radius_km) continue;
     const interested = get(key("interest", id + ":" + req.user.id)) === true;
     const already = list(key("matches", req.user.id)).some(mid => { const m = get(key("match", mid)); return m?.status === "active" && [m.user_one, m.user_two].includes(id); });
-    if (!already) people.push({ user_id: id, display_name: "Anonymous member", interests: p.core_values || [], distance_km: Math.max(1, Math.round(dist)), interested_in_you: interested });
+    if (!already) { const candidate_token = randomUUID(); put(key("candidate", req.user.id + ":" + candidate_token), id); people.push({ candidate_token, display_name: "Anonymous member", interests: p.core_values || [], distance_km: Math.max(1, Math.round(dist)), interested_in_you: interested }); }
   }
   people.sort((a,b) => a.distance_km - b.distance_km);
   res.json({ success: true, radius_km: loc.radius_km, people: people.slice(0, 50) });
 });
 router.post("/shake/interest", limited, (req, res) => {
-  const target = req.body?.target_user_id, mine = requireProfile(req, res);
+  const token = req.body?.candidate_token, mine = requireProfile(req, res);
   if (!mine) return;
-  if (!isUuid(target) || target === req.user.id || !profileOf(target) || profileOf(target).profile_visibility !== "public") return fail(res, 404, "invalid_target", "Member not found.");
+  const target = typeof token === "string" ? get(key("candidate", req.user.id + ":" + token)) : null;
+  if (!target || !profileOf(target) || profileOf(target).profile_visibility !== "public") return fail(res, 404, "invalid_target", "Member not found.");
+  state.delete(key("candidate", req.user.id + ":" + token));
   if (!compatible(mine, profileOf(target))) return fail(res, 409, "not_compatible", "This member is not compatible with your discovery preferences.");
   if (isBlocked(req.user.id, target)) return fail(res, 403, "blocked", "This connection is unavailable.");
   const a = get(key("location", req.user.id)), b = get(key("location", target));
@@ -197,7 +199,7 @@ router.post("/match/:id/end", (req, res) => {
 router.get("/chat/:matchId/messages", (req, res) => {
   const m = liveMatch(req, res); if (!m) return;
   const after = req.query.after ? Date.parse(req.query.after) : 0;
-  const messages = list(key("messages", m.id)).filter(x => Date.parse(x.created_at) > after).map(x => ({ ...x, mine: x.sender_id === req.user.id }));
+  const messages = list(key("messages", m.id)).filter(x => Date.parse(x.created_at) > after).map(x => ({ id:x.id, body:x.body, created_at:x.created_at, mine:x.sender_id === req.user.id }));
   res.json({ success: true, messages, expires_at: null });
 });
 router.post("/chat/:matchId/messages", limited, (req, res) => {
@@ -206,7 +208,7 @@ router.post("/chat/:matchId/messages", limited, (req, res) => {
   if (!body || body.length > 2000) return fail(res, 400, "invalid_message", "Message must be 1–2000 characters.");
   const msg = { id: randomUUID(), sender_id: req.user.id, body, created_at: now(), mine: true };
   const messages = list(key("messages", m.id)); messages.push(msg); put(key("messages", m.id), messages.slice(-200));
-  res.status(201).json({ success: true, message: msg });
+  res.status(201).json({ success: true, message: { id:msg.id, body:msg.body, created_at:msg.created_at, mine:true } });
 });
 router.get("/chat/:matchId/voice", (req, res) => {
   if (!liveMatch(req, res)) return;
@@ -262,7 +264,7 @@ router.get("/friends", (req,res) => {
   });
   res.json({success:true,friends});
 });
-router.get("/friends/requests", (req,res) => res.json({success:true,incoming:list(key("friend-in",req.user.id)),outgoing:list(key("friend-out",req.user.id))}));
+router.get("/friends/requests", (req,res) => res.json({success:true,incoming:list(key("friend-in",req.user.id)).map(r=>({id:r.id,created_at:r.created_at})),outgoing:list(key("friend-out",req.user.id)).map(r=>({id:r.id,created_at:r.created_at}))}));
 router.post("/friends/request", limited, (req,res) => {
   const m=matchOf(req.body?.match_id,req.user.id); if(!m) return fail(res,404,"match_not_found","Active chat required.");
   const partner=m.user_one===req.user.id?m.user_two:m.user_one;
