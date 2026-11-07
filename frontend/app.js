@@ -19,7 +19,7 @@ modalKicker:"YOUR FIRST STEP",back:"Back",continue:"Continue",modalDisclaimer:"Y
 }
 };
 
-let language = 'ml';
+let language = 'en';
 let currentStep = 1;
 let profile = {name:'',age:'',place:'',job:'',values:['music'],about:'',agree:false,privacyAgree:false};
 let done = false;
@@ -28,11 +28,9 @@ const $$ = s => [...document.querySelectorAll(s)];
 function t(key){return translations[language][key] || translations.en[key] || key;}
 function updateLanguage(){
   document.documentElement.lang = language;
-  $('#langBtn').textContent = language === 'ml' ? 'EN ↗' : 'മലയാളം ↗';
   $$('[data-i18n]').forEach(el => { const key=el.dataset.i18n; if(translations[language][key]!==undefined) el.innerHTML=translations[language][key]; });
   if($('#profileModal').classList.contains('open')) renderStep();
 }
-$('#langBtn').addEventListener('click',()=>{language=language==='ml'?'en':'ml';updateLanguage();});
 $('#menuBtn').addEventListener('click',()=>$('.nav-links').classList.toggle('open'));
 $$('.nav-links a').forEach(a=>a.addEventListener('click',()=>$('.nav-links').classList.remove('open')));
 $('#year').textContent = new Date().getFullYear();
