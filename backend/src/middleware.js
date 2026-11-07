@@ -68,7 +68,9 @@ async function requireAuth(req, res, next) {
       enforcement.status === "banned" ||
       (enforcement.status === "suspended" && (!enforcement.expires_at || Date.parse(enforcement.expires_at) > Date.now()))
     );
-    if (activeEnforcement) {
+    // Restricted users may still export or delete their own account.
+    const accountDataRight = req.path === "/account" || req.path === "/account/export";
+    if (activeEnforcement && !accountDataRight) {
       return res.status(403).json({ success: false, code: "account_restricted", message: enforcement.status === "banned" ? "This account is permanently banned." : "This account is temporarily suspended." });
     }
     req.user = { id: u.id }; // immutable id only
