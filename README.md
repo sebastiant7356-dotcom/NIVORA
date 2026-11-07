@@ -1,6 +1,6 @@
-# NIVORA — Kerala matchmaking
+# NIVORA — Kerala Shake & Chat Android app
 
-NIVORA is a Malayalam-first, mobile-friendly matchmaking service for adults aged 21–40 in Kerala. It is operated by an individual, Sebastian Thomas; there is no registered company at launch.
+NIVORA is a Malayalam-first Android social discovery app for adults aged 21–40 in Kerala. The app is built around Shake & Chat, anonymous posts, user-controlled profile visibility and friendships that require mutual acceptance. It is operated by an individual, Sebastian Thomas; there is no registered company at launch.
 
 ## Live services
 
@@ -16,10 +16,11 @@ The app is deployed on Render and uses Supabase for Google OAuth, database and p
 
 - Google OAuth sign-in only; no phone OTP.
 - Customer profiles are auto-activated after consent. Staff accounts are excluded from matching.
-- Up to five daily recommendations per user, based on the Kerala calendar day.
-- Multiple concurrent match conversations are supported.
-- Active conversations last up to 72 hours and include text chat and voice messages only. There are no live voice or video calls.
-- Shake & Chat is optional, separate from the Daily 5 quota, and searches compatible opted-in members within 50 km. Exact coordinates are not shown. A mutual interest creates an anonymous chat; names, photos and profile details remain hidden until both members consent to reveal.
+- Shake is the main discovery action. Members choose a radius from 1 to 100 km; discovery is limited to Kerala.
+- A mutual interest creates an anonymous chat. There is no 72-hour expiry; either member can end the conversation.
+- Members can request friendship from a chat. A friendship exists only after the other member accepts.
+- Members choose whether their profile is visible or hidden.
+- Anonymous text posts can be shared with all Kerala members or within a selected nearby radius. Other members do not see the author identity; authorised staff can access it for safety investigations.
 - Customer profile photos (up to four, JPEG/PNG/WebP, 5 MB each) remain hidden from other members until staff approval.
 - Staff can review pending photos. Account investigations are limited to accounts with member reports; sensitive access is audit-logged.
 - Blocking, reporting, account export and account deletion are available.
@@ -28,7 +29,8 @@ The app is deployed on Render and uses Supabase for Google OAuth, database and p
 ## Repository layout
 
 - `backend/` — Node.js / Express API, SQL migrations and tests.
-- `frontend/` — static HTML, CSS and browser JavaScript.
+- `frontend/` — app UI source bundled into the Android application.
+- `capacitor.config.json`, `package.json`, `scripts/` — Capacitor Android wrapper and native OAuth/location bridge.
 - `docs/` — setup notes and historical project reports.
 
 ## Local development
@@ -39,12 +41,12 @@ The app is deployed on Render and uses Supabase for Google OAuth, database and p
 4. Run the backend with `npm start` (or the documented server start command in `backend/package.json`).
 5. Serve `frontend/` with a local static HTTP server and set the frontend API configuration to the local backend URL.
 
-GitHub Actions is configured to run backend syntax checks, backend tests and frontend JavaScript syntax checks on pushes and pull requests to `main`.
+GitHub Actions runs backend checks and builds a debug Android APK from the `feature/kerala-social-android-app` branch.
 
 ## Launch limitations — read before inviting users
 
-- A complete end-to-end test with two independent customer Google accounts has not yet been completed. In particular, test mutual Shake & Chat interest, anonymous chat, both-sided reveal consent/withdrawal, daily matching, text chat and voice messages on real devices.
-- Real-device GPS permission allow/deny behaviour still needs testing.
+- A complete end-to-end test with two independent customer Google accounts has not yet been completed. Test radius boundaries, physical shake discovery, mutual interest, anonymous chat, profile visibility, mutual friend acceptance, anonymous post audiences, block/report and persistent chat on real Android devices.
+- Real-device Google OAuth deep-link return, GPS permission allow/deny behaviour and physical motion detection still need testing.
 - Privacy Notice and Terms are drafts, not legal advice or lawyer-approved documents. Obtain an Indian legal review before broad public promotion.
 - Supabase Free currently reports leaked-password protection unavailable on that plan. NIVORA uses Google OAuth only, but this remains a provider-level warning.
 - The app does not verify identity, age, background or relationship status. Age is self-declared.
