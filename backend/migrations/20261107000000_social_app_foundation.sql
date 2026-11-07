@@ -16,19 +16,7 @@ alter table public.profiles
 alter table public.profiles
   add constraint profiles_profile_visibility_check check (profile_visibility in ('public','hidden'));
 
--- Multiple independent conversations per member are required by the social model.
-do $$
-declare pk_name text;
-begin
-  select c.conname into pk_name
-  from pg_constraint c
-  where c.conrelid = 'public.match_members'::regclass and c.contype = 'p';
-  if pk_name is not null then
-    execute format('alter table public.match_members drop constraint %I', pk_name);
-  end if;
-end $$;
-alter table public.match_members
-  add constraint match_members_match_user_pk primary key (match_id, user_id);
+-- Existing composite match_members primary key already permits multiple conversations per member.
 create index if not exists match_members_user_idx on public.match_members(user_id, match_id);
 
 -- A friendship exists only after the recipient accepts the request.
