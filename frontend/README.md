@@ -9,8 +9,7 @@ The frontend is a static HTML, CSS and browser-JavaScript application.
 - `common.js` — shared configuration and API helpers.
 - `dashboard.html` / `portal.css` — customer dashboard and portal styles.
 - `admin.html` / `admin.js` — staff-only administration interface.
-- `privacy_ml.html` / `terms_ml.html` — Malayalam legal-information drafts.
-- `privacy_en.html` / `terms_en.html` — English legal-information drafts.
+- `privacy.html` / `terms.html` — English-only privacy notice and terms of use.
 - `supabase-config.js` — public frontend Supabase configuration; never place service-role keys here.
 
 ## Authentication
