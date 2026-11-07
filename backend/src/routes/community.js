@@ -34,21 +34,12 @@ router.get("/feed", async (req, res) => {
   if (error) return res.status(500).json({ success: false, message: "Could not load the community feed." });
   const { data: blockedRows } = await db.from("blocks").select("blocked_id").eq("blocker_id", req.user.id);
   const blockedIds = new Set((blockedRows || []).map((row) => row.blocked_id));
-  const radiusRows = (rows || []).filter((p) => p.audience === "radius" && !blockedIds.has(p.author_id));
-  let mine = null, authorLocations = [];
-  if (radiusRows.length) {
-    const { data: loc } = await db.from("shake_locations").select("latitude,longitude").eq("user_id", req.user.id).eq("enabled", true).maybeSingle();
-    mine = loc;
-    const authorIds = [...new Set(radiusRows.map((p) => p.author_id))];
-    const { data } = await db.from("shake_locations").select("user_id,latitude,longitude").in("user_id", authorIds).eq("enabled", true);
-    authorLocations = data || [];
-  }
-  const locById = new Map(authorLocations.map((x) => [x.user_id, x]));
+  const { data: mine } = await db.from("shake_locations").select("latitude,longitude")
+    .eq("user_id", req.user.id).eq("enabled", true).maybeSingle();
   const visible = (rows || []).filter((p) => {
     if (blockedIds.has(p.author_id)) return false;
     if (p.audience === "kerala") return true;
-    const loc = locById.get(p.author_id);
-    return Boolean(mine && loc && distanceKm(mine.latitude, mine.longitude, loc.latitude, loc.longitude) <= p.radius_km);
+    return Boolean(mine && Number.isFinite(Number(p.latitude)) && Number.isFinite(Number(p.longitude)) && distanceKm(mine.latitude, mine.longitude, p.latitude, p.longitude) <= p.radius_km);
   }).map((p) => ({ id: p.id, body: p.body, audience: p.audience, created_at: p.created_at, mine: p.author_id === req.user.id }));
   res.json({ success: true, posts: visible });
 });
