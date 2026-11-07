@@ -94,6 +94,7 @@
   }
 
   async function signInWithGoogle() {
+    if (window.NivoraNative?.isNative?.()) return window.NivoraNative.signInWithGoogle();
     const { data, error } = await client().auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin + window.location.pathname }
