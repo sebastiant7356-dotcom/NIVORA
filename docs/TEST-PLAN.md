@@ -1,6 +1,6 @@
 # NIVORA — Controlled User Test Plan
 
-Last updated: 2026-11-05
+Last updated: 2026-11-07
 
 This is a manual release-gate plan for a small, consent-based pilot. It is not evidence that the checks have passed. Record each result as PASS, FAIL, or NOT TESTED, with date, browser/device, and a short bug reference. Never include passwords, OAuth tokens, service-role keys, exact location coordinates, or unnecessary personal data in bug reports.
 
@@ -22,7 +22,7 @@ A pilot must not proceed if any of these checks fail:
 2. A non-member or blocked user can read or send chat/voice messages.
 3. Shake & Chat reveals either person's identity before both members consent.
 4. Account deletion reports success while profile, chat, photo, or voice data remains accessible.
-5. Google sign-in, profile creation, matching, or report/block flow is broken.
+5. Google sign-in, profile creation, Shake discovery, chat, friend, or report/block flow is broken.
 6. The operator cannot access and act on reports.
 
 ## 3. Two-account end-to-end checks
@@ -43,13 +43,13 @@ Record Account A and Account B as test aliases only.
 | Photo approval | Upload valid/invalid photos; inspect as staff and as another member | Up to four allowed formats/sizes; pending/rejected photos are not visible to other members |
 | Shake location | Deny permission, opt in, refresh, then switch off | No discovery without opt-in; off removes stored location and stops discovery |
 | 50 km discovery | Test a consenting compatible account inside and outside radius | Only eligible compatible accounts within 50 km are returned; only approximate distance is shown |
-| Anonymous reveal | Mutual interest; consent on A only; then B; withdraw before B consents | Identity stays hidden until both consent; one-sided consent can be withdrawn |
+| Anonymous reveal | Mutual interest; consent on A only; then B; withdraw before B consents | Identity stays hidden until both consent; one-sided consent can be withdrawn; hidden profiles remain hidden |\n| Profile visibility | Set A public, then hidden; repeat discovery | Public profiles may appear anonymously; hidden profiles are excluded from discovery and remain hidden in chat |\n| Friend request | Send request from active Shake chat; accept on B | Friendship is created only after acceptance; persistent friend chat can be opened from Friends |\n| Anonymous posts | Publish to Kerala and nearby radius audiences | Posts show no member identity; radius audience uses opted-in location |\n| Anonymous post safety | Report, block author, and review as staff | Blocked author posts disappear for blocker; staff can audit, inspect and remove reported posts |
 | Block | A blocks B | Match ends; neither account is recommended to the other again |
 | Report | Submit a report and inspect staff workflow | Report is stored; only authorized staff can inspect the relevant reported account/evidence |
 | Data export | Request export from each test account | Export belongs only to requesting account and is usable |
 | Account deletion | Delete a dedicated test account | Customer profile, matches, chats, photos and voice files are no longer accessible; any legally retained registration record follows the disclosed 180-day policy |
 
-For the 72-hour expiry test, use a controlled test environment or a documented test record. Do not alter production users' timestamps to simulate expiry.
+Shake and friend chats have no automatic expiry. Verify that they remain available until a member ends the chat, blocks the other member, or an account is suspended.
 
 ## 4. Security and configuration checks
 
@@ -81,7 +81,7 @@ Do not send passwords, Google login codes, tokens, exact location, or unredacted
 
 Severity:
 - Critical: privacy breach, account takeover, unauthorized access, identity/location exposure, or data loss. Stop the pilot immediately.
-- High: login, matching, chat, block/report, or deletion is unusable. Pause promotion until fixed.
+- High: login, Shake discovery, chat, friend, block/report, or deletion is unusable. Pause promotion until fixed.
 - Medium: a core flow has a workaround or a display/data issue without privacy impact.
 - Low: cosmetic or wording issue.
 
