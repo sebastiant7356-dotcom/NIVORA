@@ -51,8 +51,8 @@ function matchView(m, userId) {
     id: m.id, status: m.status, started_at: m.started_at, expires_at: null,
     is_shake_match: m.source === "shake", is_persistent_chat: true,
     match_source: m.source, partner_id: partnerId,
-    reveal: { my_consented: Boolean(mine), partner_consented: Boolean(theirs), revealed: Boolean(mine && theirs), partner_hidden: !(mine && theirs) },
-    partner: mine && theirs ? profileOf(partnerId) : null
+    reveal: { my_consented: Boolean(mine), partner_consented: Boolean(theirs), revealed: Boolean(mine && theirs), partner_hidden: !(mine && theirs) || profileOf(partnerId)?.profile_visibility === "hidden" },
+    partner: mine && theirs && profileOf(partnerId)?.profile_visibility !== "hidden" ? profileOf(partnerId) : null
   };
 }
 function createMatch(a, b, source = "shake") {
@@ -150,7 +150,8 @@ router.get("/shake/discover", (req, res) => {
 router.post("/shake/interest", limited, (req, res) => {
   const target = req.body?.target_user_id, mine = requireProfile(req, res);
   if (!mine) return;
-  if (!isUuid(target) || target === req.user.id || !profileOf(target)) return fail(res, 404, "invalid_target", "Member not found.");
+  if (!isUuid(target) || target === req.user.id || !profileOf(target) || profileOf(target).profile_visibility !== "public") return fail(res, 404, "invalid_target", "Member not found.");
+  if (!compatible(mine, profileOf(target))) return fail(res, 409, "not_compatible", "This member is not compatible with your discovery preferences.");
   if (isBlocked(req.user.id, target)) return fail(res, 403, "blocked", "This connection is unavailable.");
   const a = get(key("location", req.user.id)), b = get(key("location", target));
   if (!a || !b) return fail(res, 409, "location_not_enabled", "Nearby discovery is no longer enabled.");
@@ -257,7 +258,7 @@ router.post("/community/posts/:id/block", (req,res) => {
 // Mutual friend requests. Both request and acceptance exist only in volatile memory.
 router.get("/friends", (req,res) => {
   const friends = list(key("friends",req.user.id)).map(id => {
-    const p=profileOf(id); return {friend_id:id,display_name:p?.full_name || "BEYOND member",age:p?.age || null,district:p?.district || null};
+    const p=profileOf(id); return {friend_id:id,display_name:p && p.profile_visibility !== "hidden" ? (p.first_name || "BEYOND member") : "BEYOND member",age:p && p.profile_visibility !== "hidden" ? p.age : null,district:p && p.profile_visibility !== "hidden" ? p.district : null};
   });
   res.json({success:true,friends});
 });
@@ -320,7 +321,11 @@ router.delete("/session", (req, res) => {
     if (k === "community:posts") put(k, value.filter(p => p.author_id !== id));
     else if (k === "safety:reports") put(k, value.filter(r => r.reporter_id !== id && r.reported_id !== id));
     else if (k === "feedback") put(k, value.filter(r => r.user_id !== id));
-    else if (remove) state.delete(k);
+    else if (Array.isArray(value) && (k.startsWith("friend-in:") || k.startsWith("friend-out:"))) {
+      put(k, value.filter(r => r.sender_id !== id && r.recipient_id !== id));
+    } else if (Array.isArray(value) && k.startsWith("friends:")) {
+      put(k, value.filter(friendId => friendId !== id));
+    } else if (remove) state.delete(k);
   }
   res.json({ success: true, cleared: true });
 });
