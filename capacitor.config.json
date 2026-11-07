@@ -1,0 +1,8 @@
+{
+  "appId": "in.nivora.social",
+  "appName": "NIVORA",
+  "webDir": "frontend",
+  "server": {
+    "androidScheme": "https"
+  }
+}
