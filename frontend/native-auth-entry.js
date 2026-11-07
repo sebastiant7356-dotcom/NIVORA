@@ -18,7 +18,7 @@ async function finishOAuth(url) {
     await Browser.close().catch(() => {});
     window.location.replace("index.html");
   } catch (error) {
-    console.error("MELVO Google sign-in callback failed:", error?.message || "unknown");
+    console.error("BEYOND Google sign-in callback failed:", error?.message || "unknown");
     document.dispatchEvent(new CustomEvent("nivora-auth-error", { detail: "Google sign-in could not be completed. Please try again." }));
   }
 }
