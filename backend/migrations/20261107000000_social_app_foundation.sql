@@ -149,7 +149,7 @@ begin
   end if;
 
   select * into existing_match from public.match_history
-   where status='active' and match_source='shake'
+   where status='active' and match_source in ('shake','friend')
      and ((user_one=p_user and user_two=p_target) or (user_one=p_target and user_two=p_user))
    order by created_at desc limit 1;
   if existing_match.id is not null then
