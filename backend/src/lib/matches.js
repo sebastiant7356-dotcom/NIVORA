@@ -132,6 +132,7 @@ async function matchView(match, userId) {
 
     const revealState = shakeRevealState(match, userId, partnerId, consentRows);
     const revealed = revealState.revealed;
+  const partnerHidden = partner?.profile_visibility === "hidden";
     if (shakeMatch) {
       view.reveal = {
         my_consented: revealState.my_consented,
@@ -146,7 +147,7 @@ async function matchView(match, userId) {
 
     // For Shake & Chat, fail closed: do not return profile fields or signed photos
     // until BOTH members have recorded consent on the server.
-    if (partner && accountsActive && revealed && partner.profile_visibility !== "hidden") {
+    if (partner && accountsActive && revealed && !partnerHidden) {
       const { data: photos } = await db.from("profile_photos")
         .select("id, object_path, sort_order").eq("user_id", partnerId)
         .eq("approval_status", "approved").order("sort_order");
