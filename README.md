@@ -46,7 +46,7 @@ Before Android Google sign-in works, add the exact redirect `in.melvo.social://a
 
 ## Current release blockers
 
-- Apply the two new social/global migrations in order: `20261107000000_social_app_foundation.sql`, then `20261108000000_global_social_platform.sql`.
+- The social/global migrations have been applied to Supabase: `20261107000000_social_app_foundation.sql`, `20261108000000_global_social_platform.sql`, and `20261109000000_cleanup_legacy_post_constraint.sql`.
 - Add the Android OAuth redirect URI to Supabase Auth.
 - Deploy the updated backend to the existing Render service.
 - Complete two-account tests for global discovery, mutual anonymous reveal, persistent chat, friend requests, global/radius posts, blocking, reporting and account deletion.
