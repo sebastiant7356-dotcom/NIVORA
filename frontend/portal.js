@@ -310,7 +310,9 @@
     const nav = document.createElement("nav"); nav.className = "customer-bottom-nav"; nav.setAttribute("aria-label", "Customer navigation");
     const tabData = [["messages","✉",p("messagesTab")],["match","♡",L() === "ml" ? "Chat" : "Chat"],["shake","⌖",p("shakeTab")],["community","◌",L() === "ml" ? "Posts" : "Posts"],["profile","◉",p("profileTab")]];
     nav.innerHTML = tabData.map((t) => "<button type='button' data-dashboard='" + t[0] + "' aria-pressed='false'><span>" + t[1] + "</span><small>" + t[2] + "</small></button>").join("");
-    const community = document.createElement("section"); community.className = "dashboard-panel"; community.id = "dashboard-community";\n    community.innerHTML = "<h2 class='modal-title'>Anonymous posts</h2><p class='modal-description'>Share thoughts without showing your profile.</p><textarea id='communityBody' maxlength='2000' rows='4' placeholder='Write an anonymous post…'></textarea><div class='field'><label for='communityAudience'>Who can see this?</label><select id='communityAudience'><option value='kerala'>All NIVORA users in Kerala</option><option value='radius'>People within my radius</option></select></div><div class='nv-row'><button class='primary-btn' id='communityPublish' type='button'>Post anonymously</button></div><div class='nv-msg' id='communityStatus' role='status'></div><div id='communityFeed' class='shake-people'></div>";\n    body.append(inbox, shake, community, nav);
+    const community = document.createElement("section"); community.className = "dashboard-panel"; community.id = "dashboard-community";
+    community.innerHTML = "<h2 class='modal-title'>Anonymous posts</h2><p class='modal-description'>Share thoughts without showing your profile.</p><textarea id='communityBody' maxlength='2000' rows='4' placeholder='Write an anonymous post…'></textarea><div class='field'><label for='communityAudience'>Who can see this?</label><select id='communityAudience'><option value='kerala'>All NIVORA users in Kerala</option><option value='radius'>People within my radius</option></select></div><div class='nv-row'><button class='primary-btn' id='communityPublish' type='button'>Post anonymously</button></div><div class='nv-msg' id='communityStatus' role='status'></div><div id='communityFeed' class='shake-people'></div>";
+    body.append(inbox, shake, community, nav);
     const panels = [inbox, matchPanel, shake, community, profilePanel];
     const activate = (id) => {
       panels.forEach((panel) => { panel.hidden = panel.id !== "dashboard-" + id; });
@@ -319,7 +321,8 @@
       });
       if (id === "match" && match && ["proposed", "active"].includes(match.status)) startChat(match);
       else { stopRealtime(); clearInterval(tickTimer); }
-      if (id === "shake") loadShakePanel();\n      if (id === "community") loadCommunityPanel();
+      if (id === "shake") loadShakePanel();
+      if (id === "community") loadCommunityPanel();
     };
     nav.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => activate(button.dataset.dashboard)));
     welcome.querySelectorAll("[data-open-tab]").forEach((button) => button.addEventListener("click", () => activate(button.dataset.openTab)));
@@ -340,11 +343,13 @@
       const state = await api("/api/shake/status");
       enable.hidden = state.enabled; refresh.hidden = !state.enabled; disable.hidden = !state.enabled;
       status.textContent = state.enabled ? p("shakeEnabled") : p("shakePrivacy");
-      const radius = body.querySelector("#shakeRadius"); if (radius) radius.value = String(state.radius_km || 25);\n      const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.hidden = !state.enabled;
+      const radius = body.querySelector("#shakeRadius"); if (radius) radius.value = String(state.radius_km || 25);
+      const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.hidden = !state.enabled;
       if (state.enabled) await discoverShakePeople();
     } catch (e) { status.textContent = e.message || p("shakeError"); }
     enable.onclick = enableShakeLocation;
-    const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.onclick = discoverShakePeople;\n    const radius = body.querySelector("#shakeRadius"); if (radius) radius.onchange = enableShakeLocation;
+    const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.onclick = discoverShakePeople;
+    const radius = body.querySelector("#shakeRadius"); if (radius) radius.onchange = enableShakeLocation;
     refresh.onclick = discoverShakePeople;
     disable.onclick = disableShakeLocation;
   }
