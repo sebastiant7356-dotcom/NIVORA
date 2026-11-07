@@ -3,19 +3,18 @@ const express = require("express");
 const { serviceClient } = require("../lib/clients");
 const { requireAuth } = require("../middleware");
 const { createLimiter, byUser } = require("../lib/ratelimit");
-const { clean, isKeralaDistrict, isUuid } = require("../lib/validation");
+const { clean, isUuid } = require("../lib/validation");
 const { audit } = require("../lib/audit");
 
 const router = express.Router();
 router.use(requireAuth);
 const postLimit = createLimiter({ windowMs: 60 * 60_000, max: 10, keyFn: byUser });
 
-async function eligibleKeralaMember(db, userId) {
+async function eligibleMember(db, userId) {
   const { data, error } = await db.from("profiles")
-    .select("district,approval_status,is_active,suspended_at")
+    .select("approval_status,is_active,suspended_at")
     .eq("id", userId).maybeSingle();
-  return !error && data && data.approval_status === "approved" && data.is_active &&
-    !data.suspended_at && isKeralaDistrict(data.district);
+  return !error && data && data.approval_status === "approved" && data.is_active && !data.suspended_at;
 }
 
 function distanceKm(aLat, aLon, bLat, bLon) {
@@ -27,7 +26,7 @@ function distanceKm(aLat, aLon, bLat, bLon) {
 
 router.get("/feed", async (req, res) => {
   const db = serviceClient();
-  if (!(await eligibleKeralaMember(db, req.user.id))) return res.status(403).json({ success: false, message: "NIVORA community is currently for members in Kerala only." });
+  if (!(await eligibleMember(db, req.user.id))) return res.status(403).json({ success: false, message: "This account is not eligible to use the community." });
   const { data: rows, error } = await db.from("anonymous_posts")
     .select("id,author_id,body,audience,radius_km,latitude,longitude,created_at")
     .eq("status", "published").order("created_at", { ascending: false }).limit(100);
@@ -38,7 +37,7 @@ router.get("/feed", async (req, res) => {
     .eq("user_id", req.user.id).eq("enabled", true).maybeSingle();
   const visible = (rows || []).filter((p) => {
     if (blockedIds.has(p.author_id)) return false;
-    if (p.audience === "kerala") return true;
+    if (p.audience === "global" || p.audience === "kerala") return true;
     return Boolean(mine && Number.isFinite(Number(p.latitude)) && Number.isFinite(Number(p.longitude)) && distanceKm(mine.latitude, mine.longitude, p.latitude, p.longitude) <= p.radius_km);
   }).map((p) => ({ id: p.id, body: p.body, audience: p.audience, created_at: p.created_at, mine: p.author_id === req.user.id }));
   res.json({ success: true, posts: visible });
@@ -49,7 +48,7 @@ router.post("/posts", postLimit, async (req, res) => {
   if (!(await eligibleKeralaMember(db, req.user.id))) return res.status(403).json({ success: false, message: "NIVORA community is currently for members in Kerala only." });
   if (typeof req.body?.body !== "string") return res.status(400).json({ success: false, message: "Write a post first." });
   const body = clean(req.body.body);
-  const audience = req.body?.audience === "radius" ? "radius" : "kerala";
+  const audience = req.body?.audience === "radius" ? "radius" : "global";
   const radius = Number(req.body?.radius_km ?? 25);
   if (body.length < 1 || body.length > 2000) return res.status(400).json({ success: false, message: "Posts must be 1–2000 characters." });
   if (audience === "radius" && (!Number.isInteger(radius) || radius < 1 || radius > 100)) return res.status(400).json({ success: false, message: "Choose a radius from 1 to 100 km." });
