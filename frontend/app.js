@@ -153,7 +153,7 @@ function renderStep(){
   if(currentStep===1){
     content.innerHTML=`<h2 class="modal-title"> ${language==='ml'?'നിങ്ങളുടെ Profile':'Your profile'} </h2><p class="modal-description">${language==='ml'?'പുതിയ ആളുകൾക്ക് നിങ്ങളെ പരിചയപ്പെടാൻ സഹായിക്കുന്ന കുറച്ച് വിവരങ്ങൾ.':'Share a few details so people can get to know you.'}</p>
       <div class="field-grid">${field('name',t('name'),'text',profile.name,'autocomplete="name" required')}${field('age',t('age'),'number',profile.age,'min="21" max="40" inputmode="numeric" required')}</div>
-      ${field('place',language==='ml'?'കേരളത്തിലെ ജില്ല':'Kerala district','text',profile.place,'autocomplete="address-level2" required')}
+      <div class="field"><label for="place">${language==='ml'?'കേരളത്തിലെ ജില്ല':'Kerala district'}</label><select id="place" required><option value="">—</option>${["Thiruvananthapuram","Kollam","Pathanamthitta","Alappuzha","Kottayam","Idukki","Ernakulam","Thrissur","Palakkad","Malappuram","Kozhikode","Wayanad","Kannur","Kasaragod"].map(d=>`<option value="${d}" ${profile.place===d?'selected':''}>${d}</option>`).join('')}</select></div>
       ${field('job',t('job'),'text',profile.job,'')}
       <div class="field"><label for="about">${language==='ml'?'നിങ്ങളെക്കുറിച്ച്':'About you'}</label><textarea id="about" rows="3" maxlength="400">${escapeHtml(profile.about)}</textarea></div>`;
   }else if(currentStep===2){
