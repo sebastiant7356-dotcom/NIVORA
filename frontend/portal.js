@@ -548,28 +548,23 @@
   // ----- edit profile -----
   function renderEdit() {
     const vs = ["family", "kindness", "career", "faith", "communication", "lifestyle"];
-    const sel = (id, opts, cur) => `<select id="${id}">${opts.map((o) => `<option value="${o}" ${cur === o ? "selected" : ""}>${p(o)}</option>`).join("")}</select>`;
-    body.innerHTML = `<h2 class="modal-title">${p("editProfile")}</h2><p class="modal-description">${p("reviewNote")}</p>
+    body.innerHTML = `<h2 class="modal-title">${p("editProfile")}</h2><p class="modal-description">Update the details shown on your NIVORA profile. Your visibility is controlled separately.</p>
       <div class="field-grid"><div class="field"><label>${p("name")}</label><input id="eName" value="${esc(val("full_name"))}"></div><div class="field"><label>${p("age")}</label><input id="eAge" type="number" min="21" max="40" value="${esc(val("age"))}"></div></div>
       <div class="field"><label>${p("place")}</label><input id="ePlace" value="${esc(val("district"))}"></div>
       <div class="field"><label>${p("job")}</label><input id="eJob" value="${esc(val("job_title"))}"></div>
-      <div class="field"><label>${p("lookingFor")}</label>${sel("eLook", ["woman", "man", "any"], val("looking_for"))}</div>
-      <div class="field"><label>${p("relationship")}</label>${sel("eRel", ["marriage", "longterm"], val("relationship_intention"))}</div>
-      <div class="field-grid"><div class="field"><label>${p("minAge")}</label><input id="eMin" type="number" min="21" max="40" value="${esc(val("min_partner_age"))}"></div><div class="field"><label>${p("maxAge")}</label><input id="eMax" type="number" min="21" max="40" value="${esc(val("max_partner_age"))}"></div></div>
-      <label class="field-label">${p("values")}</label><div class="choice-grid">${vs.map((v) => `<label class="choice"><input type="checkbox" name="eVals" value="${v}" ${(profile.core_values || []).includes(v) ? "checked" : ""}> ${valName(v)}</label>`).join("")}</div>
+      <label class="field-label">Interests (up to 3)</label><div class="choice-grid">${vs.map((v) => `<label class="choice"><input type="checkbox" name="eVals" value="${v}" ${(profile.core_values || []).includes(v) ? "checked" : ""}> ${valName(v)}</label>`).join("")}</div>
       <div class="field"><label>${p("about")}</label><textarea id="eAbout" rows="4" maxlength="1000">${esc(val("bio"))}</textarea></div>
       <div class="nv-msg" id="pMsg"></div><div class="nv-row"><button class="primary-btn" id="eSave" type="button">${p("save")}</button><button class="back-btn" id="eBack" type="button">${p("close")}</button></div>`;
     const $ = (s) => body.querySelector(s);
     $("#eBack").onclick = render;
     $("#eSave").onclick = async () => {
       const vals = [...body.querySelectorAll("[name=eVals]:checked")].map((x) => x.value);
-      if (vals.length < 1 || vals.length > 3) return msg(L() === "ml" ? "1 മുതൽ 3 വരെ മൂല്യങ്ങൾ തിരഞ്ഞെടുക്കുക." : "Choose 1 to 3 values.");
+      if (vals.length < 1 || vals.length > 3) return msg(L() === "ml" ? "1 മുതൽ 3 വരെ താൽപര്യങ്ങൾ തിരഞ്ഞെടുക്കുക." : "Choose 1 to 3 interests.");
       $("#eSave").disabled = true; $("#eSave").textContent = p("saving");
       try {
         const r = await api("/api/profile", { method: "PUT", body: {
-          full_name: $("#eName").value, age: Number($("#eAge").value), district: $("#ePlace").value, job_title: $("#eJob").value,
-          bio: $("#eAbout").value, looking_for: $("#eLook").value, relationship_intention: $("#eRel").value,
-          min_partner_age: Number($("#eMin").value), max_partner_age: Number($("#eMax").value), core_values: vals } });
+          full_name: $("#eName").value, age: Number($("#eAge").value), district: $("#ePlace").value,
+          job_title: $("#eJob").value, bio: $("#eAbout").value, core_values: vals } });
         profile = r.profile; await loadAll(); render(); msg(r.message || p("saved"), true);
       } catch (e) { $("#eSave").disabled = false; $("#eSave").textContent = p("save"); msg(e.message); }
     };
