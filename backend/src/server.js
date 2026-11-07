@@ -38,8 +38,12 @@ function createApp() {
     session_inactivity_hours: 12
   }));
 
-  // Minimal-data mode: all member-generated content is handled by a volatile
-  // in-process session API. Legacy Supabase content routes are not mounted.
+  // Persistent safety moderation is deliberately mounted before the volatile member API.
+  // It stores only reports, enforcement status and moderator audit actions.
+  app.use("/api", require("./routes/moderation-api").router);
+
+  // Minimal-data mode: all other member-generated content is handled by volatile memory.
+  // Legacy Supabase content routes are not mounted.
   app.use("/api", require("./routes/ephemeral-api"));
 
   app.use(mw.notFound);
