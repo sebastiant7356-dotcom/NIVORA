@@ -1,12 +1,12 @@
-# NIVORA — Android Social App Test Plan
+# MELVO — Global Android Social App Test Plan
 
 Last updated: 2026-11-07
 
-This is a manual release-gate plan. It is not evidence that the checks have passed. Record each result as PASS, FAIL, or NOT TESTED with date, device, and a short bug reference. Never include passwords, OAuth tokens, service-role keys, exact coordinates, or unnecessary personal data in bug reports.
+This is a manual release-gate plan, not evidence that the checks have passed. Record each result as PASS, FAIL or NOT TESTED with date, device and a short bug reference. Never include passwords, OAuth tokens, service-role keys, exact coordinates or unnecessary personal data in bug reports.
 
 ## 1. Pilot limits and safety
 
-- Invite a small group of adults aged 21+ in Kerala only.
+- Start with a controlled pilot of adults aged 18+ in one or two countries; do not open worldwide until legal, safety and support coverage exist in each target market.
 - Use two or more independent customer Google accounts. Never use staff accounts as customer profiles.
 - Keep location sharing off by default. Members must opt in and may turn it off at any time.
 - Have an operator ready to review reports and respond through nivora.helpdesk@gmail.com before inviting real users.
@@ -17,11 +17,11 @@ This is a manual release-gate plan. It is not evidence that the checks have pass
 
 | Area | Test | Expected result |
 |---|---|---|
-| Google OAuth | Sign in with two separate Google accounts on Android | System browser opens, OAuth returns through the app deep link, correct account session is restored |
-| Profile | Create and edit profiles | Only Kerala districts are accepted; no duplicate profile is created |
+| Google OAuth | Sign in with two separate Google accounts on Android | System browser opens, OAuth returns through the MELVO app deep link, correct account session is restored |
+| Profile | Create and edit profiles using different countries | City/region/country text is accepted; age must be 18+; no dating preferences are required |
 | Staff separation | Sign in with a staff account | Staff console only; no customer profile or discovery |
-| Radius | Set 1, 5, 25 and 100 km; test accounts inside/outside each radius | Only public Kerala members within the selected radius appear |
-| Location | Deny, grant, change radius, disable location | No discovery without opt-in; disabling removes stored location |
+| Radius | Set 1, 5, 25 and 100 km; test accounts inside/outside each radius in different countries | Only public members within the selected radius appear |
+| Location | Deny, grant, change radius, disable location | No discovery without opt-in; disabling removes stored location and radius-audience posts |
 | Physical Shake | Shake the device and use manual fallback | A random nearby anonymous candidate is selected; sensor events are throttled |
 | Anonymous discovery | View candidate cards before matching | No name, photo, exact location or profile identity is exposed |
 | Mutual interest | A sends interest, then B responds | Chat is created only after mutual interest |
@@ -31,7 +31,7 @@ This is a manual release-gate plan. It is not evidence that the checks have pass
 | Persistent chat | Keep a Shake chat open beyond 72 hours in a controlled test | No automatic expiry; either member can end or block the connection |
 | Friend request | Send a request from a Shake chat and accept on the other account | Friendship exists only after acceptance |
 | Friend chat | Open a friend from the Friends list; end and reopen | A persistent friend chat can be created/reopened |
-| Anonymous posts | Publish to all Kerala members and to a nearby radius | Author identity is not shown; audience selection is respected |
+| Anonymous posts | Publish globally and to a nearby radius from different countries | Global posts are visible worldwide; radius posts are visible only within their selected radius; author identity stays hidden |
 | Post safety | Report and block an anonymous post author | Report reaches staff; blocked author's posts and chats are hidden for blocker |
 | Staff moderation | Inspect and remove a reported anonymous post | Staff actions are audited; removed post disappears from feed |
 | Block | Block a member from chat | Active chats and friendship close; users cannot discover each other |
@@ -48,20 +48,21 @@ Do not launch if:
 5. Anonymous posts expose author identity to members or cannot be reported/blocked.
 6. Staff cannot inspect and remove reported anonymous content.
 7. Account deletion reports success while user data remains accessible.
+8. A global/radius audience leaks posts across its intended audience boundary.
 
 ## 4. Security and configuration
 
 - Google OAuth is the only customer sign-in method.
-- Add `in.nivora.social://auth/callback` to Supabase Auth redirect URLs. Google provider callback remains the Supabase Auth callback URL.
+- Add `in.melvo.social://auth/callback` to Supabase Auth redirect URLs. Google provider callback remains the Supabase Auth callback URL.
 - Keep the Supabase service-role key in the backend host's secret environment only.
 - Keep profile-photo and voice-message storage private; signed URLs must expire.
 - Confirm backend CORS and staff authorization.
 - Confirm location is optional, off by default, and never returned as coordinates/address to another member.
 - Run backend syntax checks and tests; run frontend JavaScript syntax checks.
-- Apply database migrations in a non-production project first. Verify migration status before production application.
+- Apply migrations to a non-production database first. Verify migration status before production application.
 
 ## 5. Bug reporting
 
-Send reports to nivora.helpdesk@gmail.com with test alias, date/time IST, device, feature, reproduction steps, expected and actual result. Redact names, email addresses, messages and personal data. Never send passwords, login codes, tokens, exact coordinates or unredacted private chats.
+Send reports to nivora.helpdesk@gmail.com with test alias, date/time and timezone, device, feature, reproduction steps, expected and actual result. Redact names, email addresses, messages and personal data. Never send passwords, login codes, tokens, exact coordinates or unredacted private chats.
 
 Critical issues include privacy breaches, account takeover, unauthorized access, identity/location exposure or data loss. Stop the pilot immediately if any occur.
