@@ -29,6 +29,12 @@ jobs:
           java-version: 21
       - name: Install Capacitor and build tools
         run: npm install
+      - name: Install backend dependencies
+        run: npm --prefix backend install
+      - name: Check backend syntax
+        run: npm --prefix backend run check
+      - name: Run backend tests
+        run: npm --prefix backend test
       - name: Bundle native OAuth bridge
         run: npm run build:native
       - name: Generate Android project
