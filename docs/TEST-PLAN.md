@@ -1,103 +1,67 @@
-# NIVORA — Controlled User Test Plan
+# NIVORA — Android Social App Test Plan
 
 Last updated: 2026-11-07
 
-This is a manual release-gate plan for a small, consent-based pilot. It is not evidence that the checks have passed. Record each result as PASS, FAIL, or NOT TESTED, with date, browser/device, and a short bug reference. Never include passwords, OAuth tokens, service-role keys, exact location coordinates, or unnecessary personal data in bug reports.
+This is a manual release-gate plan. It is not evidence that the checks have passed. Record each result as PASS, FAIL, or NOT TESTED with date, device, and a short bug reference. Never include passwords, OAuth tokens, service-role keys, exact coordinates, or unnecessary personal data in bug reports.
 
 ## 1. Pilot limits and safety
 
-- Start with a small, invited group of adults aged 21+ in Kerala. Do not run a broad public campaign until the release gates below pass.
-- Use two or more independent customer Google accounts for matching tests. Staff accounts must never be used as customer profiles.
-- Tell testers clearly that NIVORA is an early pilot, has no guaranteed number of members or matches, and that profiles/messages are user-generated.
-- Keep Shake & Chat location sharing off by default. Testers must actively opt in and may turn it off at any time.
-- Have the operator ready to review reports and respond through nivora.helpdesk@gmail.com before inviting real users. Do not promise continuous moderation or response times that cannot be met.
-- Do not ask testers to upload identity documents or share private conversations for debugging. Ask for the screen, approximate time, browser/device, and steps to reproduce; redact names and personal details.
-- Do not use paid ads until critical/high-severity issues are resolved and the privacy notice, terms, grievance contact, and account-deletion flow have been reviewed.
+- Invite a small group of adults aged 21+ in Kerala only.
+- Use two or more independent customer Google accounts. Never use staff accounts as customer profiles.
+- Keep location sharing off by default. Members must opt in and may turn it off at any time.
+- Have an operator ready to review reports and respond through nivora.helpdesk@gmail.com before inviting real users.
+- Do not ask testers to upload identity documents or share private conversations for debugging.
+- Do not promote broadly until all critical/high-severity release gates pass.
 
-## 2. Release gates
-
-A pilot must not proceed if any of these checks fail:
-
-1. A user can access another member's private profile, email, exact location, photos awaiting approval, or conversation without authorization.
-2. A non-member or blocked user can read or send chat/voice messages.
-3. Shake & Chat reveals either person's identity before both members consent.
-4. Account deletion reports success while profile, chat, photo, or voice data remains accessible.
-5. Google sign-in, profile creation, Shake discovery, chat, friend, or report/block flow is broken.
-6. The operator cannot access and act on reports.
-
-## 3. Two-account end-to-end checks
-
-Record Account A and Account B as test aliases only.
+## 2. Two-account end-to-end checks
 
 | Area | Test | Expected result |
 |---|---|---|
-| Google OAuth | Sign in with two separate Google accounts; sign out and sign back in | Both accounts authenticate; later sign-in returns to the correct member dashboard |
-| Profile | Create and save each profile | Required fields validate; no duplicate profile is created on refresh/re-login |
-| Staff separation | Sign in with a staff account | Staff console only; no customer profile or matching |
-| Daily 5 | Request recommendations repeatedly | No more than five recommendations per user per Kerala calendar day; quota shown accurately |
-| Multiple matches | Create more than one valid conversation where available | Each conversation appears separately and opens the correct chat |
-| 72-hour window | Check start/end timestamps and expiry handling | Chat opens only for eligible live matches and closes after the 72-hour window or when ended |
-| Continue / Stop | Test both choices on both accounts | The match state changes consistently; no user is silently treated as having consented |
-| Text chat | Send, reload, and retrieve messages | Only the two match members can read/send; messages persist and are ordered |
-| Voice message | Record, send, play, and reject invalid/oversized audio | Valid recordings up to 60 seconds / 2 MB work; invalid payloads are rejected; storage remains private |
-| Photo approval | Upload valid/invalid photos; inspect as staff and as another member | Up to four allowed formats/sizes; pending/rejected photos are not visible to other members |
-| Shake location | Deny permission, opt in, refresh, then switch off | No discovery without opt-in; off removes stored location and stops discovery |
-| Radius discovery | Test a consenting account inside and outside selected 1–100 km radius | Only public Kerala members within the selected radius appear; only approximate distance and interests are shown |
-| Anonymous reveal | Mutual interest; consent on A only; then B; withdraw before B consents | Identity stays hidden until both consent; one-sided consent can be withdrawn; hidden profiles remain hidden |\n| Profile visibility | Set A public, then hidden; repeat discovery | Public profiles may appear anonymously; hidden profiles are excluded from discovery and remain hidden in chat |\n| Friend request | Send request from active Shake chat; accept on B | Friendship is created only after acceptance; persistent friend chat can be opened from Friends |\n| Anonymous posts | Publish to Kerala and nearby radius audiences | Posts show no member identity; radius audience uses opted-in location |\n| Anonymous post safety | Report, block author, and review as staff | Blocked author posts disappear for blocker; staff can audit, inspect and remove reported posts |
-| Block | A blocks B | Match ends; neither account is recommended to the other again |
-| Report | Submit a report and inspect staff workflow | Report is stored; only authorized staff can inspect the relevant reported account/evidence |
-| Data export | Request export from each test account | Export belongs only to requesting account and is usable |
-| Account deletion | Delete a dedicated test account | Customer profile, matches, chats, photos and voice files are no longer accessible; any legally retained registration record follows the disclosed 180-day policy |
+| Google OAuth | Sign in with two separate Google accounts on Android | System browser opens, OAuth returns through the app deep link, correct account session is restored |
+| Profile | Create and edit profiles | Only Kerala districts are accepted; no duplicate profile is created |
+| Staff separation | Sign in with a staff account | Staff console only; no customer profile or discovery |
+| Radius | Set 1, 5, 25 and 100 km; test accounts inside/outside each radius | Only public Kerala members within the selected radius appear |
+| Location | Deny, grant, change radius, disable location | No discovery without opt-in; disabling removes stored location |
+| Physical Shake | Shake the device and use manual fallback | A random nearby anonymous candidate is selected; sensor events are throttled |
+| Anonymous discovery | View candidate cards before matching | No name, photo, exact location or profile identity is exposed |
+| Mutual interest | A sends interest, then B responds | Chat is created only after mutual interest |
+| Anonymous chat | Send text and voice messages | Identity remains hidden until both separately consent to reveal |
+| Profile visibility | Set a profile hidden, then search from the other account | Hidden profile does not appear in discovery and remains hidden in chat |
+| Reveal consent | A consents, then B; also test withdrawal before mutual consent | One-sided consent never reveals identity; mutual consent reveals only a public profile |
+| Persistent chat | Keep a Shake chat open beyond 72 hours in a controlled test | No automatic expiry; either member can end or block the connection |
+| Friend request | Send a request from a Shake chat and accept on the other account | Friendship exists only after acceptance |
+| Friend chat | Open a friend from the Friends list; end and reopen | A persistent friend chat can be created/reopened |
+| Anonymous posts | Publish to all Kerala members and to a nearby radius | Author identity is not shown; audience selection is respected |
+| Post safety | Report and block an anonymous post author | Report reaches staff; blocked author's posts and chats are hidden for blocker |
+| Staff moderation | Inspect and remove a reported anonymous post | Staff actions are audited; removed post disappears from feed |
+| Block | Block a member from chat | Active chats and friendship close; users cannot discover each other |
+| Data export | Request export from each test account | Export belongs only to the requesting account |
+| Account deletion | Delete a dedicated test account | Profile, matches, chats, photos and voice files are no longer accessible; disclosed retention rules apply |
 
-Shake and friend chats have no automatic expiry. Verify that they remain available until a member ends the chat, blocks the other member, or an account is suspended.
+## 3. Release gates
 
-## 4. Security and configuration checks
+Do not launch if:
+1. Another member can access private profile details, email, exact location, unapproved photos or chat content without authorization.
+2. A non-member or blocked user can read or send messages.
+3. Identity is revealed before mutual consent or a hidden profile is exposed.
+4. A chat expires automatically despite being a Shake or friend chat.
+5. Anonymous posts expose author identity to members or cannot be reported/blocked.
+6. Staff cannot inspect and remove reported anonymous content.
+7. Account deletion reports success while user data remains accessible.
 
-- Confirm only Google OAuth is exposed to customers.
-- Confirm SUPABASE_SERVICE_ROLE_KEY exists only in the backend host's secret environment and is never placed in frontend files or Git.
-- Confirm Supabase storage buckets for profile photos and voice messages are private and signed URLs expire.
-- Confirm backend CORS allows only the intended production frontend origin(s).
-- Confirm staff routes require server-side admin/moderator authorization.
-- Confirm a blocked member cannot use an old match URL or cached page to continue chat.
-- Confirm location is optional, disabled by default, and never returned as coordinates or address to another member.
-- Run from backend/: npm ci, npm run check, and npm test. Also run node --check on all frontend JavaScript files.
-- Apply database migrations in order in a non-production project first. Verify migration status before applying any new migration to production.
+## 4. Security and configuration
 
-## 5. Bug report format
+- Google OAuth is the only customer sign-in method.
+- Add `in.nivora.social://auth/callback` to Supabase Auth redirect URLs. Google provider callback remains the Supabase Auth callback URL.
+- Keep the Supabase service-role key in the backend host's secret environment only.
+- Keep profile-photo and voice-message storage private; signed URLs must expire.
+- Confirm backend CORS and staff authorization.
+- Confirm location is optional, off by default, and never returned as coordinates/address to another member.
+- Run backend syntax checks and tests; run frontend JavaScript syntax checks.
+- Apply database migrations in a non-production project first. Verify migration status before production application.
 
-Send bug reports to nivora.helpdesk@gmail.com with:
+## 5. Bug reporting
 
-- Subject: NIVORA Pilot Bug — [short issue]
-- Test alias (A/B), not the person's full name
-- Date/time (IST)
-- Device and browser
-- Page/feature
-- Steps to reproduce
-- Expected result
-- Actual result
-- Screenshot with names, email addresses, messages, and other personal data hidden
+Send reports to nivora.helpdesk@gmail.com with test alias, date/time IST, device, feature, reproduction steps, expected and actual result. Redact names, email addresses, messages and personal data. Never send passwords, login codes, tokens, exact coordinates or unredacted private chats.
 
-Do not send passwords, Google login codes, tokens, exact location, or unredacted private chats.
-
-Severity:
-- Critical: privacy breach, account takeover, unauthorized access, identity/location exposure, or data loss. Stop the pilot immediately.
-- High: login, Shake discovery, chat, friend, block/report, or deletion is unusable. Pause promotion until fixed.
-- Medium: a core flow has a workaround or a display/data issue without privacy impact.
-- Low: cosmetic or wording issue.
-
-## 6. Small Instagram pilot measurement
-
-NIVORA is a social discovery app, not a dating or matchmaking service. Check the current advertising and app-store policies for social discovery and user-generated content before paid promotion. Do not misrepresent the product category or bypass platform review.\n\nDo not judge the campaign by reach or likes alone. Track aggregate counts only:
-
-- Ad spend and impressions
-- Link clicks / landing-page visits
-- Google sign-ins started and completed
-- Profiles successfully completed
-- Members who use Shake discovery
-- Mutual interests and first messages sent\n- Friend requests accepted\n- Anonymous posts and moderation actions
-- Reports, blocks, and support requests
-- Bugs by severity and whether fixed
-
-Use a small capped budget and a short run. Stop the ad if critical/high issues appear, if reports cannot be handled, or if the app is not reliably onboarding users. Do not upload member lists, sensitive profile details, or private conversations to advertising platforms. Avoid third-party tracking pixels until the privacy notice and consent implications have been reviewed.
-
-A small pilot can reveal usability and reliability problems; it does not establish product-market fit, safety certification, revenue, or buyer valuation.
+Critical issues include privacy breaches, account takeover, unauthorized access, identity/location exposure or data loss. Stop the pilot immediately if any occur.
