@@ -90,7 +90,7 @@ function saveProfile(req, res, creating) {
   const current = profileOf(req.user.id);
   if (creating && current) return fail(res, 409, "profile_exists", "A profile already exists. Edit it instead.");
   const p = {
-    ...(current || {}), id: req.user.id, full_name: name, age, district,
+    ...(current || {}), id: req.user.id, full_name: name, first_name: name.split(/\\s+/)[0], age, district, profile_complete: true, suspended: false,
     gender: ["woman", "man", "other"].includes(b.gender) ? b.gender : "other",
     job_title: clean(b.job_title || "").slice(0, 100), bio: clean(b.bio || "").slice(0, 1000),
     looking_for: ["woman", "man", "any"].includes(b.looking_for) ? b.looking_for : "any",
@@ -319,6 +319,6 @@ router.delete("/account", async (req,res) => {
 router.get("/profile/photos", (_req,res)=>res.json({success:true,photos:[]}));
 router.post("/profile/photos", (_req,res)=>fail(res,410,"photos_disabled","Photo uploads are disabled. BEYOND does not retain photos."));
 router.delete("/profile/photos/:id", (_req,res)=>res.json({success:true}));
-router.get("/admin/me", (_req,res)=>res.json({success:true,is_staff:false,staff:false}));
+router.get("/admin/me", (_req,res)=>fail(res,403,"not_staff","Staff access is not enabled in minimal-data mode."));
 router.use((req,res)=>fail(res,410,"feature_disabled","This feature is disabled in BEYOND's minimal-data mode."));
 module.exports = router;
