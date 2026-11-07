@@ -1,4 +1,4 @@
-# Remaining manual launch checks — MELVO Android
+# Remaining manual launch checks — BEYOND Android
 
 The current product direction is Google OAuth only, global Shake & Chat, anonymous posts, mutual friendships, text chat and voice messages. The frontend is embedded in Android; no separate public frontend website is required. Phone OTP, Razorpay payments and live voice/video calling are not part of this release.
 
@@ -37,6 +37,6 @@ Public support / grievance contact currently listed: nivora.helpdesk@gmail.com. 
 ## D. Free-tier and security limitations
 
 - Render and Supabase free-tier limits, sleep/cold-start behaviour and quotas apply.
-- Supabase Security Advisor currently warns that leaked-password protection is disabled and unavailable on the current Free plan. Google OAuth is the only MELVO login method, but do not describe this provider warning as resolved.
+- Supabase Security Advisor currently warns that leaked-password protection is disabled and unavailable on the current Free plan. Google OAuth is the only BEYOND login method, but do not describe this provider warning as resolved.
 - Keep the Supabase service-role key in Render backend environment variables only.
 - External AI screening remains off by default.
