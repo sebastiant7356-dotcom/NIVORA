@@ -14,12 +14,12 @@ The current app direction is Google OAuth only, Kerala-only Shake & Chat, anonym
 Use two real test accounts and verify:
 - First login and customer profile creation.
 - Dashboard redirect on later login.
-- Daily five recommendation quota and Kerala-day reset.
+- Shake discovery within selected 1–100 km radius and Kerala-only member eligibility.
 - More than one active match conversation.
-- 72-hour chat window, text messages and voice messages.
-- Shake & Chat location permission on/off, 50 km discovery, mutual interest and anonymous chat.
-- One-sided reveal consent keeps both profiles hidden; both-sided consent reveals; withdrawal before mutual reveal works.
-- Block, report, account export and account deletion.
+- Persistent Shake and friend chats with no automatic time limit; text and voice messages.
+- Location permission on/off, physical Shake, mutual interest, anonymous chat and profile visibility.
+- One-sided reveal consent keeps identity hidden; both-sided consent reveals a public profile; hidden profiles remain hidden.
+- Mutual friend acceptance, anonymous posts, post report/block, staff removal, account export and account deletion.
 
 Do not use staff accounts as customer test profiles.
 
