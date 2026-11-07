@@ -495,7 +495,13 @@
             try { await api("/api/community/posts/" + encodeURIComponent(post.id) + "/report", { method: "POST", body: { reason: "inappropriate_content" } }); status.textContent = "Report received."; }
             catch (e) { status.textContent = e.message || "Report could not be submitted."; }
           };
-          card.appendChild(report);
+          const block = document.createElement("button"); block.className = "nv-link"; block.type = "button"; block.textContent = "Block author";
+          block.onclick = async () => {
+            if (!confirm("Block this anonymous post author? Their posts and chats will no longer be shown.")) return;
+            try { await api("/api/community/posts/" + encodeURIComponent(post.id) + "/block", { method: "POST" }); status.textContent = "Member blocked."; await loadCommunityPanel(); }
+            catch (e) { status.textContent = e.message || "Member could not be blocked."; }
+          };
+          card.append(report, block);
         }
         feed.appendChild(card);
       });
