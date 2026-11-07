@@ -19,8 +19,8 @@
       proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and voice messages will close.",
       timeLeft: "Chat window left", closed: "Closed", chat: "Chat", typeMsg: "Write a message…", send: "Send", live: "Live", reconnecting: "Reconnecting…",
       chatClosed: "This conversation is unavailable or has been ended.", voiceRecord: "Record voice message", voiceStop: "Stop recording", voiceUploading: "Uploading voice message…", voiceSent: "Voice message sent.", voiceError: "Voice messages are disabled in this version.", voiceUnsupported: "Voice recording is not supported in this browser.",
-      report: "Report", block: "Block", blockConfirm: "Block this person? The match ends and you will never be matched again.",
-      reportTitle: "Report this person", reportSend: "Send report", reportThanks: "Report received. Our team will review it.",
+      report: "Report", block: "Block", blockConfirm: "Block this person for the current server session? The match ends, but the block may be lost if the server restarts.",
+      reportTitle: "Report this person", reportSend: "Send report", reportThanks: "Report received temporarily. It may be lost if the server restarts; contact support for urgent concerns.",
       r_harassment: "Harassment", r_fake_profile: "Fake profile", r_scam: "Scam / money request", r_inappropriate_content: "Inappropriate content", r_underage: "Looks underage", r_other: "Other",
       details: "Details (optional)", feedback: "Feedback", wantContinue: "I would like to continue getting to know them", dontContinue: "I do not want to continue", sendFeedback: "Send feedback", feedbackThanks: "Thank you for your feedback.",
       pastMatches: "Past matches", none: "None yet.", from: "Started",
@@ -337,7 +337,7 @@
       try {
         const result = await api("/api/profile/visibility", { method: "PUT", body: { visibility: visibilitySelect.value } });
         profile.profile_visibility = result.visibility;
-        privacySettings.querySelector("#visibilityStatus").textContent = "Privacy setting saved.";
+        privacySettings.querySelector("#visibilityStatus").textContent = "Visibility updated for this session.";
       } catch (e) {
         privacySettings.querySelector("#visibilityStatus").textContent = e.message || "Could not update privacy setting.";
         visibilitySelect.value = profile.profile_visibility || "public";
@@ -469,7 +469,7 @@
           body: field.value, audience: body.querySelector("#communityAudience")?.value || "global",
           radius_km: Number(body.querySelector("#shakeRadius")?.value || 25)
         }});
-        field.value = ""; status.textContent = "Posted anonymously."; await loadCommunityPanel();
+        field.value = ""; status.textContent = "Posted anonymously for this active session."; await loadCommunityPanel();
       } catch (e) { status.textContent = e.message || "Post could not be published."; }
       finally { publish.disabled = false; }
     };
