@@ -57,6 +57,22 @@ async function requireAuth(req, res, next) {
     if (!providers.includes("google")) {
       return res.status(403).json({ success: false, message: "Google login required." });
     }
+    // Enforcements are durable safety records; fail closed if their status cannot be checked.
+    const { data: enforcement, error: enforcementError } = await serviceClient()
+      .from("account_enforcements").select("status,expires_at")
+      .eq("user_id", u.id).maybeSingle();
+    if (enforcementError) {
+      return res.status(503).json({ success: false, message: "Account safety status is temporarily unavailable." });
+    }
+    const activeEnforcement = enforcement && (
+      enforcement.status === "banned" ||
+      (enforcement.status === "suspended" && (!enforcement.expires_at || Date.parse(enforcement.expires_at) > Date.now()))
+    );
+    // Restricted users may still export or delete their own account.
+    const accountDataRight = req.path === "/account" || req.path === "/account/export" || req.path === "/account/appeal";
+    if (activeEnforcement && !accountDataRight) {
+      return res.status(403).json({ success: false, code: "account_restricted", message: enforcement.status === "banned" ? "This account is permanently banned. If you believe this is a mistake, sign in at /appeal.html to request a review." : "This account is temporarily suspended. If you believe this is a mistake, sign in at /appeal.html to request a review." });
+    }
     req.user = { id: u.id }; // immutable id only
     return next();
   } catch {

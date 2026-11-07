@@ -6,15 +6,18 @@ const { createLimiter, byUser } = require("../lib/ratelimit");
 const { EphemeralStore } = require("../lib/ephemeral-store");
 const { serviceClient } = require("../lib/clients");
 const { clean, isUuid } = require("../lib/validation");
+const { persistReport, exportSafetyRecords } = require("./moderation-api");
 
 const router = express.Router();
 router.use(requireAuth);
 
-// All member-generated data lives only in this process and expires after 12 hours
-// of inactivity. It is never written to Supabase tables or Storage.
+// Session content lives only in this process; profiles, locations, matches, chats,
+// posts, friend state and blocks expire after 12 hours of inactivity. Safety reports are written
+// separately by moderation-api.js with limited fields and a 90-day retention period.
 const TTL = 12 * 60 * 60 * 1000;
 const state = new EphemeralStore({ defaultTtlMs: TTL, maxEntries: 50000 });
 const limited = createLimiter({ windowMs: 60 * 60_000, max: 100, keyFn: byUser });
+const reportLimited = createLimiter({ windowMs: 60 * 60_000, max: 5, keyFn: byUser });
 const REASONS = ["harassment", "fake_profile", "scam", "inappropriate_content", "underage", "other"];
 const key = (type, id) => type + ":" + id;
 const get = (k) => { const v = state.get(k); if (v !== undefined) state.set(k, v, TTL); return v; };
@@ -248,8 +251,9 @@ router.post("/community/posts/:id/report", limited, (req,res) => {
   const post = list("community:posts").find(p => p.id === req.params.id);
   if (!post || post.author_id === req.user.id) return fail(res,404,"post_not_found","Post not found.");
   if (!REASONS.includes(req.body?.reason)) return fail(res,400,"invalid_reason","Choose a valid report reason.");
-  const reports = list("safety:reports"); reports.push({ id:randomUUID(), reporter_id:req.user.id, reported_id:post.author_id, reason:req.body.reason, details:clean(req.body.details || "").slice(0,1000), created_at:now() }); put("safety:reports",reports.slice(-1000));
-  res.status(201).json({success:true,message:"Report received for this active server session."});
+  persistReport({ reporterId:req.user.id, reportedId:post.author_id, reason:req.body.reason, details:req.body.details || "" })
+    .then(() => res.status(201).json({success:true,message:"Report received. Safety records are retained for moderation for up to 90 days."}))
+    .catch(err => fail(res, err.status || 503, "report_save_failed", err.status ? err.message : "Could not save the report. Please try again."));
 });
 router.post("/community/posts/:id/block", limited, (req,res) => {
   const post = list("community:posts").find(p => p.id === req.params.id);
@@ -298,12 +302,13 @@ router.post("/safety/block", limited, (req,res) => {
   const partner=m.user_one===req.user.id?m.user_two:m.user_one; blockUser(req.user.id,partner);
   res.json({success:true,message:"Member blocked. The active conversation is closed."});
 });
-router.post("/safety/report", limited, (req,res) => {
+router.post("/safety/report", reportLimited, (req,res) => {
   const m=matchOf(req.body?.match_id,req.user.id); if(!m) return fail(res,404,"match_not_found","Match not found.");
   if(!REASONS.includes(req.body?.reason)) return fail(res,400,"invalid_reason","Choose a valid report reason.");
   const partner=m.user_one===req.user.id?m.user_two:m.user_one;
-  const reports=list("safety:reports"); reports.push({id:randomUUID(),reporter_id:req.user.id,reported_id:partner,reason:req.body.reason,details:clean(req.body.details||"").slice(0,1000),created_at:now()}); put("safety:reports",reports.slice(-1000));
-  res.status(201).json({success:true,message:"Report received for this active server session."});
+  persistReport({ reporterId:req.user.id, reportedId:partner, reason:req.body.reason, details:req.body.details || "" })
+    .then(() => res.status(201).json({success:true,message:"Report received. Safety records are retained for moderation for up to 90 days."}))
+    .catch(err => fail(res, err.status || 503, "report_save_failed", err.status ? err.message : "Could not save the report. Please try again."));
 });
 router.post("/feedback", (req,res) => {
   const feedback=clean(req.body?.feedback||req.body?.message||"");
@@ -333,9 +338,14 @@ router.delete("/session", (req, res) => {
 });
 
 // Export contains only the active in-memory session state. No historic content exists.
-router.get("/account/export", (req,res) => {
+router.get("/account/export", async (req,res) => {
   const profile=profileOf(req.user.id);
-  res.json({success:true,exported_at:now(),profile,matches:[],feedback:[],messages:[],payments:[],photos:[],voice_messages:[]});
+  try {
+    const safety = await exportSafetyRecords(req.user.id);
+    res.json({success:true,exported_at:now(),profile,matches:[],feedback:[],messages:[],payments:[],photos:[],voice_messages:[],safety_reports:safety.reports,appeals:safety.appeals});
+  } catch {
+    fail(res,503,"export_unavailable","Your account export is temporarily unavailable.");
+  }
 });
 router.delete("/account", async (req,res) => {
   if(req.body?.confirm!=="DELETE") return fail(res,400,"confirmation_required",'Send {"confirm":"DELETE"} to delete your login account.');

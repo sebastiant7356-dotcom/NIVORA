@@ -32,6 +32,6 @@ jobs:
       - name: Check JavaScript syntax
         run: npm run check
       - name: Check frontend JavaScript syntax
-        run: node --check ../frontend/app.js && node --check ../frontend/common.js && node --check ../frontend/portal.js && node --check ../frontend/admin.js
+        run: node --check ../frontend/app.js && node --check ../frontend/common.js && node --check ../frontend/portal.js && node --check ../frontend/admin.js && node --check ../frontend/appeal.js
       - name: Run backend tests
         run: npm test

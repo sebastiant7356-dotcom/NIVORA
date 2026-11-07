@@ -98,8 +98,23 @@ test("staff moderation is limited to reported accounts", () => {
   assert.match(admin, /hasOpenReport\(db, req\.params\.id\)/);
   assert.match(admin, /viewed_reported_profile/);
   assert.match(admin, /Routine AI screening is disabled/);
-  assert.match(ui, /let tab = "reports"/);
+  assert.match(ui, /status = "open"/);
   assert.doesNotMatch(ui, /const TABS = \[\["pending"/);
+  const safetyApi = text(path.join(ROOT, "backend", "src", "routes", "moderation-api.js"));
+  assert.match(safetyApi, /from\("reports"\)/);
+  assert.match(safetyApi, /from\("account_enforcements"\)/);
+  assert.match(safetyApi, /90 \* 86400000/);
+  assert.match(safetyApi, /365 \* 86400000/);
+  assert.match(safetyApi, /requireStaff\("admin"\)/);
+  assert.match(safetyApi, /account_appeals/);
+  assert.match(safetyApi, /router\.post\("\/account\/appeal"/);
+  assert.match(safetyApi, /appealLimited/);
+  assert.match(ui, /renderAppeals/);
+  const appealUi = text(path.join(ROOT, "frontend", "appeal.js"));
+  const appealPage = text(path.join(ROOT, "frontend", "appeal.html"));
+  assert.match(appealUi, /\/api\/account\/appeal/);
+  assert.match(appealPage, /same Google account/);
+  assert.match(safetyApi, /router\.post\("\/admin\/appeals\/:id\/resolve"/);
 });
 
 

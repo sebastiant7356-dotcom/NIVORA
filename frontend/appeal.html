@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>BEYOND — Account appeal</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html"><span class="brand-copy"><b>BEYOND</b><small>ACCOUNT REVIEW</small></span></a>
+    <button class="lang-btn" id="signOut" type="button" hidden>Sign out</button>
+  </header>
+  <main class="admin-wrap">
+    <h1>Request an account review</h1>
+    <p>If you believe your account was restricted by mistake, sign in with the same Google account and submit an appeal.</p>
+    <div id="auth"></div>
+    <form id="appealForm" class="card" hidden>
+      <label for="reason">Why should the restriction be reviewed?</label>
+      <textarea id="reason" rows="6" maxlength="1000" required placeholder="Explain your situation (5–1000 characters)."></textarea>
+      <button id="submit" type="submit">Submit appeal</button>
+    </form>
+    <p id="msg" class="nv-msg" role="status"></p>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="common.js"></script>
+  <script src="appeal.js"></script>
+</body>
+</html>
