@@ -409,7 +409,8 @@
       const result = await api("/api/shake/discover");
       if (!result.people?.length) { status.textContent = p("shakeNoPeople"); return; }
       status.textContent = p("shakeEnabled");
-      const peopleToShow = randomOne && result.people.length ? [result.people[Math.floor(Math.random() * result.people.length)]] : result.people;\n      peopleToShow.forEach((person) => {
+      const peopleToShow = randomOne && result.people.length ? [result.people[Math.floor(Math.random() * result.people.length)]] : result.people;
+      peopleToShow.forEach((person) => {
         const card = document.createElement("article"); card.className = "shake-person";
         const heading = document.createElement("h3");
         heading.textContent = [person.first_name, person.age].filter(Boolean).join(", ");
