@@ -313,6 +313,7 @@
     const community = document.createElement("section"); community.className = "dashboard-panel"; community.id = "dashboard-community";
     community.innerHTML = "<h2 class='modal-title'>Anonymous posts</h2><p class='modal-description'>Share thoughts without showing your profile.</p><textarea id='communityBody' maxlength='2000' rows='4' placeholder='Write an anonymous post…'></textarea><div class='field'><label for='communityAudience'>Who can see this?</label><select id='communityAudience'><option value='kerala'>All NIVORA users in Kerala</option><option value='radius'>People within my radius</option></select></div><div class='nv-row'><button class='primary-btn' id='communityPublish' type='button'>Post anonymously</button></div><div class='nv-msg' id='communityStatus' role='status'></div><div id='communityFeed' class='shake-people'></div>";
     body.append(inbox, shake, community, nav);
+    bindMotionShake();
     const panels = [inbox, matchPanel, shake, community, profilePanel];
     const activate = (id) => {
       panels.forEach((panel) => { panel.hidden = panel.id !== "dashboard-" + id; });
