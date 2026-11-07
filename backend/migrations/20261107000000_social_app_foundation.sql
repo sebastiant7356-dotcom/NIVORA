@@ -173,6 +173,7 @@ declare
   low_id uuid;
   high_id uuid;
   chat_id uuid;
+  existing_source text;
 begin
   if p_user is null or p_partner is null or p_user = p_partner then raise exception 'invalid_target'; end if;
   low_id := least(p_user,p_partner); high_id := greatest(p_user,p_partner);
@@ -182,11 +183,18 @@ begin
   if exists (select 1 from public.blocks where (blocker_id=p_user and blocked_id=p_partner) or (blocker_id=p_partner and blocked_id=p_user)) then
     raise exception 'blocked';
   end if;
-  select id into chat_id from public.match_history
-   where status='active' and match_source='friend'
+  select id, match_source into chat_id, existing_source from public.match_history
+   where status='active' and match_source in ('shake','friend')
      and ((user_one=p_user and user_two=p_partner) or (user_one=p_partner and user_two=p_user))
-   order by created_at desc limit 1;
-  if chat_id is not null then return chat_id; end if;
+   order by case when match_source='friend' then 0 else 1 end, created_at desc limit 1;
+  if chat_id is not null then
+    if existing_source='shake' then
+      update public.match_history set match_source='friend', expires_at=null, proposal_expires_at=null,
+        user_one_accepted=true, user_two_accepted=true, started_at=coalesce(started_at,now())
+       where id=chat_id;
+    end if;
+    return chat_id;
+  end if;
   insert into public.match_history(user_one,user_two,status,started_at,expires_at,user_one_accepted,user_two_accepted,match_source)
   values(p_user,p_partner,'active',now(),null,true,true,'friend')
   returning id into chat_id;
