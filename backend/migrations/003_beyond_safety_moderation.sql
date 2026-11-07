@@ -39,7 +39,7 @@ create or replace function private.purge_expired_beyond_safety_records()
 returns void
 language plpgsql
 security definer
-set search_path = pg_catalog, public, private
+set search_path = pg_catalog
 as $$
 begin
   delete from public.reports where created_at < now() - interval '90 days';
