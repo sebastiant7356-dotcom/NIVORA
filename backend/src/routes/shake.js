@@ -27,7 +27,8 @@ async function currentCustomer(db, userId) {
   ]);
   if (staffError || error) throw new Error("account_check_failed");
   if (staff) return { error: "staff_not_customer" };
-  if (!profile || profile.approval_status !== "approved" || !profile.is_active || profile.suspended_at) return { error: "profile_unavailable" };\n  if (!isKeralaDistrict(profile.district)) return { error: "kerala_only" };
+  if (!profile || profile.approval_status !== "approved" || !profile.is_active || profile.suspended_at) return { error: "profile_unavailable" };
+  if (!isKeralaDistrict(profile.district)) return { error: "kerala_only" };
   return { profile };
 }
 
