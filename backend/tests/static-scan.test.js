@@ -98,8 +98,14 @@ test("staff moderation is limited to reported accounts", () => {
   assert.match(admin, /hasOpenReport\(db, req\.params\.id\)/);
   assert.match(admin, /viewed_reported_profile/);
   assert.match(admin, /Routine AI screening is disabled/);
-  assert.match(ui, /let tab = "reports"/);
+  assert.match(ui, /status = "open"/);
   assert.doesNotMatch(ui, /const TABS = \[\["pending"/);
+  const safetyApi = text(path.join(ROOT, "backend", "src", "routes", "moderation-api.js"));
+  assert.match(safetyApi, /from\("reports"\)/);
+  assert.match(safetyApi, /from\("account_enforcements"\)/);
+  assert.match(safetyApi, /90 \* 86400000/);
+  assert.match(safetyApi, /365 \* 86400000/);
+  assert.match(safetyApi, /requireStaff\("admin"\)/);
 });
 
 
