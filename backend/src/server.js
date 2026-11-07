@@ -18,7 +18,7 @@ function createApp() {
 
   app.use(express.json({ limit: "20kb" }));
 
-  app.get("/api/health", (req, res) => res.json({ success: true, app: "BEYOND", message: "Backend is running" }));
+  app.get("/api/health", (req, res) => res.json({ success: true, app: "BEYOND", data_mode: "ephemeral", member_content_persistence: false, message: "Backend is running" }));
 
   // Public legal documents required by the Android app and Play Store listing.
   const legalFiles = new Set(["privacy.html", "terms.html", "styles.css"]);
@@ -32,7 +32,10 @@ function createApp() {
   // Public, non-secret runtime settings for the frontend.
   app.get("/api/config", (req, res) => res.json({
     success: true,
-    policy_version: config.policyVersion
+    policy_version: config.policyVersion,
+    data_mode: "ephemeral",
+    media_uploads_enabled: false,
+    session_inactivity_hours: 12
   }));
 
   // Minimal-data mode: all member-generated content is handled by a volatile
