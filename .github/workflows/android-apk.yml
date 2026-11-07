@@ -44,6 +44,6 @@ jobs:
           ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: nivora-android-debug
+          name: melvo-android-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
