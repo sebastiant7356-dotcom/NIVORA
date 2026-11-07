@@ -44,7 +44,7 @@ async function assertLiveMatch(matchId, userId) {
   const match = await getMatchFor(matchId, userId);
   if (!match) return { status: 404, code: "match_not_found", message: "Match not found." };
   if (match.status !== "active" || (match.match_source !== "shake" && (!match.expires_at || new Date(match.expires_at) <= new Date()))) {
-    return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
+    return { status: 403, code: "match_not_live", message: "This conversation is closed or has been ended." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
   const { data: accountStates, error: stateError } = await serviceClient().from("profiles")
@@ -66,7 +66,7 @@ async function assertChatMatch(matchId, userId) {
   if (!match) return { status: 404, code: "match_not_found", message: "Match not found." };
   if (!["proposed", "active"].includes(match.status) ||
       (match.match_source !== "shake" && (!match.expires_at || new Date(match.expires_at) <= new Date()))) {
-    return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
+    return { status: 403, code: "match_not_live", message: "This conversation is closed or has been ended." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
   const { data: accountStates, error: stateError } = await serviceClient().from("profiles")
