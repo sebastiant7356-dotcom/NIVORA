@@ -32,6 +32,8 @@ function createApp() {
   app.use("/api/profile", require("./routes/profile"));
   app.use("/api/match", require("./routes/match"));
   app.use("/api/shake", require("./routes/shake"));
+  app.use("/api/friends", require("./routes/friends"));
+  app.use("/api/community", require("./routes/community"));
   app.use("/api/chat", require("./routes/chat"));
   app.use("/api/safety", require("./routes/safety"));
   app.use("/api/feedback", require("./routes/feedback"));
