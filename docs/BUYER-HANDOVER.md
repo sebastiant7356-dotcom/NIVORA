@@ -1,4 +1,4 @@
-# NIVORA — Buyer Handover Guide
+# MELVO — Buyer Handover Guide
 
 Last updated: 2026-11-07
 
@@ -8,7 +8,7 @@ already been transferred.
 
 ## 1. Source code and intellectual property
 
-- Repository: https://github.com/sebastiant7356-dotcom/NIVORA
+- Repository: https://github.com/sebastiant7356-dotcom/MELVO
 - Default branch: main
 - Android app: Capacitor wrapper; UI source in `frontend/` is bundled inside the Android package. A separate public frontend website is not required.
 - Backend: Node.js / Express API in `backend/`.
@@ -26,7 +26,7 @@ The application uses Supabase PostgreSQL and Supabase Auth with Google OAuth.
 The buyer should receive:
 - SQL schema and migration files in the repository.
 - Guidance to create or take control of a Supabase project, subject to provider rules.
-- Google OAuth callback and redirect configuration instructions, including `in.nivora.social://auth/callback` for Android.
+- Google OAuth callback and redirect configuration instructions, including `in.melvo.social://auth/callback` for Android.
 - Storage bucket and access-policy configuration guidance.
 
 Database contents containing personal/member data must be handled separately from
@@ -73,7 +73,7 @@ Before accepting final handover:
 - Build and sign the Android app under buyer-controlled accounts; keep the Render backend and Supabase project under buyer control.
 - Verify `/api/health`.
 - Configure Google OAuth and test with two independent customer accounts.
-- Test Android Google OAuth, profile creation, 1–100 km Shake discovery, persistent anonymous chat, mutual reveal, mutual friend acceptance, anonymous posts, report/block, staff moderation, voice messages, export and deletion.
+- Test Android Google OAuth, profile creation, 1–100 km global Shake discovery, persistent anonymous chat, mutual reveal, mutual friend acceptance, anonymous posts, report/block, staff moderation, voice messages, export and deletion.
 - Verify privacy notice, terms, data retention and grievance process with qualified
   Indian legal counsel before broad public operation.
 
