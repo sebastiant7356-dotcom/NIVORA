@@ -601,7 +601,7 @@
         : (m.is_shake_match && m.status === "active" && m.reveal?.revealed ? `<p class="modal-description">${p("shakeRevealDone")}</p>` : "");
       let h = header + tabs + anonymousBlock + partnerHtml(m.partner);
       if (["proposed", "active"].includes(m.status)) {
-        h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
+        h += `${m.is_shake_match ? "" : `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>`}
           <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
           <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div><div class="voice-messages" id="voiceLog" aria-live="polite"></div><div class="voice-controls"><button class="outline-btn" id="voiceRecord" type="button">${p("voiceRecord")}</button><span class="nv-msg" id="voiceStatus" role="status"></span></div></div>`;
         if (m.status === "proposed") {
@@ -669,6 +669,13 @@
     $("#mContinue") && ($("#mContinue").onclick = () => respond(true));
     $("#mStop") && ($("#mStop").onclick = () => respond(false));
     $("#mEnd") && ($("#mEnd").onclick = async () => { if (!confirm(p("endConfirm"))) return; try { await api(`/api/match/${m.id}/end`, { method: "POST" }); await loadAll(); render(); } catch (e) { $("#mMsg").textContent = e.message; } });
+    $("#friendRequest") && ($("#friendRequest").onclick = async () => {
+      const button = $("#friendRequest"); button.disabled = true;
+      try {
+        const result = await api("/api/friends/request", { method: "POST", body: { match_id: m.id } });
+        button.textContent = result.status === "friends" ? "You are friends" : "Friend request sent";
+      } catch (e) { button.disabled = false; $("#mMsg").textContent = e.message || "Could not send friend request."; }
+    });
     $("#mReport") && ($("#mReport").onclick = () => reportForm(m.id));
     $("#mBlock") && ($("#mBlock").onclick = async () => { if (!confirm(p("blockConfirm"))) return; try { const r = await api("/api/safety/block", { method: "POST", body: { match_id: m.id } }); await loadAll(); render(); msg(r.message, true); } catch (e) { $("#mMsg").textContent = e.message; } });
     if (["proposed", "active"].includes(m.status)) startChat(m);
