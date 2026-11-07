@@ -68,6 +68,8 @@ create table if not exists public.anonymous_posts (
   check ((audience = 'kerala' and radius_km is null) or
          (audience = 'radius' and radius_km between 1 and 100))
 );
+alter table public.anonymous_posts add column if not exists latitude double precision;
+alter table public.anonymous_posts add column if not exists longitude double precision;
 create index if not exists anonymous_posts_feed_idx
   on public.anonymous_posts(status, created_at desc);
 
@@ -85,6 +87,10 @@ create policy anonymous_posts_no_browser_access on public.anonymous_posts
   for all to anon, authenticated using (false) with check (false);
 revoke all on public.friend_requests, public.friendships, public.anonymous_posts from anon, authenticated;
 grant all on public.friend_requests, public.friendships, public.anonymous_posts to service_role;
+
+-- Remove the old timer from already-created Shake chats as well.
+update public.match_history set expires_at = null, proposal_expires_at = null
+ where match_source = 'shake' and status = 'active';
 
 -- Shake chats do not expire. Daily legacy matches retain their existing expiry.
 create or replace function public.nivora_expire_matches()
