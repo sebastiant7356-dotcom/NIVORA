@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ml" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123f33">
+  <meta name="description" content="MELVO — worldwide anonymous social discovery and chat.">
+  <title>MELVO — Shake & Chat</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+  <div class="announcement"><span class="dot"></span><span data-i18n="announcement">ലോകമെമ്പാടുമുള്ള ആളുകളുമായി സുരക്ഷിതമായി പരിചയപ്പെടാനും Chat ചെയ്യാനും ഒരു ഇടം.</span></div>
+  <header class="nav">
+    <a class="brand" href="#home" aria-label="MELVO home">
+      <span class="brand-mark">m<span>✦</span></span>
+      <span class="brand-copy"><b>melvo</b><small>SHAKE · CHAT · FRIENDS</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="privacy.html">Privacy & Safety</a>
+    </nav>
+    <div class="nav-actions">
+
+      <button class="lang-btn" id="langBtn" type="button">EN ↗</button>
+      <button class="lang-btn profile-nav-btn" id="openPortal" type="button" data-i18n="myprofile">എന്റെ പ്രൊഫൈൽ ↗</button>
+      <button class="lang-btn" id="googleAuthStart" type="button">Google Sign in / Sign up ↗</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu" type="button">☰</button>
+    </div>
+  </header>
+
+  <main class="app-entry">
+    <section class="hero" id="home">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-line"></span><span>GLOBAL SOCIAL DISCOVERY</span></div>
+        <h1><span data-i18n="heroLine1">സമീപത്തുള്ളവരെ കണ്ടെത്തൂ.</span><br><em data-i18n="heroLine2">സ്വതന്ത്രമായി Chat ചെയ്യൂ.</em></h1>
+        <p class="hero-sub" data-i18n="heroDesc">നിങ്ങൾക്ക് ഇഷ്ടമുള്ള Radius തിരഞ്ഞെടുക്കൂ. ഫോൺ Shake ചെയ്ത് ലോകമെമ്പാടുമുള്ള പുതിയ ആളുകളെ പരിചയപ്പെടൂ.</p>
+        <div class="hero-buttons">
+          <button class="outline-btn" id="openProfile" type="button" data-i18n="heroCta">Profile തുടങ്ങാം</button>
+          <button class="primary-btn" id="googleAuthHero" type="button">Continue with Google</button>
+        </div>
+        <div class="hero-note"><div class="avatar-stack"><span>⌖</span><span>✉</span><span>◌</span></div><div><b>Shake. Chat. Friends.</b><small>Anonymous posts · Private profiles · Worldwide</small></div></div>
+      </div>
+      <div class="hero-art">
+        <div class="sun-disc"></div>
+        <div class="hero-landscape"><span>⌖</span><div class="landscape-hills"></div><div class="palm palm-one">♧</div><div class="palm palm-two">♧</div></div>
+      </div>
+    </section>
+    <div hidden><button id="phoneAction" type="button">Preview</button><button id="heroStart" type="button">Start</button><button id="previewStart" type="button">Start</button></div>
+  </main>
+  <footer class="footer"><a class="brand footer-brand" href="#home"><span class="brand-mark">n<span>♡</span></span><span class="brand-copy"><b>melvo</b><small>SHAKE · CHAT · FRIENDS</small></span></a><p data-i18n="footerLine">ലോകമെമ്പാടുമുള്ള പുതിയ പരിചയങ്ങൾക്കായി ഒരു സ്വകാര്യ ഇടം.</p><div class="footer-links"><a href="privacy.html" id="privacyLink" data-i18n="footerPrivacy">സ്വകാര്യത</a><a href="terms.html">English Terms</a><a href="terms_ml.html">മലയാളം നിബന്ധനകൾ</a><a href="privacy_ml.html">മലയാളം Privacy</a><a href="privacy.html#grievances">Grievances</a><a href="mailto:melvo.helpdesk@gmail.com">Help email</a></div><small>© <span id="year"></span> MELVO · <span data-i18n="footerDemo">For adults aged 21–40.</span></small></footer>
+
+  <div class="modal-backdrop" id="profileModal" aria-hidden="true">
+    <section class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="closeModal" type="button" aria-label="Close">×</button>
+      <div class="modal-topline"><span class="section-kicker" data-i18n="modalKicker">YOUR FIRST STEP</span><span class="modal-step" id="stepCounter">01 / 04</span></div>
+      <div class="progress"><span id="progressBar"></span></div>
+      <div id="wizardContent"></div>
+      <div class="wizard-error" id="wizardError" role="status"></div>
+      <div class="wizard-actions"><button class="back-btn" id="backStep" type="button" disabled>← <span data-i18n="back">Back</span></button><button class="primary-btn wizard-next" id="nextStep" type="button"><span data-i18n="continue">Continue</span> <span class="arrow">→</span></button></div>
+      <p class="modal-disclaimer" data-i18n="modalDisclaimer">Sign in with Google to save and activate your profile.</p>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__sbPrimaryFailed=true"></script>
+  <script>
+    // Some mobile networks/DNS filters block one CDN but not another. If the first one
+    // failed (or silently didn't set window.supabase), fall back to a second CDN.
+    if (window.__sbPrimaryFailed || !window.supabase) {
+      document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\\/script>');
+    }
+  </script>
+  <script src="supabase-config.js"></script>
+  <script src="native-auth.js"></script>
+  <script src="common.js"></script>
+  <script src="app.js"></script>
+  <script src="portal.js"></script>
+</body>
+</html>
