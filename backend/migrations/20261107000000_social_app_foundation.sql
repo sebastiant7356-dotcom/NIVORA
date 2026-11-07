@@ -16,6 +16,11 @@ alter table public.profiles
 alter table public.profiles
   add constraint profiles_profile_visibility_check check (profile_visibility in ('public','hidden'));
 
+-- Friend conversations use the same chat transport, but never expire automatically.
+alter table public.match_history drop constraint if exists match_history_match_source_check;
+alter table public.match_history
+  add constraint match_history_match_source_check check (match_source in ('daily','shake','friend'));
+
 -- Existing composite match_members primary key already permits multiple conversations per member.
 create index if not exists match_members_user_idx on public.match_members(user_id, match_id);
 
@@ -78,7 +83,7 @@ grant all on public.friend_requests, public.friendships, public.anonymous_posts 
 
 -- Remove the old timer from already-created Shake chats as well.
 update public.match_history set expires_at = null, proposal_expires_at = null
- where match_source = 'shake' and status = 'active';
+ where match_source in ('shake','friend') and status = 'active';
 
 -- Shake chats do not expire. Daily legacy matches retain their existing expiry.
 create or replace function public.nivora_expire_matches()
@@ -89,7 +94,7 @@ begin
     update public.match_history
        set status = 'expired', ended_at = now(), ended_reason = 'expired'
      where status in ('proposed','active')
-       and (match_source is distinct from 'shake')
+       and (match_source is distinct from 'shake' and match_source is distinct from 'friend')
        and expires_at is not null and expires_at <= now()
     returning 1)
   select count(*) into n from e;
@@ -162,9 +167,44 @@ revoke all on function public.nivora_shake_mutual_interest(uuid,uuid) from publi
 grant execute on function public.nivora_shake_mutual_interest(uuid,uuid) to service_role;
 
 -- A friend request can be sent only from an active Shake conversation.
+create or replace function public.nivora_open_friend_chat(p_user uuid, p_partner uuid)
+returns uuid language plpgsql security definer set search_path = pg_catalog, public as $$
+declare
+  low_id uuid;
+  high_id uuid;
+  chat_id uuid;
+begin
+  if p_user is null or p_partner is null or p_user = p_partner then raise exception 'invalid_target'; end if;
+  low_id := least(p_user,p_partner); high_id := greatest(p_user,p_partner);
+  if not exists (select 1 from public.friendships where user_low=low_id and user_high=high_id) then
+    raise exception 'not_friends';
+  end if;
+  if exists (select 1 from public.blocks where (blocker_id=p_user and blocked_id=p_partner) or (blocker_id=p_partner and blocked_id=p_user)) then
+    raise exception 'blocked';
+  end if;
+  select id into chat_id from public.match_history
+   where status='active' and match_source='friend'
+     and ((user_one=p_user and user_two=p_partner) or (user_one=p_partner and user_two=p_user))
+   order by created_at desc limit 1;
+  if chat_id is not null then return chat_id; end if;
+  insert into public.match_history(user_one,user_two,status,started_at,expires_at,user_one_accepted,user_two_accepted,match_source)
+  values(p_user,p_partner,'active',now(),null,true,true,'friend')
+  returning id into chat_id;
+  insert into public.match_members(user_id,match_id) values(p_user,chat_id),(p_partner,chat_id);
+  return chat_id;
+end $$;
+revoke all on function public.nivora_open_friend_chat(uuid,uuid) from public, anon, authenticated;
+grant execute on function public.nivora_open_friend_chat(uuid,uuid) to service_role;
+
 create or replace function public.nivora_send_friend_request(p_user uuid, p_match uuid)
 returns jsonb language plpgsql security definer set search_path = pg_catalog, public as $$
-declare m public.match_history%rowtype; partner uuid; low_id uuid; high_id uuid; request_id uuid;
+declare
+  m public.match_history%rowtype;
+  partner uuid;
+  low_id uuid;
+  high_id uuid;
+  request_id uuid;
+  friend_chat uuid;
 begin
   select * into m from public.match_history where id=p_match and match_source='shake' and status='active'
     and p_user in (user_one,user_two);
@@ -173,14 +213,16 @@ begin
   if exists (select 1 from public.blocks where (blocker_id=p_user and blocked_id=partner) or (blocker_id=partner and blocked_id=p_user)) then raise exception 'blocked'; end if;
   low_id := least(p_user,partner); high_id := greatest(p_user,partner);
   if exists(select 1 from public.friendships where user_low=low_id and user_high=high_id) then
-    return jsonb_build_object('status','friends');
+    friend_chat := public.nivora_open_friend_chat(p_user,partner);
+    return jsonb_build_object('status','friends','chat_id',friend_chat);
   end if;
   select id into request_id from public.friend_requests
     where sender_id=partner and recipient_id=p_user and status='pending' limit 1;
   if request_id is not null then
     update public.friend_requests set status='accepted', responded_at=now() where id=request_id;
     insert into public.friendships(user_low,user_high) values(low_id,high_id) on conflict do nothing;
-    return jsonb_build_object('status','friends');
+    friend_chat := public.nivora_open_friend_chat(p_user,partner);
+    return jsonb_build_object('status','friends','chat_id',friend_chat);
   end if;
   insert into public.friend_requests(sender_id,recipient_id) values(p_user,partner)
     on conflict (sender_id,recipient_id) where status='pending' do nothing returning id into request_id;
@@ -191,18 +233,23 @@ grant execute on function public.nivora_send_friend_request(uuid,uuid) to servic
 
 create or replace function public.nivora_respond_friend_request(p_user uuid, p_request uuid, p_accept boolean)
 returns jsonb language plpgsql security definer set search_path = pg_catalog, public as $$
-declare r public.friend_requests%rowtype; low_id uuid; high_id uuid;
+declare r public.friend_requests%rowtype; low_id uuid; high_id uuid; friend_chat uuid;
 begin
   select * into r from public.friend_requests where id=p_request and recipient_id=p_user and status='pending' for update;
   if r.id is null then raise exception 'request_not_found'; end if;
   if p_accept then
+    if exists (select 1 from public.blocks where (blocker_id=p_user and blocked_id=r.sender_id) or (blocker_id=r.sender_id and blocked_id=p_user)) then
+      raise exception 'blocked';
+    end if;
     low_id := least(r.sender_id,r.recipient_id); high_id := greatest(r.sender_id,r.recipient_id);
     insert into public.friendships(user_low,user_high) values(low_id,high_id) on conflict do nothing;
     update public.friend_requests set status='accepted',responded_at=now() where id=p_request;
-    return jsonb_build_object('status','friends');
+    friend_chat := public.nivora_open_friend_chat(p_user,r.sender_id);
+    return jsonb_build_object('status','friends','chat_id',friend_chat);
   end if;
   update public.friend_requests set status='declined',responded_at=now() where id=p_request;
   return jsonb_build_object('status','declined');
 end $$;
 revoke all on function public.nivora_respond_friend_request(uuid,uuid,boolean) from public, anon, authenticated;
+grant execute on function public.nivora_respond_friend_request(uuid,uuid,boolean) to service_role;
 grant execute on function public.nivora_respond_friend_request(uuid,uuid,boolean) to service_role;
