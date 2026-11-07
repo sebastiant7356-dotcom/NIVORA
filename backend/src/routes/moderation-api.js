@@ -28,6 +28,13 @@ async function persistReport({ reporterId, reportedId, reason, details = "" }) {
     const e = new Error("Invalid report."); e.status = 400; throw e;
   }
   await purgeExpiredReports();
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data: duplicate, error: duplicateError } = await serviceClient().from("reports")
+    .select("id").eq("reporter_id", reporterId).eq("reported_id", reportedId).gte("created_at", since).limit(1);
+  if (duplicateError) throw duplicateError;
+  if (duplicate?.length) {
+    const e = new Error("You have already reported this account recently."); e.status = 409; throw e;
+  }
   const { data, error } = await serviceClient().from("reports").insert({
     reporter_id: reporterId, reported_id: reportedId, match_id: null,
     reason, details: clean(details).slice(0, 500), status: "open"
@@ -45,7 +52,9 @@ router.get("/admin/reports", requireStaff(), wrap(async (req, res) => {
     .select("id,reporter_id,reported_id,reason,details,status,resolution,created_at,resolved_at")
     .eq("status", status).order("created_at", { ascending: false }).limit(200);
   if (error) throw error;
-  res.json({ success: true, reports: data || [] });
+  const counts = new Map();
+  for (const row of data || []) if (row.reported_id) counts.set(row.reported_id, (counts.get(row.reported_id) || 0) + 1);
+  res.json({ success: true, reports: (data || []).map(row => ({ ...row, repeat_report_count: counts.get(row.reported_id) || 1 })) });
 }));
 router.post("/admin/reports/:id/resolve", requireStaff(), wrap(async (req, res) => {
   const status = req.body?.status;
