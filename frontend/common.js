@@ -102,5 +102,6 @@
     return data;
   }
 
-  window.NV = { API, cfg, client, session, api, authPanel, signInWithGoogle, t, esc, lang, isLocal, ready };\n  window.NivoraNative?.handlePending?.();
+  window.NV = { API, cfg, client, session, api, authPanel, signInWithGoogle, t, esc, lang, isLocal, ready };
+  window.NivoraNative?.handlePending?.();
 })();
