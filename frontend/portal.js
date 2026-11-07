@@ -518,9 +518,22 @@
         decline.onclick = () => respondFriend(request.id, false);
         row.append(label, accept, decline); incomingBox.appendChild(row);
       });
-      list.innerHTML = (friends.friends || []).length
-        ? (friends.friends || []).map((friend) => "<article class='shake-person'><h3>" + esc(friend.display_name) + "</h3><p>" + esc([friend.age, friend.district].filter(Boolean).join(" · ")) + "</p></article>").join("")
-        : "<p class='modal-description'>No friends yet. Start with a chat.</p>";
+      list.innerHTML = "";
+      if (!(friends.friends || []).length) list.innerHTML = "<p class='modal-description'>No friends yet. Start with a chat.</p>";
+      (friends.friends || []).forEach((friend) => {
+        const row = document.createElement("article"); row.className = "shake-person";
+        const title = document.createElement("h3"); title.textContent = friend.display_name;
+        const details = document.createElement("p"); details.textContent = [friend.age, friend.district].filter(Boolean).join(" · ");
+        const chat = document.createElement("button"); chat.className = "primary-btn"; chat.type = "button"; chat.textContent = "Chat";
+        chat.onclick = async () => {
+          chat.disabled = true;
+          try {
+            const opened = await api("/api/friends/" + encodeURIComponent(friend.friend_id) + "/chat", { method: "POST" });
+            selectedMatchId = opened.match_id; await loadAll(); render();
+          } catch (e) { chat.disabled = false; if (status) status.textContent = e.message || "Friend chat could not be opened."; }
+        };
+        row.append(title, details, chat); list.appendChild(row);
+      });
       if (!requests.incoming?.length) incomingBox.innerHTML = "<p class='modal-description'>No pending friend requests.</p>";
     } catch (e) { if (status) status.textContent = e.message || "Friends could not be loaded."; }
   }
