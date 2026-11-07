@@ -338,7 +338,16 @@ router.get("/account/export", (req,res) => {
 router.delete("/account", async (req,res) => {
   if(req.body?.confirm!=="DELETE") return fail(res,400,"confirmation_required",'Send {"confirm":"DELETE"} to delete your login account.');
   const id=req.user.id;
-  for(const [k] of state.entries()) if(k.endsWith(":"+id) || k.includes(":"+id+":")) state.delete(k);
+  for (const [k, value] of state.entries()) {
+    if (k.startsWith("match:") && value && [value.user_one, value.user_two].includes(id)) {
+      state.delete(key("messages", value.id)); state.delete(k);
+    } else if (k === "community:posts") put(k, value.filter(p => p.author_id !== id));
+    else if (k === "safety:reports") put(k, value.filter(r => r.reporter_id !== id && r.reported_id !== id));
+    else if (k === "feedback") put(k, value.filter(r => r.user_id !== id));
+    else if (Array.isArray(value) && (k.startsWith("friend-in:") || k.startsWith("friend-out:"))) put(k, value.filter(r => r.sender_id !== id && r.recipient_id !== id));
+    else if (Array.isArray(value) && k.startsWith("friends:")) put(k, value.filter(friendId => friendId !== id));
+    else if (k.endsWith(":" + id) || k.includes(":" + id + ":")) state.delete(k);
+  }
   try {
     const {error}=await serviceClient().auth.admin.deleteUser(id);
     if(error) return fail(res,500,"account_delete_failed","The login account could not be deleted. Contact support.");
