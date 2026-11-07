@@ -8,13 +8,14 @@
     "cap:sync": "npm run build:native && cap sync android"
   },
   "dependencies": {
-    "@capacitor/android": "latest",
-    "@capacitor/app": "latest",
-    "@capacitor/browser": "latest",
-    "@capacitor/core": "latest"
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/browser": "8.0.5",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/geolocation": "8.2.4"
   },
   "devDependencies": {
-    "@capacitor/cli": "latest",
-    "esbuild": "latest"
+    "@capacitor/cli": "8.6.0",
+    "esbuild": "0.25.12"
   }
 }
