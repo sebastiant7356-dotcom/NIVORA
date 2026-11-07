@@ -3,10 +3,12 @@ const express = require("express");
 const { requireAuth, requireStaff } = require("../middleware");
 const { serviceClient } = require("../lib/clients");
 const { clean } = require("../lib/validation");
+const { createLimiter, byUser } = require("../lib/ratelimit");
 
 const router = express.Router();
 router.use(requireAuth);
 const REASONS = ["harassment", "fake_profile", "scam", "inappropriate_content", "underage", "other"];
+const appealLimited = createLimiter({ windowMs: 60 * 60_000, max: 3, keyFn: byUser });
 const audit = async (actorId, action, targetId, details = {}) => {
   const { error } = await serviceClient().from("audit_log").insert({
     actor_id: actorId, action, target_type: "user", target_id: targetId, details
@@ -47,7 +49,7 @@ async function persistReport({ reporterId, reportedId, reason, details = "" }) {
 }
 const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
-router.post("/account/appeal", wrap(async (req, res) => {
+router.post("/account/appeal", appealLimited, wrap(async (req, res) => {
   const reason = clean(req.body?.reason || "").slice(0, 1000);
   if (reason.length < 5) return res.status(400).json({ success: false, message: "Enter an appeal reason of at least 5 characters." });
   const { data: enforcement, error: enforcementError } = await serviceClient().from("account_enforcements")
