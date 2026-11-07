@@ -56,27 +56,27 @@ test("BEYOND minimal-data mode mounts volatile session APIs, not legacy persiste
   const server = text(path.join(ROOT, "backend", "src", "server.js"));
   const api = text(path.join(ROOT, "backend", "src", "routes", "ephemeral-api.js"));
   const portal = text(path.join(ROOT, "frontend", "portal.js"));
-  assert.match(server, /routes\\/ephemeral-api/);
+  assert.ok(server.includes('app.use("/api", require("./routes/ephemeral-api"))'));
   for (const route of ["profile", "match", "shake", "friends", "community", "chat", "safety", "account", "admin"]) {
-    assert.doesNotMatch(server, new RegExp('require\\\\("\\\\.\\\\/routes\\\\/' + route + '"\\\\)'));
+    assert.ok(!server.includes('require("./routes/' + route + '")'), "legacy route mounted: " + route);
   }
-  assert.doesNotMatch(api, /\\.from\\s*\\(/);
-  assert.doesNotMatch(api, /\\.storage\\s*\\./);
-  assert.match(api, /new EphemeralStore/);
-  assert.match(api, /mutual/);
-  assert.match(api, /profile_visibility/);
-  assert.match(portal, /Photo sharing is disabled/);
+  assert.ok(!api.includes(".from("));
+  assert.ok(!api.includes(".storage."));
+  assert.ok(api.includes("new EphemeralStore"));
+  assert.ok(api.includes("mutual"));
+  assert.ok(api.includes("profile_visibility"));
+  assert.ok(portal.includes("Photo sharing is disabled"));
 });
 
 test("voice and photo uploads are disabled in minimal-data mode", () => {
   const api = text(path.join(ROOT, "backend", "src", "routes", "ephemeral-api.js"));
   const server = text(path.join(ROOT, "backend", "src", "server.js"));
   const portal = text(path.join(ROOT, "frontend", "portal.js"));
-  assert.match(api, /voice_disabled/);
-  assert.match(api, /photos_disabled/);
-  assert.doesNotMatch(server, /express\\.raw/);
-  assert.doesNotMatch(portal, /id="voiceRecord"/);
-  assert.doesNotMatch(portal, /id="photoInput"/);
+  assert.ok(api.includes("voice_disabled"));
+  assert.ok(api.includes("photos_disabled"));
+  assert.ok(!server.includes("express.raw"));
+  assert.ok(!portal.includes('id="voiceRecord"'));
+  assert.ok(!portal.includes('id="photoInput"'));
 });
 
 test("staff accounts cannot become customer profiles or receive matches", () => {
