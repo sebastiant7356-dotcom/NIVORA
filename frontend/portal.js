@@ -78,7 +78,7 @@
   function close() { stopVoiceRecording(true); stopRealtime(); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
-  let me = null, profile = null, match = null, matches = [], selectedMatchId = null, dailyQuota = { daily_used: 0, daily_limit: 5 }, history = [], photos = [], isStaff = false;
+  let me = null, profile = null, match = null, matches = [], selectedMatchId = null, history = [], photos = [], isStaff = false;
   let tickTimer = null, chatChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
   let voiceRecorder = null, voiceStream = null, voiceChunks = [], voiceMime = "", voiceStartedAt = 0, voiceLimitTimer = null, voiceDisplayTimer = null, voiceDiscard = false, voiceSeen = new Set(), lastVoiceTs = null;
   const val = (k) => (k in (profile || {}) ? profile[k] : "");
@@ -88,7 +88,7 @@
     const [pr, m, h] = await Promise.all([
       api("/api/profile"), api("/api/match/current"), api("/api/match/history").catch(() => ({ history: [] }))
     ]);
-    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; history = h.history || [];
+    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; history = h.history || [];
     photos = profile ? ((await api("/api/profile/photos").catch(() => ({ photos: [] }))).photos || []) : [];
     isStaff = await api("/api/admin/me").then(() => true).catch(() => false);
   }
@@ -611,14 +611,12 @@
     const box = body.querySelector("#matchBox");
     if (profile.approval_status !== "approved") { box.innerHTML = `<p class="modal-description">${p("needApproval")}</p>`; return; }
 
-    const canFind = dailyQuota.daily_used < dailyQuota.daily_limit && profile.profile_complete && !profile.suspended;
     const tabs = matches.length ? `<div class="nv-row" style="flex-wrap:wrap;gap:8px;margin-bottom:12px">${matches.map((item, i) =>
       `<button type="button" class="${match?.id === item.id ? "primary-btn" : "outline-btn"}" data-match-id="${esc(item.id)}">${p("chatTab")} ${i + 1}${item.status === "proposed" ? " · Pending" : ""}</button>`
     ).join("")}</div>` : "";
-    const find = `<div class="nv-row"><button class="primary-btn" id="mFind" type="button" ${canFind ? "" : "disabled"}>${p("findMatch")}</button></div>`;
     let header = `<p class="modal-description">${matches.length} conversation(s). Chats remain open until one member ends or blocks the connection.</p>`;
     if (!match) {
-      box.innerHTML = header + find + `<div class="nv-msg" id="mMsg"></div>`;
+      box.innerHTML = header + `<div class="nv-msg" id="mMsg"></div>`;
     } else {
       const m = match;
       const anonymousBlock = m.is_shake_match && m.status === "active" && m.reveal?.partner_hidden
@@ -651,21 +649,6 @@
         closeChat(); stopRealtime(); match = next; selectedMatchId = next.id; render();
       };
     });
-    const findButton = box.querySelector("#mFind");
-    if (findButton) findButton.onclick = async (ev) => {
-      ev.target.disabled = true; ev.target.textContent = p("finding");
-      try {
-        const r = await api("/api/match/find", { method: "POST" });
-        if (!r.found) {
-          const message = box.querySelector("#mMsg"); if (message) message.textContent = r.message || p("noMatchNow");
-          ev.target.disabled = !canFind; ev.target.textContent = p("findMatch"); return;
-        }
-        selectedMatchId = r.match?.id || selectedMatchId; await loadAll(); render();
-      } catch (e) {
-        const message = box.querySelector("#mMsg"); if (message) message.textContent = e.message;
-        ev.target.disabled = !canFind; ev.target.textContent = p("findMatch");
-      }
-    };
     if (!match) return;
     const m = match, $ = (s) => box.querySelector(s);
     $("#shakeReveal") && ($("#shakeReveal").onclick = async () => {
