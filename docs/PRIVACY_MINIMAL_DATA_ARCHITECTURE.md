@@ -1,49 +1,48 @@
 # BEYOND Minimal-Data Architecture
 
 ## Product decision
-BEYOND must retain only the authentication account needed to sign in. Google passwords are never collected or stored by BEYOND. Supabase Auth remains the identity provider and stores the authentication identity (provider subject/user UUID, provider metadata required for OAuth, and email only where supplied/required by Google/Supabase).
+BEYOND retains only the Google/Supabase Auth account identity needed to sign in. Google passwords are never collected or stored. Member-generated content is session-only and must not be written to Supabase Postgres or Supabase Storage.
 
-No application content is persisted in the BEYOND database or object storage:
-- profile fields and profile photos
-- chat text, voice notes, attachments
-- precise or approximate location history
-- discovery/like/match state
-- friend relationships
-- anonymous posts
-- feedback/report payloads containing user-submitted content
-- activity history and analytics tied to an account
+## Current implementation on this branch
+- `backend/src/routes/ephemeral-api.js` replaces the legacy profile, discovery, match, chat, friend, community, safety, feedback, and account API mounts.
+- `backend/src/lib/ephemeral-store.js` holds member content in volatile process memory with a 12-hour inactivity TTL and bounded capacity.
+- The old database-backed member-content route modules remain in the repository for reference but are no longer mounted by `server.js`.
+- Profile photos and voice uploads return a disabled response; UI upload controls are removed.
+- Chat history, match history and durable friend lists are not available.
+- Google authentication continues through Supabase Auth. Account deletion removes the Supabase Auth user.
+- Static CI tests assert that the mounted minimal-data API has no Supabase table, RPC or Storage access.
 
-## Runtime model
-User-generated content exists only in volatile runtime memory while the relevant live session is active. Use a dedicated ephemeral realtime service with authenticated WebSocket connections. Do not use process-local memory as the production solution because Render may restart or scale instances, causing inconsistent sessions. The ephemeral service must:
-- authenticate each connection by verifying the Supabase access token;
-- keep profile/discovery/chat state in RAM only;
-- enforce 18+ eligibility using a non-persistent client attestation/consent flow; do not persist birth date;
-- enforce mutual-interest, mutual-reveal, and mutual-friend consent server-side;
-- enforce radius calculations without writing coordinates to a database;
-- remove all user state on disconnect, logout, explicit clear, or bounded inactivity timeout;
-- avoid message bodies, tokens, coordinates, and identifiers in logs, traces, crash reports, and analytics;
-- use TLS/WSS and per-user rate limits;
-- make clear to users that chats and session state disappear when the session ends and cannot be recovered.
+## Important production limitations — not launch-ready
+The current adapter uses one Render process's RAM. Render restarts, redeploys, memory pressure, or scaling to multiple instances can erase or split active sessions. A dedicated authenticated ephemeral WebSocket/presence service is still required for reliable production realtime behaviour. The Render service is currently configured as a single instance; this does not eliminate restart loss.
+
+Block and report actions are also volatile. A report may disappear on restart or TTL expiry, and this version does not provide a durable staff moderation console. This is a material user-safety limitation. Do not market or release this version as a fully moderated public social network. A durable moderation system would require retaining limited report evidence, which conflicts with the strict "login details only" retention requirement; the product owner must explicitly choose between those requirements before public launch.
+
+## Session data lifecycle
+- Profile, exact location while opted in, discovery interest, active match, chat text, friend request, post, block, report and feedback are stored only in process memory.
+- Each stored item has a maximum 12-hour inactivity lifetime; capacity eviction and process restart may remove it sooner.
+- No user content is intended to survive logout/session expiry, process restart, or deployment.
+- Exact coordinates are used only for distance calculation and are never returned to another member or written to a database.
+- No message body, access token, password, or coordinate may be written to request logs.
 
 ## Authentication and security
-- Google OAuth only.
-- Never ask for, receive, hash, or store a Google password.
-- Keep Supabase Auth as the only persistent user store.
-- Do not put service-role credentials in the Android app.
-- Keep access tokens in the platform secure storage; never log them.
-- Account deletion must delete the Supabase Auth user and associated provider identity. Since app content is ephemeral, no content export/archive exists.
+- Google OAuth only; provider credentials remain with Google/Supabase.
+- Backend verifies Supabase access tokens and requires the Google provider.
+- Service-role credentials must never be shipped in the Android app.
+- Profile and discovery require a declared age of at least 18. Age is self-declared, not independently verified.
+- Mutual interest creates a chat; profile reveal and friendship each require separate mutual consent.
+- TLS/WSS, strict CORS, rate limits and security headers remain required.
 
-## Required code changes before enabling this policy
-1. Replace database-backed profile, match, shake, chat, friend, anonymous-post, voice-message, feedback, and safety routes with the ephemeral realtime service.
-2. Remove profile-photo and voice-message upload endpoints and disable their Supabase Storage buckets.
-3. Remove service-role database access from application routes; retain only server-side auth verification and minimal admin/security functions that do not retain member content.
-4. Replace account export/deletion behavior and all UI copy to match non-persistent sessions.
-5. Replace privacy policy and terms so they accurately disclose transient processing, authentication retention, legal/safety exceptions, and third-party processing by Google/Supabase/hosting providers.
-6. Add automated tests proving no route writes member content to Postgres or Storage.
-7. Deploy only after end-to-end tests with two separate Android accounts.
+## Existing production data and rollout
+Deploying the new route mount prevents this version from creating new member-content rows through the API, but it does not delete historical rows or Storage objects created by earlier versions. The Supabase project has existing legacy content tables and at least some historical profile/match rows. Do not claim the account-only retention goal is achieved until every legacy table and Storage bucket has been inventoried, a deletion plan is reviewed, and the deletion has been executed and verified. Preserve only Auth identities needed for login and any strictly required operator access-control configuration.
 
-## Data deletion and rollout
-Do not run destructive SQL or purge existing production records as part of code deployment. First deploy the no-new-content-write implementation, verify it, then run a separately approved deletion migration for existing content rows and objects. Preserve only the Supabase Auth users required for login. Record the deletion result without retaining deleted content or content-derived identifiers.
+## Required verification before release
+1. Run backend syntax checks and all tests.
+2. Run two-account Android end-to-end tests for profile setup, location opt-in, discovery, mutual interest, anonymous chat, mutual reveal, friendship, blocking and account deletion.
+3. Verify no API route writes member content to Postgres or Storage.
+4. Verify the production Auth redirect allow-list and Google OAuth configuration.
+5. Inventory and remove legacy database rows and Storage objects only after the new no-write deployment is confirmed healthy.
+6. Decide whether durable safety reports are required. If yes, revise the strict retention policy before implementing durable moderation.
+7. Replace the process-local adapter with a reliable ephemeral realtime service before multi-instance production use.
 
-## Critical product trade-off
-With this policy, conversations, profiles, matches, friends, posts, and discovery state do not survive a disconnect, logout, backend restart, or session expiry. There is no chat history, photo profile, persistent friend list, or cross-device profile. This is intentional and must be reflected in onboarding and Play Store disclosures.
+## Explicit product trade-offs
+There is no saved profile, photo, voice message, chat history, match history, persistent friend list, post archive, or durable safety-report record. Users may need to re-enter profile information after a backend restart. This behaviour must be disclosed in onboarding, the Privacy Notice and the Terms.
