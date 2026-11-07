@@ -126,7 +126,7 @@ test("match response never contains phone, email or last name", async () => {
 
 test("profile: duplicate create -> 409; rejected profiles cannot edit; approved edit remains approved", async () => {
   const router = require("../src/routes/profile");
-  const body = { full_name: "Ananya Nair", age: 26, district: "Kochi", gender: "woman", looking_for: "man", relationship_intention: "marriage", core_values: ["family"], consents: { terms: true, privacy: true } };
+  const body = { full_name: "Ananya Nair", age: 26, district: "Kochi, India", core_values: ["music"], consents: { terms: true, privacy: true } };
   when((c) => (c.table === "profiles" ? { data: { id: UID }, error: null } : { data: null, error: null }));
   assert.equal((await call(router, "POST", "/", { body })).code, 409);
   when((c) => (c.table === "staff_roles" ? { data: null, error: null } : { data: { approval_status: "rejected" }, error: null }));
@@ -149,7 +149,7 @@ test("profile create stores verified id, forced approved status and consent time
     if (c.ops.find((o) => o[0] === "maybeSingle")) return { data: null, error: null };
     return { data: null, error: null };
   });
-  const r = await call(router, "POST", "/", { body: { full_name: "Ananya Nair", age: 26, district: "Kochi", gender: "woman", looking_for: "man", relationship_intention: "marriage", core_values: ["family"], consents: { terms: true, privacy: true }, id: OTHER, approval_status: "approved" } });
+  const r = await call(router, "POST", "/", { body: { full_name: "Ananya Nair", age: 26, district: "Kochi, India", core_values: ["music"], consents: { terms: true, privacy: true }, id: OTHER, approval_status: "approved" } });
   assert.equal(r.code, 201); assert.equal(row.id, UID); assert.equal(row.approval_status, "approved");
   assert.ok(row.consent_terms_at && row.consent_privacy_at && row.consent_version);
 });
