@@ -1,8 +1,8 @@
 {
-  "name": "melvo-android",
+  "name": "beyond-android",
   "version": "1.0.0",
   "private": true,
-  "description": "MELVO global social discovery Android app",
+  "description": "BEYOND global social discovery Android app",
   "scripts": {
     "build:native": "esbuild frontend/native-auth-entry.js --bundle --format=iife --outfile=frontend/native-auth.js",
     "cap:sync": "npm run build:native && cap sync android"
