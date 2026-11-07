@@ -52,7 +52,7 @@ test("SQL: RLS enabled and matching functions not callable by browser roles", ()
   assert.ok(!/grant (insert|update|delete)[^;]*to (anon|authenticated)/i.test(sql));
 });
 
-test("NIVORA social app uses persistent Shake chats, radius discovery and friends", () => {
+test("MELVO global social app uses persistent Shake chats, radius discovery and friends", () => {
   const migration = text(path.join(ROOT, "backend", "migrations", "20261107000000_social_app_foundation.sql"));
   const route = text(path.join(ROOT, "backend", "src", "routes", "match.js"));
   const shake = text(path.join(ROOT, "backend", "src", "routes", "shake.js"));
@@ -67,12 +67,13 @@ test("NIVORA social app uses persistent Shake chats, radius discovery and friend
   assert.match(migration, /values\(p_user,p_partner,\x27active\x27,now\(\),null,true,true,\x27friend\x27\)/);
   assert.match(route, /daily_matching_disabled/);
   assert.match(shake, /mine\.radius_km/);
-  assert.match(shake, /isKeralaDistrict/);
+  assert.doesNotMatch(shake, /isKeralaDistrict|kerala_only/);
   assert.match(matches, /is_persistent_chat: persistentMatch/);
   assert.match(matches, /\["shake", "friend"\]/);
   assert.match(friends, /nivora_open_friend_chat/);
   assert.match(community, /anonymous_post_reported/);
   assert.match(community, /anonymous_post_author_blocked/);
+  assert.match(community, /audience === "global"/);
   assert.match(portal, /shakeRadius/);
   assert.match(portal, /discoverShakePeople\(true\)/);
   assert.match(portal, /friendRequest/);
