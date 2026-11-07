@@ -131,13 +131,14 @@ async function matchView(match, userId) {
     if (consentError) throw consentError;
 
     const revealState = shakeRevealState(match, userId, partnerId, consentRows);
-    const revealed = revealState.revealed;
-  const partnerHidden = partner?.profile_visibility === "hidden";
+    const partnerHidden = partner?.profile_visibility === "hidden";
+    const revealed = revealState.revealed && !partnerHidden;
     if (shakeMatch) {
       view.reveal = {
         my_consented: revealState.my_consented,
         partner_consented: revealState.partner_consented,
-        revealed
+        revealed,
+        partner_hidden: Boolean(partnerHidden)
       };
     }
 
