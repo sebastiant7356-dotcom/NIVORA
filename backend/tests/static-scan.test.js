@@ -64,7 +64,7 @@ test("NIVORA social app uses persistent Shake chats, radius discovery and friend
   assert.match(migration, /profile_visibility/);
   assert.match(migration, /create table if not exists public\.friendships/);
   assert.match(migration, /create table if not exists public\.anonymous_posts/);
-  assert.match(migration, /expires_at, user_one_accepted, user_two_accepted, match_source/);
+  assert.match(migration, /values\(p_user,p_partner,\x27active\x27,now\(\),null,true,true,\x27friend\x27\)/);
   assert.match(route, /daily_matching_disabled/);
   assert.match(shake, /mine\.radius_km/);
   assert.match(shake, /isKeralaDistrict/);
