@@ -22,7 +22,7 @@
     $("#auth").style.display = "none"; $("#app").style.display = "block";
     $("#who").style.display = "inline-block"; $("#who").textContent = role;
     $("#signOut").style.display = "inline-block";
-    $("#tabs").innerHTML = [["open","Open reports"],["actioned","Actioned"],["dismissed","Dismissed"]]
+    $("#tabs").innerHTML = [["open","Open reports"],["actioned","Actioned"],["dismissed","Dismissed"],...(role === "admin" ? [["restricted","Restricted accounts"]] : [])]
       .map(([v,l]) => '<button class="tab" data-status="' + v + '" type="button">' + l + '</button>').join("");
     $("#tabs").onclick = (e) => { const b = e.target.closest("[data-status]"); if (b) { status = b.dataset.status; load(); } };
     load();
@@ -32,9 +32,35 @@
     document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.status === status));
     msg(""); $("#list").innerHTML = "<p>Loading reports…</p>";
     try {
+      if (status === "restricted") {
+        const r = await api("/api/admin/enforcements");
+        return renderEnforcements(r.accounts || []);
+      }
       const r = await api("/api/admin/reports?status=" + encodeURIComponent(status));
       render(r.reports || []);
     } catch (e) { $("#list").innerHTML = ""; msg(e.message); }
+  }
+
+  function renderEnforcements(accounts) {
+    if (!accounts.length) { $("#list").innerHTML = "<p>No currently restricted accounts.</p>"; return; }
+    $("#list").innerHTML = accounts.map(a => `
+      <section class="card" data-user="${esc(a.user_id)}">
+        <h3>${esc(a.status.toUpperCase())}</h3>
+        <small>Account ${esc(a.user_id)} · Updated ${fmt(a.updated_at)} · ${a.expires_at ? "Until " + fmt(a.expires_at) : "No expiry set"}</small>
+        <p>${esc(a.reason)}</p>
+        <div class="admin-actions"><button data-reinstate type="button">Reinstate account</button></div>
+      </section>`).join("");
+    $("#list").onclick = async (e) => {
+      if (e.target.dataset.reinstate === undefined) return;
+      const card = e.target.closest("[data-user]");
+      if (!confirm("Reinstate this account?")) return;
+      try {
+        await api("/api/admin/users/" + encodeURIComponent(card.dataset.user) + "/enforcement", {
+          method: "POST", body: { status: "active", reason: "Restriction reviewed and lifted by an administrator." }
+        });
+        msg("Account reinstated.", true); load();
+      } catch (er) { msg(er.message); }
+    };
   }
 
   function render(reports) {
