@@ -23,6 +23,7 @@ create table if not exists public.account_appeals (
 create index if not exists reports_status_created_at_idx on public.reports(status, created_at desc);
 create index if not exists reports_reported_id_idx on public.reports(reported_id, created_at desc);
 create index if not exists account_appeals_status_created_idx on public.account_appeals(status, created_at desc);
+create index if not exists audit_log_created_at_idx on public.audit_log(created_at desc);
 alter table public.account_enforcements enable row level security;
 alter table public.account_appeals enable row level security;
 revoke all on public.account_enforcements from anon, authenticated;
