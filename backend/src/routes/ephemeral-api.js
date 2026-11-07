@@ -84,6 +84,7 @@ function saveProfile(req, res, creating) {
   const age = Number(b.age);
   const district = clean(b.district || "").slice(0, 100);
   const values = Array.isArray(b.core_values) ? [...new Set(b.core_values.map(x => clean(x).slice(0, 40)).filter(Boolean))].slice(0, 5) : [];
+  if (b.consents?.terms !== true || b.consents?.privacy !== true) return fail(res, 400, "consent_required", "Accept the Terms and Privacy Notice to continue.");
   if (name.length < 2 || !Number.isInteger(age) || age < 18 || age > 100 || !district || !values.length) {
     return fail(res, 400, "invalid_profile", "Enter a name, age 18 or older, location and at least one interest.");
   }
@@ -215,14 +216,23 @@ router.post("/chat/:matchId/voice", (_req, res) => fail(res, 410, "voice_disable
 // Anonymous posts are volatile. No media attachments are supported.
 router.get("/community/feed", (req, res) => {
   if (!requireProfile(req, res)) return;
-  const posts = list("community:posts").filter(p => !isBlocked(req.user.id, p.author_id)).map(p => ({ id:p.id, body:p.body, audience:p.audience, created_at:p.created_at, mine:p.author_id === req.user.id }));
+  const mineLoc = get(key("location", req.user.id));
+  const posts = list("community:posts").filter(p => {
+    if (isBlocked(req.user.id, p.author_id)) return false;
+    if (p.audience !== "radius" || p.author_id === req.user.id) return true;
+    const authorLoc = get(key("location", p.author_id));
+    return Boolean(mineLoc && authorLoc && distanceKm(mineLoc, authorLoc) <= p.radius_km);
+  }).map(p => ({ id:p.id, body:p.body, audience:p.audience, created_at:p.created_at, mine:p.author_id === req.user.id }));
   res.json({ success: true, posts });
 });
 router.post("/community/posts", limited, (req, res) => {
   if (!requireProfile(req, res)) return;
   const body = clean(req.body?.body || "");
   if (!body || body.length > 2000) return fail(res, 400, "invalid_post", "Posts must be 1–2000 characters.");
-  const post = { id: randomUUID(), author_id:req.user.id, body, audience:req.body?.audience === "radius" ? "radius" : "global", created_at:now() };
+  const audience = req.body?.audience === "radius" ? "radius" : "global";
+  const radius_km = Number(req.body?.radius_km ?? 25);
+  if (audience === "radius" && (!Number.isInteger(radius_km) || radius_km < 1 || radius_km > 100 || !get(key("location", req.user.id)))) return fail(res, 409, "location_required", "Enable nearby discovery before publishing to a radius.");
+  const post = { id: randomUUID(), author_id:req.user.id, body, audience, radius_km: audience === "radius" ? radius_km : null, created_at:now() };
   const posts = list("community:posts"); posts.unshift(post); put("community:posts", posts);
   res.status(201).json({ success:true, post:{ id:post.id, body:post.body, audience:post.audience, created_at:post.created_at } });
 });
@@ -297,6 +307,22 @@ router.post("/feedback", (req,res) => {
   if(!feedback || feedback.length>1000) return fail(res,400,"invalid_feedback","Feedback must be 1–1000 characters.");
   const rows=list("feedback"); rows.push({user_id:req.user.id,feedback,created_at:now()}); put("feedback",rows);
   res.status(201).json({success:true});
+});
+
+// Clear every volatile item associated with this member on explicit logout.
+router.delete("/session", (req, res) => {
+  const id = req.user.id;
+  for (const [k, value] of state.entries()) {
+    let remove = k.endsWith(":" + id) || k.includes(":" + id + ":");
+    if (k.startsWith("match:") && value && [value.user_one, value.user_two].includes(id)) {
+      state.delete(key("messages", value.id)); remove = true;
+    }
+    if (k === "community:posts") put(k, value.filter(p => p.author_id !== id));
+    else if (k === "safety:reports") put(k, value.filter(r => r.reporter_id !== id && r.reported_id !== id));
+    else if (k === "feedback") put(k, value.filter(r => r.user_id !== id));
+    else if (remove) state.delete(k);
+  }
+  res.json({ success: true, cleared: true });
 });
 
 // Export contains only the active in-memory session state. No historic content exists.
