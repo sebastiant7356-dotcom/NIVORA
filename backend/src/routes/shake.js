@@ -17,11 +17,8 @@ function distanceKm(aLat, aLon, bLat, bLon) {
   const a = Math.sin(dLat / 2) ** 2 + Math.cos(rad(aLat)) * Math.cos(rad(bLat)) * Math.sin(dLon / 2) ** 2;
   return 6371 * 2 * Math.asin(Math.sqrt(Math.min(1, a)));
 }
-function compatible(a, b) {
-  return (a.looking_for === "any" || a.looking_for === b.gender) &&
-    (b.looking_for === "any" || b.looking_for === a.gender) &&
-    b.age >= a.min_partner_age && b.age <= a.max_partner_age &&
-    a.age >= b.min_partner_age && a.age <= b.max_partner_age;
+function compatible() {
+  return true;
 }
 async function currentCustomer(db, userId) {
   const [{ data: staff, error: staffError }, { data: profile, error }] = await Promise.all([
