@@ -610,15 +610,16 @@
       `<button type="button" class="${match?.id === item.id ? "primary-btn" : "outline-btn"}" data-match-id="${esc(item.id)}">${p("chatTab")} ${i + 1}${item.status === "proposed" ? " · Pending" : ""}</button>`
     ).join("")}</div>` : "";
     const find = `<div class="nv-row"><button class="primary-btn" id="mFind" type="button" ${canFind ? "" : "disabled"}>${p("findMatch")}</button></div>`;
-    let header = `<p class="modal-description">${p("dailyMatchesUsed")}: ${dailyQuota.daily_used}/${dailyQuota.daily_limit} (Kerala time). ${p("activeConversations")}: ${matches.length}</p>`;
-    if (dailyQuota.daily_used >= dailyQuota.daily_limit) header += `<p class="modal-description">${p("dailyLimitReached")}</p>`;
+    let header = `<p class="modal-description">${matches.length} conversation(s). Chats remain open until one member ends or blocks the connection.</p>`;
     if (!match) {
       box.innerHTML = header + find + `<div class="nv-msg" id="mMsg"></div>`;
     } else {
       const m = match;
-      const anonymousBlock = m.is_shake_match && m.status === "active" && !m.reveal?.revealed
-        ? `<div class="summary-box"><b>${p("shakeAnonymousTitle")}</b><p>${p("shakeAnonymousInfo")}</p><p id="shakeRevealStatus">${m.reveal?.my_consented ? p("shakeWaitingReveal") : p("shakeReveal")}</p><div class="nv-row"><button class="outline-btn" id="shakeReveal" type="button">${m.reveal?.my_consented ? p("shakeRevealCheck") : p("shakeReveal")}</button>${m.reveal?.my_consented ? `<button class="nv-link" id="shakeWithdraw" type="button">${p("shakeWithdraw")}</button>` : ""}</div></div>`
-        : (m.is_shake_match && m.status === "active" && m.reveal?.revealed ? `<p class="modal-description">${p("shakeRevealDone")}</p>` : "");
+      const anonymousBlock = m.is_shake_match && m.status === "active" && m.reveal?.partner_hidden
+        ? `<div class="summary-box"><b>${p("shakeAnonymousTitle")}</b><p>The other member has chosen to keep their profile hidden. You can continue chatting anonymously.</p></div>`
+        : (m.is_shake_match && m.status === "active" && !m.reveal?.revealed
+          ? `<div class="summary-box"><b>${p("shakeAnonymousTitle")}</b><p>${p("shakeAnonymousInfo")}</p><p id="shakeRevealStatus">${m.reveal?.my_consented ? p("shakeWaitingReveal") : p("shakeReveal")}</p><div class="nv-row"><button class="outline-btn" id="shakeReveal" type="button">${m.reveal?.my_consented ? p("shakeRevealCheck") : p("shakeReveal")}</button>${m.reveal?.my_consented ? `<button class="nv-link" id="shakeWithdraw" type="button">${p("shakeWithdraw")}</button>` : ""}</div></div>`
+          : (m.is_shake_match && m.status === "active" && m.reveal?.revealed ? `<p class="modal-description">${p("shakeRevealDone")}</p>` : ""));
       let h = header + tabs + anonymousBlock + partnerHtml(m.partner);
       if (["proposed", "active"].includes(m.status)) {
         h += `${m.is_persistent_chat ? "" : `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>`}
