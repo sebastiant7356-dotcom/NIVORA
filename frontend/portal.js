@@ -330,7 +330,7 @@
 
     const privacySettings = document.createElement("section");
     privacySettings.className = "dashboard-panel";
-    privacySettings.innerHTML = "<h3 class='nv-h'>Profile visibility</h3><p class='modal-description'>Choose whether your profile can be shown after both people agree to reveal it.</p><select id='profileVisibility'><option value='public'>Visible</option><option value='hidden'>Hidden</option></select><div class='nv-msg' id='visibilityStatus' role='status'></div>";
+    privacySettings.innerHTML = L() === "ml" ? "<h3 class='nv-h'>Profile Visibility</h3><p class='modal-description'>Shake discovery-ൽ നിങ്ങളെ കണ്ടെത്താൻ അനുവദിക്കണോ എന്ന് തിരഞ്ഞെടുക്കുക. Profile വിവരങ്ങൾ ഇരുവരും സമ്മതിക്കുന്നതുവരെ മറഞ്ഞിരിക്കും.</p><select id='profileVisibility'><option value='public'>Visible</option><option value='hidden'>Hidden</option></select><div class='nv-msg' id='visibilityStatus' role='status'></div>" : "<h3 class='nv-h'>Profile visibility</h3><p class='modal-description'>Choose whether people can find you in Shake discovery. Your profile details remain hidden until both people agree to reveal.</p><select id='profileVisibility'><option value='public'>Visible in discovery</option><option value='hidden'>Hidden from discovery</option></select><div class='nv-msg' id='visibilityStatus' role='status'></div>";
     profilePanel.appendChild(privacySettings);
     const visibilitySelect = privacySettings.querySelector("#profileVisibility");
     visibilitySelect.value = profile.profile_visibility || "public";
