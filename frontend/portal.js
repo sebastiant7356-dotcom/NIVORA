@@ -339,10 +339,12 @@
     try {
       const state = await api("/api/shake/status");
       enable.hidden = state.enabled; refresh.hidden = !state.enabled; disable.hidden = !state.enabled;
-      status.textContent = state.enabled ? p("shakeEnabled") : p("shakePrivacy");\n      const radius = body.querySelector("#shakeRadius"); if (radius) radius.value = String(state.radius_km || 25);\n      const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.hidden = !state.enabled;
+      status.textContent = state.enabled ? p("shakeEnabled") : p("shakePrivacy");
+      const radius = body.querySelector("#shakeRadius"); if (radius) radius.value = String(state.radius_km || 25);\n      const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.hidden = !state.enabled;
       if (state.enabled) await discoverShakePeople();
     } catch (e) { status.textContent = e.message || p("shakeError"); }
-    enable.onclick = enableShakeLocation;\n    const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.onclick = discoverShakePeople;\n    const radius = body.querySelector("#shakeRadius"); if (radius) radius.onchange = enableShakeLocation;
+    enable.onclick = enableShakeLocation;
+    const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.onclick = discoverShakePeople;\n    const radius = body.querySelector("#shakeRadius"); if (radius) radius.onchange = enableShakeLocation;
     refresh.onclick = discoverShakePeople;
     disable.onclick = disableShakeLocation;
   }
