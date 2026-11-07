@@ -25,5 +25,5 @@ test("server mounts the ephemeral API and does not mount legacy content routes",
 test("minimal-data API retains no member content after process restart by design", () => {
   assert.match(api, /new EphemeralStore/);
   assert.match(api, /12 \* 60 \* 60 \* 1000/);
-  assert.match(api, /volatile process memory/i);
+  assert.match(api, /lives only in this process/i);
 });
