@@ -50,13 +50,14 @@ router.get("/feed", async (req, res) => {
 });
 
 router.post("/posts", postLimit, async (req, res) => {
+  const db = serviceClient();
+  if (!(await eligibleKeralaMember(db, req.user.id))) return res.status(403).json({ success: false, message: "NIVORA community is currently for members in Kerala only." });
   if (typeof req.body?.body !== "string") return res.status(400).json({ success: false, message: "Write a post first." });
   const body = clean(req.body.body);
   const audience = req.body?.audience === "radius" ? "radius" : "kerala";
   const radius = Number(req.body?.radius_km ?? 25);
   if (body.length < 1 || body.length > 2000) return res.status(400).json({ success: false, message: "Posts must be 1–2000 characters." });
   if (audience === "radius" && (!Number.isInteger(radius) || radius < 1 || radius > 100)) return res.status(400).json({ success: false, message: "Choose a radius from 1 to 100 km." });
-  const db = serviceClient();
   let loc = null;
   if (audience === "radius") {
     const { data, error } = await db.from("shake_locations").select("latitude,longitude").eq("user_id", req.user.id).eq("enabled", true).maybeSingle();
