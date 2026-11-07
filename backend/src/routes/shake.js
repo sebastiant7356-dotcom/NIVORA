@@ -60,9 +60,11 @@ router.post("/location", locationLimit, async (req, res) => {
 });
 
 router.delete("/location", locationLimit, async (req, res) => {
-  const { error } = await serviceClient().from("shake_locations").delete().eq("user_id", req.user.id);
+  const db = serviceClient();
+  const { error } = await db.from("shake_locations").delete().eq("user_id", req.user.id);
   if (error) return res.status(500).json({ success: false, message: "Could not turn off location discovery." });
-  res.json({ success: true, enabled: false });
+  await db.from("anonymous_posts").delete().eq("author_id", req.user.id).eq("audience", "radius");
+  res.json({ success: true, enabled: false, radius_posts_removed: true });
 });
 
 router.get("/discover", discoverLimit, async (req, res) => {
