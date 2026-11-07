@@ -184,7 +184,7 @@ router.post("/match/find", (_req, res) => fail(res, 410, "retired", "Use Shake &
 router.post("/match/:id/respond", (req, res) => {
   const m = matchOf(req.params.id, req.user.id); if (!m) return fail(res, 404, "match_not_live", "Conversation not found.");
   if (typeof req.body?.accept !== "boolean") return fail(res, 400, "invalid_response", "Invalid response.");
-  if (!req.body.accept) { m.status = "ended"; put(key("match", m.id), m); }
+  if (!req.body.accept) { m.status = "ended"; put(key("match", m.id), m); state.delete(key("messages", m.id)); }
   res.json({ success: true, status: m.status, match: matchView(m, req.user.id) });
 });
 router.post("/match/:id/end", (req, res) => {
@@ -288,7 +288,7 @@ router.post("/friends/:id/chat", (req,res) => {
 function blockUser(userId, targetId) {
   put(key("block",userId+":"+targetId),true);
   removeValue(key("friends",userId),targetId); removeValue(key("friends",targetId),userId);
-  for(const mid of list(key("matches",userId))) { const m=get(key("match",mid)); if(m && [m.user_one,m.user_two].includes(targetId)) { m.status="ended"; put(key("match",mid),m); } }
+  for(const mid of list(key("matches",userId))) { const m=get(key("match",mid)); if(m && [m.user_one,m.user_two].includes(targetId)) { m.status="ended"; put(key("match",mid),m); state.delete(key("messages",mid)); } }
   for(const k of ["friend-in:"+userId,"friend-out:"+userId,"friend-in:"+targetId,"friend-out:"+targetId]) put(k,list(k).filter(r=>r.sender_id!==targetId && r.recipient_id!==targetId));
 }
 router.post("/safety/block", (req,res) => {
