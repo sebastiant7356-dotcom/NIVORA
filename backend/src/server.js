@@ -16,10 +16,6 @@ function createApp() {
 
   app.use("/api", createLimiter({ windowMs: 15 * 60_000, max: 600 }));
 
-  // Private uploads use raw bodies and must be parsed before the JSON middleware.
-  app.use("/api/profile/photos", express.raw({ type: "*/*", limit: "5mb" }), require("./routes/profile-photos"));
-  app.use("/api/chat/:matchId/voice", express.raw({ type: "*/*", limit: "2mb" }));
-
   app.use(express.json({ limit: "20kb" }));
 
   app.get("/api/health", (req, res) => res.json({ success: true, app: "BEYOND", message: "Backend is running" }));
@@ -39,16 +35,9 @@ function createApp() {
     policy_version: config.policyVersion
   }));
 
-  app.use("/api/profile", require("./routes/profile"));
-  app.use("/api/match", require("./routes/match"));
-  app.use("/api/shake", require("./routes/shake"));
-  app.use("/api/friends", require("./routes/friends"));
-  app.use("/api/community", require("./routes/community"));
-  app.use("/api/chat", require("./routes/chat"));
-  app.use("/api/safety", require("./routes/safety"));
-  app.use("/api/feedback", require("./routes/feedback"));
-  app.use("/api/account", require("./routes/account"));
-  app.use("/api/admin", require("./routes/admin"));
+  // Minimal-data mode: all member-generated content is handled by a volatile
+  // in-process session API. Legacy Supabase content routes are not mounted.
+  app.use("/api", require("./routes/ephemeral-api"));
 
   app.use(mw.notFound);
   app.use(mw.errorHandler);
