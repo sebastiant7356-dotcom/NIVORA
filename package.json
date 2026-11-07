@@ -1,0 +1,21 @@
+{
+  "name": "beyond-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BEYOND global social discovery Android app",
+  "scripts": {
+    "build:native": "esbuild frontend/native-auth-entry.js --bundle --format=iife --outfile=frontend/native-auth.js",
+    "cap:sync": "npm run build:native && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/browser": "8.0.5",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/geolocation": "8.2.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0",
+    "esbuild": "0.25.12"
+  }
+}

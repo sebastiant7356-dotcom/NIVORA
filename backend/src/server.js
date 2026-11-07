@@ -22,10 +22,10 @@ function createApp() {
 
   app.use(express.json({ limit: "20kb" }));
 
-  app.get("/api/health", (req, res) => res.json({ success: true, app: "MELVO", message: "Backend is running" }));
+  app.get("/api/health", (req, res) => res.json({ success: true, app: "BEYOND", message: "Backend is running" }));
 
   // Public legal documents required by the Android app and Play Store listing.
-  const legalFiles = new Set(["privacy.html", "privacy_ml.html", "terms.html", "terms_ml.html", "styles.css"]);
+  const legalFiles = new Set(["privacy.html", "terms.html", "styles.css"]);
   app.get("/privacy", (req, res) => res.redirect(302, "/legal/privacy.html"));
   app.get("/terms", (req, res) => res.redirect(302, "/legal/terms.html"));
   app.get("/legal/:file", (req, res, next) => {
@@ -58,12 +58,12 @@ function createApp() {
 if (require.main === module) {
   const missing = config.missing();
   if (missing.length) {
-    console.error("MELVO backend cannot start. Missing required settings: " + missing.join(", "));
+    console.error("BEYOND backend cannot start. Missing required settings: " + missing.join(", "));
     console.error("Copy .env.example to .env and fill them in.");
     process.exit(1);
   }
   createApp().listen(config.port, "0.0.0.0", () => {
-    console.log(`MELVO backend running on port ${config.port} (${config.isProd ? "production" : "development"})`);
+    console.log(`BEYOND backend running on port ${config.port} (${config.isProd ? "production" : "development"})`);
   });
 }
 

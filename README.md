@@ -1,6 +1,6 @@
-# MELVO — Global Shake & Chat Android app
+# BEYOND — Global Shake & Chat Android app
 
-MELVO is the working product name for a global, adults-only social discovery app. The brand name is provisional and must pass trademark, domain and Play Store name checks before public release. The source repository is still named NIVORA.
+BEYOND is the working product name for a global, adults-only social discovery app. The brand name is provisional and must pass trademark, domain and Play Store name checks before public release. The source repository is still named NIVORA.
 
 ## Product
 
@@ -29,10 +29,10 @@ Supabase provides Google OAuth, PostgreSQL and private storage. Render hosts the
 ## Android build
 
 - Capacitor application ID: `in.melvo.social`
-- Display name: `MELVO`
+- Display name: `BEYOND`
 - OAuth deep link: `in.melvo.social://auth/callback`
 
-GitHub Actions builds a debug APK and uploads it as the `melvo-android-debug` artifact. A debug APK is for testing only.
+GitHub Actions builds a debug APK and uploads it as the `beyond-android-debug` artifact. A debug APK is for testing only.
 
 For a local build:
 1. Install Node.js 22+ and Java 21.
@@ -46,7 +46,8 @@ Before Android Google sign-in works, add the exact redirect `in.melvo.social://a
 
 ## Current release blockers
 
-- The social/global migrations have been applied to Supabase: `20261107000000_social_app_foundation.sql`, `20261108000000_global_social_platform.sql`, and `20261109000000_cleanup_legacy_post_constraint.sql`.
+- The social/global migrations are already present in Supabase: `20261107000000_social_app_foundation.sql`, `20261108000000_global_social_platform.sql`, and `20261109000000_cleanup_legacy_post_constraint.sql`.
+- The additive performance migration `anonymous_posts_author_index` has been applied to the connected Supabase database; it indexes `anonymous_posts.author_id`.
 - Add the Android OAuth redirect URI to Supabase Auth.
 - Deploy the updated backend to the existing Render service.
 - Complete two-account tests for global discovery, mutual anonymous reveal, persistent chat, friend requests, global/radius posts, blocking, reporting and account deletion.
@@ -56,6 +57,6 @@ Before Android Google sign-in works, add the exact redirect `in.melvo.social://a
 
 ## Important limitations
 
-MELVO is not yet a production-ready worldwide service. The code changes are in a draft pull request and have not been merged or deployed. A worldwide product also requires country-specific legal review, privacy and data-transfer compliance, child-safety controls, moderation coverage, and capacity planning. Do not advertise worldwide availability until the database migration, backend deployment, OAuth configuration and real-device testing are complete.
+BEYOND is not yet a production-ready worldwide service. The code changes are in a draft pull request and have not been merged or deployed. A worldwide product also requires country-specific legal review, privacy and data-transfer compliance, child-safety controls, moderation coverage, and capacity planning. Do not advertise worldwide availability until the database migration, backend deployment, OAuth configuration and real-device testing are complete.
 
 The operator is an individual, not a registered company. Keep secrets only in provider secret settings; never commit OAuth client secrets or Supabase service-role keys.

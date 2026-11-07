@@ -1,4 +1,4 @@
-# MELVO — Global Android Social App Test Plan
+# BEYOND — Global Android Social App Test Plan
 
 Last updated: 2026-11-07
 
@@ -17,7 +17,7 @@ This is a manual release-gate plan, not evidence that the checks have passed. Re
 
 | Area | Test | Expected result |
 |---|---|---|
-| Google OAuth | Sign in with two separate Google accounts on Android | System browser opens, OAuth returns through the MELVO app deep link, correct account session is restored |
+| Google OAuth | Sign in with two separate Google accounts on Android | System browser opens, OAuth returns through the BEYOND app deep link, correct account session is restored |
 | Profile | Create and edit profiles using different countries | City/region/country text is accepted; age must be 18+; no dating preferences are required |
 | Staff separation | Sign in with a staff account | Staff console only; no customer profile or discovery |
 | Radius | Set 1, 5, 25 and 100 km; test accounts inside/outside each radius in different countries | Only public members within the selected radius appear |

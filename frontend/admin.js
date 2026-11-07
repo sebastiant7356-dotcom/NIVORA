@@ -1,4 +1,4 @@
-/* NIVORA staff screen. All authorisation happens on the server (/api/admin/* checks staff_roles). */
+/* BEYOND staff screen. All authorisation happens on the server (/api/admin/* checks staff_roles). */
 (function () {
   "use strict";
   const { api, client, session, authPanel, esc } = window.NV;
@@ -17,7 +17,7 @@
     try { role = (await api("/api/admin/me")).role; }
     catch (e) {
       $("#auth").style.display = "block";
-      $("#auth").innerHTML = `<div class="card"><h3>Not authorised</h3><p>${e.status === 403 ? "This account is not a staff member." : esc(e.message)}</p><a class="outline-btn" href="index.html">Back to NIVORA</a></div>`;
+      $("#auth").innerHTML = `<div class="card"><h3>Not authorised</h3><p>${e.status === 403 ? "This account is not a staff member." : esc(e.message)}</p><a class="outline-btn" href="index.html">Back to BEYOND</a></div>`;
       $("#signOut").style.display = "inline-block"; return;
     }
     $("#auth").style.display = "none"; $("#app").style.display = "block";
@@ -133,6 +133,8 @@
     };
   }
 
+  const postIdFor = (report) => (String(report.details || "").match(/Anonymous post ([0-9a-f-]{36})/i) || [])[1] || null;
+
   function renderReports(list) {
     if (!list.length) { $("#list").innerHTML = `<p>No open reports.</p>`; return; }
     $("#list").innerHTML = list.map((r) => `<div class="card" data-id="${esc(r.id)}"><h3>${esc(r.reason)}</h3><small>Filed ${fmt(r.created_at)} · reported user ${esc(r.reported_id || "deleted")}</small><p>${esc(r.details || "(no details)")}</p>
@@ -140,7 +142,8 @@
       <button data-r="actioned" type="button">Mark actioned</button><button data-r="dismissed" class="alt" type="button">Dismiss</button>
       ${role === "admin" ? `<button data-r="actioned" data-s="1" class="bad" type="button">Action + suspend user</button>` : ""}
       ${r.reported_id ? `<button data-profile="${esc(r.reported_id)}" class="alt" type="button">View reported profile</button><button data-photos="${esc(r.reported_id)}" class="alt" type="button">View reported profile photos</button>` : ""}
-      ${r.match_id ? `<button data-chat class="alt" type="button">View reported chat (audit-logged)</button><button data-voice class="alt" type="button">Review reported voice (audit-logged)</button>` : ""}</div><div class="hist"></div></div>`).join("");
+      ${r.match_id ? `<button data-chat class="alt" type="button">View reported chat (audit-logged)</button><button data-voice class="alt" type="button">Review reported voice (audit-logged)</button>` : ""}
+      ${postIdFor(r) ? `<button data-post="${esc(postIdFor(r))}" class="alt" type="button">View anonymous post (audit-logged)</button>` : ""}</div><div class="hist"></div></div>`).join("");
     $("#list").onclick = async (e) => {
       const card = e.target.closest(".card"); if (!card) return; const id = card.dataset.id;
       if (e.target.dataset.r) {
@@ -148,6 +151,21 @@
       } else if (e.target.dataset.chat !== undefined) {
         if (!confirm("Reading a private conversation is logged in the audit trail. Continue?")) return;
         try { const r = await api(`/api/admin/reports/${id}/messages`); card.querySelector(".hist").innerHTML = r.messages.map((m) => `<div class="bubble theirs">${esc(m.body)}</div>`).join("") || "<small>No messages.</small>"; } catch (er) { msg(er.message); }
+      } else if (e.target.dataset.post) {
+        if (!confirm("Viewing an anonymous post report is audit-logged. Continue?")) return;
+        try {
+          const r = await api(`/api/admin/reports/${id}/anonymous-post`);
+          card.querySelector(".hist").innerHTML = `<h4>Reported anonymous post</h4><p>${esc(r.post.body)}</p><small>Author: ${esc(r.post.author_id)} · Audience: ${esc(r.post.audience)} · Status: ${esc(r.post.status)}</small><div class="admin-actions"><button data-remove-post="${esc(r.post.id)}" class="bad" type="button">Remove post</button></div>`;
+        } catch (er) { msg(er.message); }
+      } else if (e.target.dataset.removePost) {
+        const reason = card.querySelector("textarea")?.value || "";
+        if (reason.trim().length < 5) { msg("Enter a removal reason (at least 5 characters) in the resolution box."); return; }
+        if (!confirm("Remove this anonymous post?")) return;
+        try {
+          await api(`/api/admin/anonymous-posts/${encodeURIComponent(e.target.dataset.removePost)}/remove`, { method: "POST", body: { reason } });
+          msg("Anonymous post removed.", true);
+          load();
+        } catch (er) { msg(er.message); }
       } else if (e.target.dataset.profile) {
         try {
           const r = await api(`/api/admin/profiles/${e.target.dataset.profile}`), p = r.profile;

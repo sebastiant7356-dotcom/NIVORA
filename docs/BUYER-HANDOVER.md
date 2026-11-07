@@ -1,4 +1,4 @@
-# MELVO — Buyer Handover Guide
+# BEYOND — Buyer Handover Guide
 
 Last updated: 2026-11-07
 
@@ -8,7 +8,7 @@ already been transferred.
 
 ## 1. Source code and intellectual property
 
-- Repository: https://github.com/sebastiant7356-dotcom/MELVO
+- Repository: https://github.com/sebastiant7356-dotcom/BEYOND
 - Default branch: main
 - Android app: Capacitor wrapper; UI source in `frontend/` is bundled inside the Android package. A separate public frontend website is not required.
 - Backend: Node.js / Express API in `backend/`.

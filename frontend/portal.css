@@ -1,4 +1,4 @@
-/* NIVORA portal + admin styles — reuse the existing brand tokens from styles.css */
+/* BEYOND portal + admin styles — reuse the existing brand tokens from styles.css */
 .portal-modal{max-width:560px;max-height:92vh;overflow:auto}
 .nv-h{font:700 13px 'DM Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#698575;margin:26px 0 10px;border-top:1px solid var(--line);padding-top:16px}
 .nv-msg{min-height:18px;font-size:12px;color:#a2503f;margin:8px 0}.nv-msg.ok{color:#2f6b4f}
@@ -102,7 +102,7 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
 .shake-coming .modal-description{max-width:420px}
 
 
-/* NIVORA dashboard refresh — warm, modern, mobile-first */
+/* BEYOND dashboard refresh — warm, modern, mobile-first */
 .dashboard-page{
   background:
     radial-gradient(ellipse at 8% 0%,rgba(191,215,180,.38),transparent 34rem),
@@ -293,7 +293,7 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
 }
 
 
-/* NIVORA signature dashboard — refined editorial layout */
+/* BEYOND signature dashboard — refined editorial layout */
 .dashboard-page .profile-modal.portal-modal{
   max-width:none;
   padding:24px max(18px,calc((100vw - 1080px)/2)) calc(116px + env(safe-area-inset-bottom));
@@ -411,7 +411,7 @@ table.audit{width:100%;border-collapse:collapse;font-size:12px}table.audit td,ta
 }
 
 
-/* NIVORA — expressive, welcoming dashboard finish */
+/* BEYOND — expressive, welcoming dashboard finish */
 .dashboard-page .dashboard-welcome{
   isolation:isolate;
   min-height:330px;

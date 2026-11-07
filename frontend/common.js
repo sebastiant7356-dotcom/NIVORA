@@ -1,7 +1,7 @@
-/* NIVORA shared browser helpers: config, Google OAuth, Supabase client and API calls. */
+/* BEYOND shared browser helpers: config, Google OAuth, Supabase client and API calls. */
 (function () {
   "use strict";
-  const cfg = window.NIVORA_CONFIG || {};
+  const cfg = window.BEYOND_CONFIG || {};
   const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   const API = String(cfg.apiBase || (isLocal ? `${location.protocol}//${location.hostname}:4000` : "")).replace(/\/+$/, "");
 
@@ -76,9 +76,9 @@
   function authPanel(container, { onCancel } = {}) {
     return new Promise((resolve, reject) => {
       container.innerHTML = `<h2 class="modal-title">${t("signInTitle")}</h2>
-        <p class="modal-description">${lang() === "ml" ? "Google അക്കൗണ്ട് ഉപയോഗിച്ച് സുരക്ഷിതമായി തുടരുക." : "Continue securely with your Google account."}</p>
+        <p class="modal-description">${lang() === "ml" ? "Continue securely with your Google account." : "Continue securely with your Google account."}</p>
         <div class="nv-msg" id="nvMsg" role="status"></div>
-        <div class="nv-row"><button class="primary-btn" id="nvGoogleAuth" type="button">Google ഉപയോഗിച്ച് തുടരുക / Continue with Google</button></div>
+        <div class="nv-row"><button class="primary-btn" id="nvGoogleAuth" type="button">Continue with Google</button></div>
         <div class="nv-row"><button class="back-btn" id="nvCancel" type="button">${t("cancel")}</button></div>`;
       container.querySelector("#nvGoogleAuth").onclick = async () => {
         const btn = container.querySelector("#nvGoogleAuth");
@@ -86,7 +86,7 @@
         try { await signInWithGoogle(); }
         catch (e) {
           container.querySelector("#nvMsg").textContent = e.message || t("generic");
-          btn.disabled = false; btn.textContent = "Google ഉപയോഗിച്ച് തുടരുക / Continue with Google";
+          btn.disabled = false; btn.textContent = "Continue with Google";
         }
       };
       container.querySelector("#nvCancel").onclick = () => { onCancel && onCancel(); reject(new Error("cancelled")); };
@@ -94,6 +94,7 @@
   }
 
   async function signInWithGoogle() {
+    if (window.NivoraNative?.isNative?.()) return window.NivoraNative.signInWithGoogle();
     const { data, error } = await client().auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin + window.location.pathname }
@@ -103,4 +104,5 @@
   }
 
   window.NV = { API, cfg, client, session, api, authPanel, signInWithGoogle, t, esc, lang, isLocal, ready };
+  window.NivoraNative?.handlePending?.();
 })();

@@ -1,0 +1,8 @@
+{
+  "appId": "in.melvo.social",
+  "appName": "BEYOND",
+  "webDir": "frontend",
+  "server": {
+    "androidScheme": "https"
+  }
+}

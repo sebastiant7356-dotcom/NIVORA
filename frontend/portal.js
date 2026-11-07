@@ -1,4 +1,4 @@
-/* NIVORA member portal: profile, matching, chat, voice messages, safety and account. Depends on common.js */
+/* BEYOND member portal: profile, matching, chat, voice messages, safety and account. Depends on common.js */
 (function () {
   "use strict";
   const { api, client, session, signInWithGoogle, esc } = window.NV;
@@ -6,19 +6,19 @@
 
   const P = {
     en: {
-      myspace: "My space", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Find a match to start chatting.", shakeIntro: "Discover people who are also looking to connect within 50 km.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Location sharing is optional. Your exact location is private and is never shown to other members.", shakeEnable: "Enable nearby discovery", shakeDisable: "Turn off location sharing", shakeRefresh: "Find people nearby", shakeLoading: "Finding people within 50 km…", shakeNoPeople: "No compatible members are available nearby yet.", shakePermission: "Allow location access in your browser to continue.", shakeEnabled: "Nearby discovery is enabled. Your exact location stays private.", shakeLike: "Interested", shakeLikeBack: "Like back", shakeWaiting: "Interest sent. Waiting for a mutual interest.", shakeMatched: "It’s a mutual interest! Your chat is ready in Messages.", shakeAnonymousTitle: "You are chatting anonymously", shakeAnonymousInfo: "Your name, photos and profile details stay hidden until both of you choose to reveal.", shakeReveal: "I am comfortable revealing my profile", shakeWaitingReveal: "Your choice is saved. Waiting for the other person to consent.", shakeRevealDone: "Both of you agreed. Profiles are now visible.", shakeRevealCheck: "Check reveal status", shakeWithdraw: "Withdraw my consent", shakeDistance: "km away", shakeError: "Could not load Shake & Chat. Please try again.", shakeConsent: "By enabling, you allow NIVORA to use your location privately to find compatible members within 50 km. You can turn this off anytime.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
-      noProfile: "You have not created a profile yet.", staffAccount: "This is a NIVORA staff account. Customer profiles and matching are disabled for staff.", staffConsole: "Open staff console", createProfile: "Create my profile",
+      myspace: "My space", messagesTab: "Messages", matchTab: "Chat", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Shake to discover someone nearby.", shakeIntro: "Choose your distance, shake your phone, and meet people around the world.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Your exact location is private. Only an approximate distance is shown.", shakeEnable: "Enable nearby discovery", shakeDisable: "Turn off location sharing", shakeRefresh: "Find people nearby", shakeLoading: "Finding people within your selected radius…", shakeNoPeople: "No members are available within your radius right now.", shakePermission: "Allow location access in BEYOND to continue.", shakeEnabled: "Nearby discovery is enabled. Your exact location stays private.", shakeLike: "Interested", shakeLikeBack: "Like back", shakeWaiting: "Interest sent. Waiting for a mutual interest.", shakeMatched: "It’s a mutual interest! Your chat is ready in Messages.", shakeAnonymousTitle: "You are chatting anonymously", shakeAnonymousInfo: "Your name, photos and profile details stay hidden until both of you choose to reveal.", shakeReveal: "I am comfortable revealing my profile", shakeWaitingReveal: "Your choice is saved. Waiting for the other person to consent.", shakeRevealDone: "Both of you agreed. Profiles are now visible.", shakeRevealCheck: "Check reveal status", shakeWithdraw: "Withdraw my consent", shakeDistance: "km away", shakeError: "Could not load Shake & Chat. Please try again.", shakeConsent: "Choose a search radius from 1 to 100 km. You can turn discovery off at any time.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
+      noProfile: "You have not created a profile yet.", staffAccount: "This is a BEYOND staff account. Customer profiles and matching are disabled for staff.", staffConsole: "Open staff console", createProfile: "Create my profile",
       status_pending: "Awaiting staff review", status_approved: "Approved", status_rejected: "Not approved", status_changes_requested: "Changes requested",
-      suspended: "Your account is suspended. Please contact support.", incomplete: "Your profile is missing some details (gender, preferences, values). Please edit it before matching.",
+      suspended: "Your account is suspended. Please contact support.", incomplete: "Your profile is missing a few details. Please edit it before using Shake & Chat.",
       reason: "Staff note", editProfile: "Edit profile", save: "Save changes", saving: "Saving…", saved: "Saved.", reviewNote: "Your profile changes are saved immediately. Keep your details accurate and use Report or Block if needed.",
       rejectedNote: "This profile was not approved and cannot be edited here.",
-      matching: "Your match", findMatch: "Find my match", finding: "Searching…", noMatchNow: "No suitable profile is available right now. Please check again later.",
-      dailyMatchesUsed: "Daily matches used", activeConversations: "Active conversations", dailyLimitReached: "You have used all five recommendations for today.", chatTab: "Chat",
+      matching: "Conversations", findMatch: "Find my match", finding: "Searching…", noMatchNow: "No suitable profile is available right now. Please check again later.",
+      dailyMatchesUsed: "Conversations", activeConversations: "Active conversations", dailyLimitReached: "", chatTab: "Chat",
       needApproval: "Save your profile details to activate matching.",
       accept: "Accept", decline: "Decline", continueMatch: "Continue", stopMatch: "Stop", waitingPartner: "You chose Continue. Waiting for the other person.", waitingYou: "Choose Continue or Stop to proceed.",
       proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and voice messages will close.",
       timeLeft: "Chat window left", closed: "Closed", chat: "Chat", typeMsg: "Write a message…", send: "Send", live: "Live", reconnecting: "Reconnecting…",
-      chatClosed: "This conversation is closed (match ended or 72 hours are over).", voiceRecord: "Record voice message", voiceStop: "Stop recording", voiceUploading: "Uploading voice message…", voiceSent: "Voice message sent.", voiceError: "Voice message could not be sent.", voiceUnsupported: "Voice recording is not supported in this browser.",
+      chatClosed: "This conversation is unavailable or has been ended.", voiceRecord: "Record voice message", voiceStop: "Stop recording", voiceUploading: "Uploading voice message…", voiceSent: "Voice message sent.", voiceError: "Voice message could not be sent.", voiceUnsupported: "Voice recording is not supported in this browser.",
       report: "Report", block: "Block", blockConfirm: "Block this person? The match ends and you will never be matched again.",
       reportTitle: "Report this person", reportSend: "Send report", reportThanks: "Report received. Our team will review it.",
       r_harassment: "Harassment", r_fake_profile: "Fake profile", r_scam: "Scam / money request", r_inappropriate_content: "Inappropriate content", r_underage: "Looks underage", r_other: "Other",
@@ -26,25 +26,25 @@
       pastMatches: "Past matches", none: "None yet.", from: "Started",
       
       account: "Account & privacy", export: "Download my data", del: "Delete my account", delWarn: "This permanently deletes your profile, matches and chats. Type DELETE to confirm.", delDone: "Your account was deleted.",
-      photos: "Profile photos", photoHelp: "Upload up to 4 clear photos (JPEG, PNG or WebP, max 5 MB each). Photos become visible to other members only after staff approval. Account reviews are otherwise report-led.", addPhoto: "Choose photo", photoPending: "Awaiting review", photoApproved: "Approved", photoRejected: "Not approved", photoDelete: "Remove", photoLimit: "You have reached the 4-photo limit.", photoUpload: "Uploading…", photoError: "Photo upload failed.", values: "Values", intention: "Intention", sharedValues: "Shared values",
-      v_family: "Family", v_kindness: "Kindness & respect", v_career: "Career", v_faith: "Faith / culture", v_communication: "Open communication", v_lifestyle: "Lifestyle",
+      photos: "Profile photos", photoHelp: "Upload up to 4 clear photos (JPEG, PNG or WebP, max 5 MB each). Photos become visible to other members only after staff approval. Account reviews are otherwise report-led.", addPhoto: "Choose photo", photoPending: "Awaiting review", photoApproved: "Approved", photoRejected: "Not approved", photoDelete: "Remove", photoLimit: "You have reached the 4-photo limit.", photoUpload: "Uploading…", photoError: "Photo upload failed.", values: "Interests", intention: "Interests", sharedValues: "Shared interests",
+      v_music: "Music", v_movies: "Movies", v_gaming: "Gaming", v_sports: "Sports", v_travel: "Travel", v_food: "Food", v_art: "Art", v_books: "Books", v_technology: "Technology", v_fitness: "Fitness", v_nature: "Nature", v_languages: "Languages", v_photography: "Photography", v_culture: "Culture", v_learning: "Learning", v_family: "Family", v_kindness: "Kindness & respect", v_career: "Career", v_faith: "Culture / faith", v_communication: "Communication", v_lifestyle: "Lifestyle",
       marriage: "Marriage", longterm: "Long-term relationship", woman: "Woman", man: "Man", other: "Other", any: "Open to possibilities",
       name: "Name", age: "Age", place: "Location", job: "Work / study", about: "About you", lookingFor: "I'm looking for", relationship: "Relationship intention", minAge: "Partner min age", maxAge: "Partner max age"
     },
     ml: {
-      myspace: "എന്റെ ഇടം", messagesTab: "Messages", matchTab: "Match", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "നിങ്ങളുടെ സജീവ സംഭാഷണങ്ങൾ ഇവിടെ കാണാം.", noConversations: "ഇതുവരെ സംഭാഷണങ്ങളില്ല. Match കണ്ടെത്തി chat തുടങ്ങാം.", shakeIntro: "50 km ചുറ്റളവിൽ പരിചയപ്പെടാൻ താൽപര്യമുള്ളവരെ കണ്ടെത്താം.", shakeComing: "Shake & Chat ഉടൻ വരുന്നു", shakePrivacy: "Location പങ്കിടൽ നിങ്ങളുടെ ഇഷ്ടമാണ്. കൃത്യമായ സ്ഥലം മറ്റുള്ളവർക്ക് ഒരിക്കലും കാണിക്കില്ല.", shakeEnable: "സമീപത്തുള്ളവരെ കണ്ടെത്തുക", shakeDisable: "Location പങ്കിടൽ നിർത്തുക", shakeRefresh: "സമീപത്തുള്ളവരെ തിരയുക", shakeLoading: "50 km ചുറ്റളവിൽ തിരയുന്നു…", shakeNoPeople: "സമീപത്ത് അനുയോജ്യരായ അംഗങ്ങൾ ഇപ്പോൾ ലഭ്യമല്ല.", shakePermission: "തുടരാൻ browser-ൽ location അനുമതി നൽകുക.", shakeEnabled: "Nearby discovery പ്രവർത്തനക്ഷമമാണ്. കൃത്യമായ സ്ഥലം സ്വകാര്യമാണ്.", shakeLike: "താൽപര്യമുണ്ട്", shakeLikeBack: "തിരിച്ചും താൽപര്യമുണ്ട്", shakeWaiting: "താൽപര്യം അയച്ചു. മറുവശത്തുനിന്നുള്ള താൽപര്യം കാത്തിരിക്കുന്നു.", shakeMatched: "പരസ്പര താൽപര്യം ലഭിച്ചു! Messages-ൽ chat തുടങ്ങാം.", shakeAnonymousTitle: "നിങ്ങൾ ഇപ്പോൾ അജ്ഞാതരായി chat ചെയ്യുന്നു", shakeAnonymousInfo: "നിങ്ങൾ രണ്ടുപേരും സമ്മതിക്കുന്നതുവരെ പേര്, ഫോട്ടോ, profile വിവരങ്ങൾ മറച്ചുവെക്കും.", shakeReveal: "എന്റെ profile വെളിപ്പെടുത്താൻ എനിക്ക് സമ്മതമാണ്", shakeWaitingReveal: "നിങ്ങളുടെ സമ്മതം സേവ് ചെയ്തു. മറ്റേയാളുടെ സമ്മതം കാത്തിരിക്കുന്നു.", shakeRevealDone: "രണ്ടുപേരും സമ്മതിച്ചു. ഇപ്പോൾ profile കാണാം.", shakeRevealCheck: "Reveal നില പരിശോധിക്കുക", shakeWithdraw: "എന്റെ സമ്മതം പിൻവലിക്കുക", shakeDistance: "km അകലെ", shakeError: "Shake & Chat തുറക്കാനായില്ല. വീണ്ടും ശ്രമിക്കുക.", shakeConsent: "50 km ചുറ്റളവിൽ അനുയോജ്യരായ അംഗങ്ങളെ കണ്ടെത്താൻ നിങ്ങളുടെ location സ്വകാര്യമായി ഉപയോഗിക്കാൻ NIVORA-യെ അനുവദിക്കുന്നു. എപ്പോൾ വേണമെങ്കിലും ഇത് നിർത്താം.", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
-      noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", staffAccount: "ഇത് NIVORA staff account ആണ്. Staff അംഗങ്ങൾക്ക് customer profile അല്ലെങ്കിൽ matching ലഭ്യമല്ല.", staffConsole: "Staff console തുറക്കുക", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
+      myspace: "എന്റെ ഇടം", messagesTab: "Messages", matchTab: "Chat", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "നിങ്ങളുടെ സജീവ സംഭാഷണങ്ങൾ ഇവിടെ കാണാം.", noConversations: "ഇതുവരെ സംഭാഷണങ്ങളില്ല. സമീപത്തുള്ളവരെ കണ്ടെത്താൻ Shake ചെയ്യൂ.", shakeIntro: "നിങ്ങൾക്ക് ഇഷ്ടമുള്ള ദൂരം തിരഞ്ഞെടുക്കൂ. ഫോൺ Shake ചെയ്ത് ലോകമെമ്പാടുമുള്ളവരെ പരിചയപ്പെടാം.", shakeComing: "Shake & Chat ഉടൻ വരുന്നു", shakePrivacy: "നിങ്ങളുടെ കൃത്യമായ Location മറ്റുള്ളവർക്ക് കാണിക്കില്ല. ഏകദേശ ദൂരം മാത്രമേ കാണൂ.", shakeEnable: "സമീപത്തുള്ളവരെ കണ്ടെത്തുക", shakeDisable: "Location പങ്കിടൽ നിർത്തുക", shakeRefresh: "സമീപത്തുള്ളവരെ തിരയുക", shakeLoading: "നിങ്ങൾ തിരഞ്ഞെടുത്ത Radius-ൽ തിരയുന്നു…", shakeNoPeople: "നിങ്ങളുടെ Radius-ൽ ഇപ്പോൾ അംഗങ്ങളെ കണ്ടെത്താനായില്ല.", shakePermission: "BEYOND-യിൽ തുടരാൻ Location permission നൽകുക.", shakeEnabled: "Nearby discovery പ്രവർത്തനക്ഷമമാണ്. കൃത്യമായ സ്ഥലം സ്വകാര്യമാണ്.", shakeLike: "താൽപര്യമുണ്ട്", shakeLikeBack: "തിരിച്ചും താൽപര്യമുണ്ട്", shakeWaiting: "താൽപര്യം അയച്ചു. മറുവശത്തുനിന്നുള്ള താൽപര്യം കാത്തിരിക്കുന്നു.", shakeMatched: "പരസ്പര താൽപര്യം ലഭിച്ചു! Messages-ൽ chat തുടങ്ങാം.", shakeAnonymousTitle: "നിങ്ങൾ ഇപ്പോൾ അജ്ഞാതരായി chat ചെയ്യുന്നു", shakeAnonymousInfo: "നിങ്ങൾ രണ്ടുപേരും സമ്മതിക്കുന്നതുവരെ പേര്, ഫോട്ടോ, profile വിവരങ്ങൾ മറച്ചുവെക്കും.", shakeReveal: "എന്റെ profile വെളിപ്പെടുത്താൻ എനിക്ക് സമ്മതമാണ്", shakeWaitingReveal: "നിങ്ങളുടെ സമ്മതം സേവ് ചെയ്തു. മറ്റേയാളുടെ സമ്മതം കാത്തിരിക്കുന്നു.", shakeRevealDone: "രണ്ടുപേരും സമ്മതിച്ചു. ഇപ്പോൾ profile കാണാം.", shakeRevealCheck: "Reveal നില പരിശോധിക്കുക", shakeWithdraw: "എന്റെ സമ്മതം പിൻവലിക്കുക", shakeDistance: "km അകലെ", shakeError: "Shake & Chat തുറക്കാനായില്ല. വീണ്ടും ശ്രമിക്കുക.", shakeConsent: "1 മുതൽ 100 km വരെ നിങ്ങൾക്ക് ഇഷ്ടമുള്ള Radius തിരഞ്ഞെടുക്കാം. എപ്പോൾ വേണമെങ്കിലും Discovery നിർത്താം.", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
+      noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", staffAccount: "ഇത് BEYOND staff account ആണ്. Staff അംഗങ്ങൾക്ക് customer profile അല്ലെങ്കിൽ matching ലഭ്യമല്ല.", staffConsole: "Staff console തുറക്കുക", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
       status_pending: "Staff review കാത്തിരിക്കുന്നു", status_approved: "അംഗീകരിച്ചു", status_rejected: "അംഗീകരിച്ചില്ല", status_changes_requested: "മാറ്റങ്ങൾ ആവശ്യപ്പെട്ടിട്ടുണ്ട്",
-      suspended: "നിങ്ങളുടെ account suspend ചെയ്തിരിക്കുന്നു. Support-നെ ബന്ധപ്പെടുക.", incomplete: "Profile-ൽ ചില വിവരങ്ങൾ കുറവാണ് (gender, preferences, values). Matching-ന് മുമ്പ് edit ചെയ്യുക.",
+      suspended: "നിങ്ങളുടെ account suspend ചെയ്തിരിക്കുന്നു. Support-നെ ബന്ധപ്പെടുക.", incomplete: "Profile-ൽ കുറച്ച് വിവരങ്ങൾ കുറവാണ്. Shake & Chat ഉപയോഗിക്കുന്നതിന് മുമ്പ് edit ചെയ്യുക.",
       reason: "Staff കുറിപ്പ്", editProfile: "Profile edit ചെയ്യുക", save: "സേവ് ചെയ്യുക", saving: "സേവ് ചെയ്യുന്നു…", saved: "സേവ് ചെയ്തു.", reviewNote: "Profile-ലെ മാറ്റങ്ങൾ ഉടൻ save ആകും. വിവരങ്ങൾ ശരിയായി നൽകുക; ആവശ്യമെങ്കിൽ Report / Block ഉപയോഗിക്കുക.",
       rejectedNote: "ഈ profile അംഗീകരിച്ചിട്ടില്ല; ഇവിടെ edit ചെയ്യാനാകില്ല.",
-      matching: "നിങ്ങളുടെ match", findMatch: "എന്റെ match കണ്ടെത്തുക", finding: "തിരയുന്നു…", noMatchNow: "ഇപ്പോൾ അനുയോജ്യമായ profile ഇല്ല. പിന്നീട് നോക്കുക.",
-      dailyMatchesUsed: "ഇന്ന് ലഭിച്ച matches", activeConversations: "സജീവ സംഭാഷണങ്ങൾ", dailyLimitReached: "ഇന്നത്തെ അഞ്ച് matching-ഉം ഉപയോഗിച്ചു.", chatTab: "Chat",
+      matching: "സംഭാഷണങ്ങൾ", findMatch: "എന്റെ match കണ്ടെത്തുക", finding: "തിരയുന്നു…", noMatchNow: "ഇപ്പോൾ അനുയോജ്യമായ profile ഇല്ല. പിന്നീട് നോക്കുക.",
+      dailyMatchesUsed: "സംഭാഷണങ്ങൾ", activeConversations: "സജീവ സംഭാഷണങ്ങൾ", dailyLimitReached: "", chatTab: "Chat",
       needApproval: "Matching തുടങ്ങാൻ profile details save ചെയ്യുക.",
       accept: "സ്വീകരിക്കുക", decline: "നിരസിക്കുക", continueMatch: "തുടരാം", stopMatch: "നിർത്താം", waitingPartner: "നിങ്ങൾ Continue തിരഞ്ഞെടുത്തു. മറ്റേയാളുടെ തീരുമാനം കാത്തിരിക്കുന്നു.", waitingYou: "തുടരാൻ Continue അല്ലെങ്കിൽ Stop തിരഞ്ഞെടുക്കുക.",
       proposalEnds: "ഇതിനുമുമ്പ് മറുപടി നൽകുക", endMatch: "Match അവസാനിപ്പിക്കുക", endConfirm: "ഈ match അവസാനിപ്പിക്കണോ? Chat, voice messages അടയും.",
       timeLeft: "Chat സമയം ബാക്കി", closed: "അടച്ചു", chat: "Chat", typeMsg: "സന്ദേശം എഴുതുക…", send: "അയയ്ക്കുക", live: "ലൈവ്", reconnecting: "വീണ്ടും ബന്ധിപ്പിക്കുന്നു…",
-      chatClosed: "ഈ സംഭാഷണം അടച്ചു (match അവസാനിച്ചു / 72 മണിക്കൂർ കഴിഞ്ഞു).", voiceRecord: "Voice message റെക്കോർഡ് ചെയ്യുക", voiceStop: "റെക്കോർഡിംഗ് നിർത്തുക", voiceUploading: "Voice message upload ചെയ്യുന്നു…", voiceSent: "Voice message അയച്ചു.", voiceError: "Voice message അയയ്ക്കാനായില്ല.", voiceUnsupported: "ഈ browser-ൽ voice recording ലഭ്യമല്ല.",
+      chatClosed: "ഈ സംഭാഷണം ലഭ്യമല്ല അല്ലെങ്കിൽ അവസാനിപ്പിച്ചു.", voiceRecord: "Voice message റെക്കോർഡ് ചെയ്യുക", voiceStop: "റെക്കോർഡിംഗ് നിർത്തുക", voiceUploading: "Voice message upload ചെയ്യുന്നു…", voiceSent: "Voice message അയച്ചു.", voiceError: "Voice message അയയ്ക്കാനായില്ല.", voiceUnsupported: "ഈ browser-ൽ voice recording ലഭ്യമല്ല.",
       report: "Report", block: "Block", blockConfirm: "ഇവരെ block ചെയ്യണോ? Match അവസാനിക്കും, വീണ്ടും match ചെയ്യില്ല.",
       reportTitle: "ഇവരെ report ചെയ്യുക", reportSend: "Report അയയ്ക്കുക", reportThanks: "Report ലഭിച്ചു. ഞങ്ങളുടെ ടീം പരിശോധിക്കും.",
       r_harassment: "ശല്യപ്പെടുത്തൽ", r_fake_profile: "വ്യാജ profile", r_scam: "തട്ടിപ്പ് / പണം ആവശ്യപ്പെടൽ", r_inappropriate_content: "അനുചിതമായ ഉള്ളടക്കം", r_underage: "പ്രായപൂർത്തിയായില്ലെന്ന് തോന്നുന്നു", r_other: "മറ്റുള്ളവ",
@@ -52,8 +52,8 @@
       pastMatches: "മുൻ match-കൾ", none: "ഇതുവരെ ഇല്ല.", from: "തുടങ്ങിയത്",
       
       account: "Account & സ്വകാര്യത", export: "എന്റെ data download ചെയ്യുക", del: "എന്റെ account delete ചെയ്യുക", delWarn: "Profile, match, chat എല്ലാം സ്ഥിരമായി മായും. സ്ഥിരീകരിക്കാൻ DELETE എന്ന് ടൈപ്പ് ചെയ്യുക.", delDone: "നിങ്ങളുടെ account delete ചെയ്തു.",
-      photos: "Profile photos", photoHelp: "പരമാവധി 4 വ്യക്തമായ ഫോട്ടോകൾ ചേർക്കാം (JPEG, PNG, WebP; ഓരോന്നും 5 MB വരെ). Staff അംഗീകരിച്ച ശേഷമേ മറ്റുള്ളവർക്ക് ഫോട്ടോകൾ കാണാനാകൂ. മറ്റ് account പരിശോധനകൾ Report ലഭിക്കുമ്പോൾ മാത്രമായിരിക്കും.", addPhoto: "ഫോട്ടോ തിരഞ്ഞെടുക്കുക", photoPending: "Review കാത്തിരിക്കുന്നു", photoApproved: "അംഗീകരിച്ചു", photoRejected: "അംഗീകരിച്ചില്ല", photoDelete: "നീക്കം ചെയ്യുക", photoLimit: "4 ഫോട്ടോ പരിധി കഴിഞ്ഞു.", photoUpload: "Upload ചെയ്യുന്നു…", photoError: "ഫോട്ടോ upload ചെയ്യാനായില്ല.", values: "മൂല്യങ്ങൾ", intention: "ലക്ഷ്യം", sharedValues: "പൊതുവായ മൂല്യങ്ങൾ",
-      v_family: "കുടുംബം", v_kindness: "ദയയും ബഹുമാനവും", v_career: "കരിയർ", v_faith: "വിശ്വാസം / സംസ്കാരം", v_communication: "തുറന്ന സംഭാഷണം", v_lifestyle: "ജീവിതശൈലി",
+      photos: "Profile photos", photoHelp: "പരമാവധി 4 വ്യക്തമായ ഫോട്ടോകൾ ചേർക്കാം (JPEG, PNG, WebP; ഓരോന്നും 5 MB വരെ). Staff അംഗീകരിച്ച ശേഷമേ മറ്റുള്ളവർക്ക് ഫോട്ടോകൾ കാണാനാകൂ. മറ്റ് account പരിശോധനകൾ Report ലഭിക്കുമ്പോൾ മാത്രമായിരിക്കും.", addPhoto: "ഫോട്ടോ തിരഞ്ഞെടുക്കുക", photoPending: "Review കാത്തിരിക്കുന്നു", photoApproved: "അംഗീകരിച്ചു", photoRejected: "അംഗീകരിച്ചില്ല", photoDelete: "നീക്കം ചെയ്യുക", photoLimit: "4 ഫോട്ടോ പരിധി കഴിഞ്ഞു.", photoUpload: "Upload ചെയ്യുന്നു…", photoError: "ഫോട്ടോ upload ചെയ്യാനായില്ല.", values: "താൽപര്യങ്ങൾ", intention: "താൽപര്യങ്ങൾ", sharedValues: "പൊതുവായ താൽപര്യങ്ങൾ",
+      v_music: "സംഗീതം", v_movies: "സിനിമ", v_gaming: "ഗെയിമിംഗ്", v_sports: "കായികം", v_travel: "യാത്ര", v_food: "ഭക്ഷണം", v_art: "കല", v_books: "പുസ്തകങ്ങൾ", v_technology: "സാങ്കേതികവിദ്യ", v_fitness: "ഫിറ്റ്നസ്", v_nature: "പ്രകൃതി", v_languages: "ഭാഷകൾ", v_photography: "ഫോട്ടോഗ്രഫി", v_culture: "സംസ്കാരം", v_learning: "പഠനം", v_family: "കുടുംബം", v_kindness: "ദയയും ബഹുമാനവും", v_career: "കരിയർ", v_faith: "സംസ്കാരം / വിശ്വാസം", v_communication: "തുറന്ന സംഭാഷണം", v_lifestyle: "ജീവിതശൈലി",
       marriage: "വിവാഹം", longterm: "ദീർഘകാല ബന്ധം", woman: "സ്ത്രീ", man: "പുരുഷൻ", other: "മറ്റൊന്ന്", any: "തുറന്ന മനസ്സോടെ",
       name: "പേര്", age: "വയസ്സ്", place: "സ്ഥലം", job: "ജോലി / പഠനം", about: "നിങ്ങളെക്കുറിച്ച്", lookingFor: "ഞാൻ അന്വേഷിക്കുന്നത്", relationship: "ബന്ധത്തിന്റെ ലക്ഷ്യം", minAge: "പങ്കാളിയുടെ കുറഞ്ഞ വയസ്സ്", maxAge: "പങ്കാളിയുടെ കൂടിയ വയസ്സ്"
     }
@@ -78,7 +78,7 @@
   function close() { stopVoiceRecording(true); stopRealtime(); if (modal) { modal.classList.remove("open"); modal.setAttribute("aria-hidden", "true"); } document.body.style.overflow = ""; clearInterval(tickTimer); }
 
   // ---------- state ----------
-  let me = null, profile = null, match = null, matches = [], selectedMatchId = null, dailyQuota = { daily_used: 0, daily_limit: 5 }, history = [], photos = [], isStaff = false;
+  let me = null, profile = null, match = null, matches = [], selectedMatchId = null, history = [], photos = [], isStaff = false;
   let tickTimer = null, chatChannel = null, pollTimer = null, seen = new Set(), lastTs = null;
   let voiceRecorder = null, voiceStream = null, voiceChunks = [], voiceMime = "", voiceStartedAt = 0, voiceLimitTimer = null, voiceDisplayTimer = null, voiceDiscard = false, voiceSeen = new Set(), lastVoiceTs = null;
   const val = (k) => (k in (profile || {}) ? profile[k] : "");
@@ -88,7 +88,7 @@
     const [pr, m, h] = await Promise.all([
       api("/api/profile"), api("/api/match/current"), api("/api/match/history").catch(() => ({ history: [] }))
     ]);
-    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; dailyQuota = { daily_used: m.daily_used || 0, daily_limit: m.daily_limit || 5 }; history = h.history || [];
+    profile = pr.profile; matches = Array.isArray(m.matches) ? m.matches : (m.match ? [m.match] : []); match = matches.find((x) => x.id === selectedMatchId) || matches.find((x) => x.id === match?.id) || matches[0] || null; selectedMatchId = match?.id || null; history = h.history || [];
     photos = profile ? ((await api("/api/profile/photos").catch(() => ({ photos: [] }))).photos || []) : [];
     isStaff = await api("/api/admin/me").then(() => true).catch(() => false);
   }
@@ -101,7 +101,7 @@
       container.innerHTML = `<h2 class="modal-title">${L() === "ml" ? "Sign in" : "Sign in"}</h2>
         <p class="modal-description">${L() === "ml" ? "Google അക്കൗണ്ട് ഉപയോഗിച്ച് സുരക്ഷിതമായി തുടരുക." : "Continue securely with your Google account."}</p>
         <div class="nv-msg" id="nvPortalErr" role="status"></div>
-        <button class="primary-btn" id="nvPortalGoogle" type="button">Google ഉപയോഗിച്ച് തുടരുക / Continue with Google</button>
+        <button class="primary-btn" id="nvPortalGoogle" type="button">Continue with Google</button>
         <button class="back-btn" id="nvPortalCancel" type="button">${L() === "ml" ? "റദ്ദാക്കുക" : "Cancel"}</button>`;
       container.querySelector("#nvPortalGoogle").onclick = async () => {
         const btn = container.querySelector("#nvPortalGoogle");
@@ -110,7 +110,7 @@
         catch (e) {
           sessionStorage.removeItem("nivora_pending_portal");
           container.querySelector("#nvPortalErr").textContent = e.message || "Google sign-in failed.";
-          btn.disabled = false; btn.textContent = "Google ഉപയോഗിച്ച് തുടരുക / Continue with Google";
+          btn.disabled = false; btn.textContent = "Continue with Google";
         }
       };
       container.querySelector("#nvPortalCancel").onclick = () => { onCancel && onCancel(); reject(new Error("cancelled")); };
@@ -138,7 +138,7 @@
   // Called after Google redirects back to the page, if a "My space" sign-in was in progress.
   async function resumePortalLogin() {
     // Run on every homepage load, not only when a particular sign-in button set a flag.
-    // This also restores the dashboard for an already-authenticated customer reopening NIVORA.
+    // This also restores the dashboard for an already-authenticated customer reopening BEYOND.
     let pending = false;
     try { pending = sessionStorage.getItem("nivora_pending_portal") === "1"; } catch (_) { /* ignore */ }
     let s;
@@ -165,10 +165,8 @@
     const existing = await api("/api/profile");
     if (existing.profile) return { existing: true, profile: existing.profile };
     const payload = {
-      full_name: form.name.trim(), age: Number(form.age), district: form.place.trim(), gender: form.gender,
-      job_title: form.job.trim(), bio: form.about.trim(), looking_for: form.lookingFor,
-      relationship_intention: form.relationship, core_values: form.values,
-      min_partner_age: form.minAge ? Number(form.minAge) : 21, max_partner_age: form.maxAge ? Number(form.maxAge) : 40,
+      full_name: form.name.trim(), age: Number(form.age), district: form.place.trim(),
+      job_title: form.job.trim(), bio: form.about.trim(), core_values: form.values,
       consents: { terms: !!form.agree, privacy: !!form.privacyAgree }
     };
     return api("/api/profile", { method: "POST", body: payload });
@@ -182,7 +180,7 @@
     if (!pt) return "";
     return `<div class="summary-box"><b>${esc(pt.first_name)}, ${esc(pt.age)}</b><br>${esc(pt.district || "—")} · ${esc(pt.job_title || "—")}<br>
       ${pt.photos && pt.photos.length ? `<div class="partner-photos">${pt.photos.map((ph) => `<img src="${esc(ph.url)}" alt="Approved profile photo" loading="lazy">`).join("")}</div>` : ""}
-      <b>${p("intention")}:</b> ${esc(p(pt.relationship_intention))}<br>
+      
       <b>${p("values")}:</b> ${esc((pt.core_values || []).map(valName).join(", ") || "—")}<br>
       ${pt.shared_values?.length ? `<b>${p("sharedValues")}:</b> ${esc(pt.shared_values.map(valName).join(", "))}<br>` : ""}
       ${pt.bio ? `<br>${esc(pt.bio)}` : ""}</div>`;
@@ -260,35 +258,29 @@
     const matchPanel = wrap("dashboard-match", p("matchTab"), matchNodes);
     const welcome = document.createElement("section");
     welcome.className = "dashboard-welcome";
-    const remaining = Math.max(0, (dailyQuota.daily_limit || 5) - (dailyQuota.daily_used || 0));
     const ml = L() === "ml";
     welcome.innerHTML = `
       <div class="dashboard-welcome-copy">
-        <span class="dashboard-eyebrow"><i></i> ${ml ? "അർത്ഥവത്തായ ബന്ധങ്ങളിലേക്കൊരു ചുവട്" : "A LITTLE CLOSER TO SOMETHING MEANINGFUL"}</span>
-        <h1>${ml ? "സന്തോഷം, വീണ്ടും കണ്ടതിൽ" : "Good to see you"},<br><em>${esc((profile.full_name || "").split(" ")[0])}</em></h1>
-        <p>${ml ? "ഒരു ചെറിയ hello-യിൽ നിന്ന് മനോഹരമായൊരു ബന്ധം തുടങ്ങാം." : "One simple hello could be the start of something meaningful."}</p>
+        <span class="dashboard-eyebrow"><i></i> GLOBAL SOCIAL DISCOVERY</span>
+        <h1>${ml ? "സ്വാഗതം" : "Welcome"},<br><em>${esc((profile.full_name || "").split(" ")[0])}</em></h1>
+        <p>${ml ? "പുതിയ ആളുകളെ കണ്ടെത്തൂ. സംസാരിക്കൂ. ഇരുവരും ആഗ്രഹിച്ചാൽ സുഹൃത്തുക്കളാകൂ." : "Discover people nearby. Chat freely. Become friends only when both agree."}</p>
         <div class="dashboard-hero-actions">
-          <button type="button" class="dashboard-hero-primary" data-open-tab="match">${ml ? "Match കണ്ടെത്താം" : "Discover matches"} <span>↗</span></button>
-          <button type="button" class="dashboard-hero-secondary" data-open-tab="shake">${ml ? "Shake & Chat" : "Explore nearby"} <span>⌖</span></button>
+          <button type="button" class="dashboard-hero-primary" data-open-tab="shake">${ml ? "Shake ചെയ്യാം" : "Shake to discover"} <span>⌖</span></button>
+          <button type="button" class="dashboard-hero-secondary" data-open-tab="community">${ml ? "Anonymous Posts" : "Anonymous posts"} <span>◌</span></button>
         </div>
-        <div class="dashboard-hero-footnote"><span>✦</span> ${ml ? "നിങ്ങളുടെ വേഗത്തിൽ, നിങ്ങളുടെ തിരഞ്ഞെടുപ്പിൽ" : "Your pace. Your choice. Your story."}</div>
+        <div class="dashboard-hero-footnote"><span>✦</span> ${ml ? "നിങ്ങളുടെ സ്വകാര്യത, നിങ്ങളുടെ തീരുമാനം" : "Your privacy. Your choice."}</div>
       </div>
       <div class="dashboard-hero-side">
         <div class="dashboard-stat-grid">
-          <div class="dashboard-stat dashboard-stat-featured"><span>♡</span><b>${remaining}</b><small>${ml ? "ഇന്നത്തെ matches ബാക്കി" : "Matches left today"}</small></div>
-          <div class="dashboard-stat"><span>✉</span><b>${matches.filter(x => ["proposed","active"].includes(x.status)).length}</b><small>${ml ? "സജീവ സംഭാഷണങ്ങൾ" : "Active conversations"}</small></div>
-        </div>
-        <div class="dashboard-daily-card">
-          <div><span>${ml ? "ഇന്നത്തെ കണ്ടെത്തൽ" : "TODAY’S DISCOVERY"}</span><b>${Math.min(dailyQuota.daily_used || 0, dailyQuota.daily_limit || 5)} / ${dailyQuota.daily_limit || 5}</b></div>
-          <div class="dashboard-progress"><i style="width:${Math.min(100, Math.max(0, ((dailyQuota.daily_used || 0) / Math.max(1, dailyQuota.daily_limit || 5)) * 100))}%"></i></div>
-          <small>${ml ? "ഓരോ ദിവസവും പുതിയ സാധ്യതകൾ" : "A fresh chance to connect, every day."}</small>
+          <div class="dashboard-stat dashboard-stat-featured"><span>✉</span><b>${matches.filter(x => ["proposed","active"].includes(x.status)).length}</b><small>${ml ? "സംഭാഷണങ്ങൾ" : "Conversations"}</small></div>
+          <div class="dashboard-stat"><span>♡</span><b>∞</b><small>${ml ? "സമയപരിധിയില്ല" : "No chat timer"}</small></div>
         </div>
       </div>
       <span class="dashboard-hero-orbit" aria-hidden="true"></span><span class="dashboard-hero-spark" aria-hidden="true">✦</span>`;
     const topbar = document.createElement("header");
     topbar.className = "dashboard-topbar";
     topbar.innerHTML = `
-      <a class="dashboard-brand" href="dashboard.html" aria-label="NIVORA home"><span class="dashboard-brand-mark">N</span><span><b>NIVORA</b><small>${ml ? "ബന്ധങ്ങൾ അർത്ഥവത്താകട്ടെ" : "MEANINGFUL CONNECTIONS"}</small></span></a>
+      <a class="dashboard-brand" href="dashboard.html" aria-label="BEYOND home"><span class="dashboard-brand-mark">N</span><span><b>BEYOND</b><small>${ml ? "ബന്ധങ്ങൾ അർത്ഥവത്താകട്ടെ" : "MEANINGFUL CONNECTIONS"}</small></span></a>
       <span class="dashboard-top-note"><i></i>${ml ? "നിങ്ങളുടെ സുരക്ഷിത ഇടം" : "Your space, your pace"}</span>`;
     body.prepend(welcome);
     body.prepend(topbar);
@@ -306,12 +298,15 @@
       inboxList.appendChild(button);
     });
     const shake = document.createElement("section"); shake.className = "dashboard-panel"; shake.id = "dashboard-shake";
-    shake.innerHTML = "<h2 class='modal-title'>" + p("shakeTab") + "</h2><p class='modal-description'>" + p("shakeIntro") + "</p><div class='shake-coming'><span>⌖</span><b>50 km</b><small>" + p("shakePrivacy") + "</small><p class='modal-description'>" + p("shakeConsent") + "</p><div class='nv-row'><button class='primary-btn' id='shakeEnable' type='button'>" + p("shakeEnable") + "</button><button class='outline-btn' id='shakeRefresh' type='button' hidden>" + p("shakeRefresh") + "</button><button class='outline-btn' id='shakeDisable' type='button' hidden>" + p("shakeDisable") + "</button></div><div class='nv-msg' id='shakeStatus' role='status'></div></div><div id='shakePeople' class='shake-people' aria-live='polite'></div>";
+    shake.innerHTML = "<h2 class='modal-title'>" + p("shakeTab") + "</h2><p class='modal-description'>" + p("shakeIntro") + "</p><div class='shake-coming'><span>⌖</span><b>BEYOND Shake</b><small>" + p("shakePrivacy") + "</small><p class='modal-description'>" + p("shakeConsent") + "</p><div class='field'><label for='shakeRadius'>Search radius</label><select id='shakeRadius'><option value='1'>1 km</option><option value='5'>5 km</option><option value='10'>10 km</option><option value='25' selected>25 km</option><option value='50'>50 km</option><option value='75'>75 km</option><option value='100'>100 km</option></select></div><div class='nv-row'><button class='primary-btn' id='shakeEnable' type='button'>" + p("shakeEnable") + "</button><button class='outline-btn' id='shakeNow' type='button' hidden>Shake now</button><button class='outline-btn' id='shakeRefresh' type='button' hidden>" + p("shakeRefresh") + "</button><button class='outline-btn' id='shakeDisable' type='button' hidden>" + p("shakeDisable") + "</button></div><div class='nv-msg' id='shakeStatus' role='status'></div></div><div id='shakePeople' class='shake-people' aria-live='polite'></div>";
     const nav = document.createElement("nav"); nav.className = "customer-bottom-nav"; nav.setAttribute("aria-label", "Customer navigation");
-    const tabData = [["messages","✉",p("messagesTab")],["match","♡",p("matchTab")],["shake","⌖",p("shakeTab")],["profile","◉",p("profileTab")]];
+    const tabData = [["messages","✉",p("messagesTab")],["match","♡",L() === "ml" ? "Chat" : "Chat"],["shake","⌖",p("shakeTab")],["community","◌",L() === "ml" ? "Posts" : "Posts"],["profile","◉",p("profileTab")]];
     nav.innerHTML = tabData.map((t) => "<button type='button' data-dashboard='" + t[0] + "' aria-pressed='false'><span>" + t[1] + "</span><small>" + t[2] + "</small></button>").join("");
-    body.append(inbox, shake, nav);
-    const panels = [inbox, matchPanel, shake, profilePanel];
+    const community = document.createElement("section"); community.className = "dashboard-panel"; community.id = "dashboard-community";
+    community.innerHTML = "<h2 class='modal-title'>Anonymous posts</h2><p class='modal-description'>Share thoughts without showing your profile.</p><textarea id='communityBody' maxlength='2000' rows='4' placeholder='Write an anonymous post…'></textarea><div class='field'><label for='communityAudience'>Who can see this?</label><select id='communityAudience'><option value='global'>Everyone worldwide</option><option value='radius'>People within my radius</option></select></div><div class='nv-row'><button class='primary-btn' id='communityPublish' type='button'>Post anonymously</button></div><div class='nv-msg' id='communityStatus' role='status'></div><div id='communityFeed' class='shake-people'></div>";
+    body.append(inbox, shake, community, nav);
+    bindMotionShake();
+    const panels = [inbox, matchPanel, shake, community, profilePanel];
     const activate = (id) => {
       panels.forEach((panel) => { panel.hidden = panel.id !== "dashboard-" + id; });
       nav.querySelectorAll("button").forEach((button) => {
@@ -320,6 +315,7 @@
       if (id === "match" && match && ["proposed", "active"].includes(match.status)) startChat(match);
       else { stopRealtime(); clearInterval(tickTimer); }
       if (id === "shake") loadShakePanel();
+      if (id === "community") loadCommunityPanel();
     };
     nav.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => activate(button.dataset.dashboard)));
     welcome.querySelectorAll("[data-open-tab]").forEach((button) => button.addEventListener("click", () => activate(button.dataset.openTab)));
@@ -329,6 +325,30 @@
     if (accountHeading) profilePanel.appendChild(accountHeading);
     if (accountRow) profilePanel.appendChild(accountRow);
     if (accountMsg) profilePanel.appendChild(accountMsg);
+
+    const privacySettings = document.createElement("section");
+    privacySettings.className = "dashboard-panel";
+    privacySettings.innerHTML = L() === "ml" ? "<h3 class='nv-h'>Profile Visibility</h3><p class='modal-description'>Shake discovery-ൽ നിങ്ങളെ കണ്ടെത്താൻ അനുവദിക്കണോ എന്ന് തിരഞ്ഞെടുക്കുക. Profile വിവരങ്ങൾ ഇരുവരും സമ്മതിക്കുന്നതുവരെ മറഞ്ഞിരിക്കും.</p><select id='profileVisibility'><option value='public'>Visible</option><option value='hidden'>Hidden</option></select><div class='nv-msg' id='visibilityStatus' role='status'></div>" : "<h3 class='nv-h'>Profile visibility</h3><p class='modal-description'>Choose whether people can find you in Shake discovery. Your profile details remain hidden until both people agree to reveal.</p><select id='profileVisibility'><option value='public'>Visible in discovery</option><option value='hidden'>Hidden from discovery</option></select><div class='nv-msg' id='visibilityStatus' role='status'></div>";
+    profilePanel.appendChild(privacySettings);
+    const visibilitySelect = privacySettings.querySelector("#profileVisibility");
+    visibilitySelect.value = profile.profile_visibility || "public";
+    visibilitySelect.onchange = async () => {
+      visibilitySelect.disabled = true;
+      try {
+        const result = await api("/api/profile/visibility", { method: "PUT", body: { visibility: visibilitySelect.value } });
+        profile.profile_visibility = result.visibility;
+        privacySettings.querySelector("#visibilityStatus").textContent = "Privacy setting saved.";
+      } catch (e) {
+        privacySettings.querySelector("#visibilityStatus").textContent = e.message || "Could not update privacy setting.";
+        visibilitySelect.value = profile.profile_visibility || "public";
+      } finally { visibilitySelect.disabled = false; }
+    };
+
+    const friendsPanel = document.createElement("section");
+    friendsPanel.className = "dashboard-panel";
+    friendsPanel.innerHTML = "<h3 class='nv-h'>Friend requests</h3><div id='friendRequests' class='shake-people'></div><h3 class='nv-h'>Friends</h3><div id='friendList' class='shake-people'></div><div class='nv-msg' id='friendsStatus'></div>";
+    profilePanel.appendChild(friendsPanel);
+    loadFriendsPanel();
   }
 
   async function loadShakePanel() {
@@ -340,36 +360,49 @@
       const state = await api("/api/shake/status");
       enable.hidden = state.enabled; refresh.hidden = !state.enabled; disable.hidden = !state.enabled;
       status.textContent = state.enabled ? p("shakeEnabled") : p("shakePrivacy");
+      const radius = body.querySelector("#shakeRadius"); if (radius) radius.value = String(state.radius_km || 25);
+      const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.hidden = !state.enabled;
       if (state.enabled) await discoverShakePeople();
     } catch (e) { status.textContent = e.message || p("shakeError"); }
     enable.onclick = enableShakeLocation;
+    const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.onclick = () => discoverShakePeople(true);
+    const radius = body.querySelector("#shakeRadius"); if (radius) radius.onchange = enableShakeLocation;
     refresh.onclick = discoverShakePeople;
     disable.onclick = disableShakeLocation;
   }
 
-  function enableShakeLocation() {
+  async function enableShakeLocation() {
     const status = body.querySelector("#shakeStatus");
-    if (!navigator.geolocation) { if (status) status.textContent = p("shakePermission"); return; }
     if (status) status.textContent = p("loading");
-    navigator.geolocation.getCurrentPosition(async (position) => {
+    const saveLocation = async (position) => {
       try {
         await api("/api/shake/location", { method: "POST", body: {
-          latitude: position.coords.latitude, longitude: position.coords.longitude
+          latitude: position.coords.latitude, longitude: position.coords.longitude,
+          radius_km: Number(body.querySelector("#shakeRadius")?.value || 25)
         } });
         await loadShakePanel();
       } catch (e) { if (status) status.textContent = e.message || p("shakeError"); }
-    }, () => { if (status) status.textContent = p("shakePermission"); }, {
-      enableHighAccuracy: false, maximumAge: 300000, timeout: 15000
-    });
+    };
+    try {
+      if (window.NivoraNative?.isNative?.() && window.NivoraNative.getCurrentPosition) {
+        const position = await window.NivoraNative.getCurrentPosition();
+        await saveLocation(position);
+        return;
+      }
+      if (!navigator.geolocation) { if (status) status.textContent = p("shakePermission"); return; }
+      navigator.geolocation.getCurrentPosition(saveLocation, () => {
+        if (status) status.textContent = p("shakePermission");
+      }, { enableHighAccuracy: false, maximumAge: 300000, timeout: 15000 });
+    } catch (e) { if (status) status.textContent = e.message || p("shakePermission"); }
   }
 
   async function disableShakeLocation() {
     const status = body.querySelector("#shakeStatus");
-    try { await api("/api/shake/location", { method: "DELETE" }); await loadShakePanel(); }
+    try { await api("/api/shake/location", { method: "DELETE" }); await loadShakePanel(); if (status) status.textContent = L() === "ml" ? "Location sharing നിർത്തി; nearby-radius posts-ഉം നീക്കം ചെയ്തു." : "Location sharing disabled; your nearby-radius posts were also removed."; }
     catch (e) { if (status) status.textContent = e.message || p("shakeError"); }
   }
 
-  async function discoverShakePeople() {
+  async function discoverShakePeople(randomOne = false) {
     const status = body.querySelector("#shakeStatus"), people = body.querySelector("#shakePeople");
     if (!people) return;
     status.textContent = p("shakeLoading"); people.innerHTML = "";
@@ -377,13 +410,14 @@
       const result = await api("/api/shake/discover");
       if (!result.people?.length) { status.textContent = p("shakeNoPeople"); return; }
       status.textContent = p("shakeEnabled");
-      result.people.forEach((person) => {
+      const peopleToShow = randomOne && result.people.length ? [result.people[Math.floor(Math.random() * result.people.length)]] : result.people;
+      peopleToShow.forEach((person) => {
         const card = document.createElement("article"); card.className = "shake-person";
         const heading = document.createElement("h3");
-        heading.textContent = [person.first_name, person.age].filter(Boolean).join(", ");
+        heading.textContent = person.display_name || "BEYOND member";
         const meta = document.createElement("p");
-        meta.textContent = [person.district, person.job_title, person.distance_km + " " + p("shakeDistance")].filter(Boolean).join(" · ");
-        const about = document.createElement("p"); about.textContent = person.bio || "";
+        meta.textContent = person.distance_km + " " + p("shakeDistance");
+        const about = document.createElement("p"); about.textContent = (person.interests || []).map(valName).join(" · ");
         const action = document.createElement("button"); action.type = "button"; action.className = "primary-btn";
         action.textContent = person.interested_in_you ? p("shakeLikeBack") : p("shakeLike");
         action.onclick = async () => {
@@ -402,6 +436,119 @@
         card.append(heading, meta); if (about.textContent) card.appendChild(about); card.appendChild(action); people.appendChild(card);
       });
     } catch (e) { status.textContent = e.message || p("shakeError"); }
+  }
+
+
+  let motionShakeBound = false, lastMotionShakeAt = 0;
+  function bindMotionShake() {
+    if (motionShakeBound || !window.addEventListener || !("DeviceMotionEvent" in window)) return;
+    motionShakeBound = true;
+    window.addEventListener("devicemotion", (event) => {
+      if (document.visibilityState === "hidden" || Date.now() - lastMotionShakeAt < 2500) return;
+      const a = event.accelerationIncludingGravity || event.acceleration;
+      if (!a) return;
+      const magnitude = Math.sqrt((a.x || 0) ** 2 + (a.y || 0) ** 2 + (a.z || 0) ** 2);
+      const panel = body.querySelector("#dashboard-shake");
+      if (magnitude > 22 && panel && !panel.hidden) {
+        lastMotionShakeAt = Date.now();
+        discoverShakePeople(true);
+      }
+    }, { passive: true });
+  }
+
+  async function loadCommunityPanel() {
+    const status = body.querySelector("#communityStatus"), feed = body.querySelector("#communityFeed");
+    const publish = body.querySelector("#communityPublish");
+    if (!feed || !publish) return;
+    publish.onclick = async () => {
+      const field = body.querySelector("#communityBody");
+      if (!field || !field.value.trim()) { status.textContent = "Write something first."; return; }
+      publish.disabled = true; status.textContent = "Publishing anonymously…";
+      try {
+        await api("/api/community/posts", { method: "POST", body: {
+          body: field.value, audience: body.querySelector("#communityAudience")?.value || "global",
+          radius_km: Number(body.querySelector("#shakeRadius")?.value || 25)
+        }});
+        field.value = ""; status.textContent = "Posted anonymously."; await loadCommunityPanel();
+      } catch (e) { status.textContent = e.message || "Post could not be published."; }
+      finally { publish.disabled = false; }
+    };
+    try {
+      const result = await api("/api/community/feed");
+      feed.innerHTML = "";
+      if (!result.posts?.length) { feed.innerHTML = "<p class='modal-description'>No posts yet. Start the conversation anonymously.</p>"; return; }
+      result.posts.forEach((post) => {
+        const card = document.createElement("article"); card.className = "shake-person";
+        const heading = document.createElement("h3"); heading.textContent = "Anonymous · " + fmt(post.created_at);
+        const textNode = document.createElement("p"); textNode.textContent = post.body;
+        card.append(heading, textNode);
+        if (post.mine) {
+          const remove = document.createElement("button"); remove.className = "nv-link"; remove.type = "button"; remove.textContent = "Delete post";
+          remove.onclick = async () => { try { await api("/api/community/posts/" + encodeURIComponent(post.id), { method: "DELETE" }); await loadCommunityPanel(); } catch (e) { status.textContent = e.message; } };
+          card.appendChild(remove);
+        } else {
+          const report = document.createElement("button"); report.className = "nv-link"; report.type = "button"; report.textContent = "Report post";
+          report.onclick = async () => {
+            if (!confirm("Report this anonymous post?")) return;
+            try { await api("/api/community/posts/" + encodeURIComponent(post.id) + "/report", { method: "POST", body: { reason: "inappropriate_content" } }); status.textContent = "Report received."; }
+            catch (e) { status.textContent = e.message || "Report could not be submitted."; }
+          };
+          const block = document.createElement("button"); block.className = "nv-link"; block.type = "button"; block.textContent = "Block author";
+          block.onclick = async () => {
+            if (!confirm("Block this anonymous post author? Their posts and chats will no longer be shown.")) return;
+            try { await api("/api/community/posts/" + encodeURIComponent(post.id) + "/block", { method: "POST" }); status.textContent = "Member blocked."; await loadCommunityPanel(); }
+            catch (e) { status.textContent = e.message || "Member could not be blocked."; }
+          };
+          card.append(report, block);
+        }
+        feed.appendChild(card);
+      });
+    } catch (e) { status.textContent = e.message || "Community feed could not be loaded."; }
+  }
+
+  async function loadFriendsPanel() {
+    const incomingBox = body.querySelector("#friendRequests"), list = body.querySelector("#friendList"), status = body.querySelector("#friendsStatus");
+    if (!incomingBox || !list) return;
+    try {
+      const results = await Promise.all([api("/api/friends/requests"), api("/api/friends")]);
+      const requests = results[0], friends = results[1];
+      incomingBox.innerHTML = "";
+      (requests.incoming || []).forEach((request) => {
+        const row = document.createElement("article"); row.className = "shake-person";
+        const label = document.createElement("p"); label.textContent = "Someone wants to become your friend.";
+        const accept = document.createElement("button"); accept.className = "primary-btn"; accept.textContent = "Accept";
+        const decline = document.createElement("button"); decline.className = "outline-btn"; decline.textContent = "Decline";
+        accept.onclick = () => respondFriend(request.id, true);
+        decline.onclick = () => respondFriend(request.id, false);
+        row.append(label, accept, decline); incomingBox.appendChild(row);
+      });
+      list.innerHTML = "";
+      if (!(friends.friends || []).length) list.innerHTML = "<p class='modal-description'>No friends yet. Start with a chat.</p>";
+      (friends.friends || []).forEach((friend) => {
+        const row = document.createElement("article"); row.className = "shake-person";
+        const title = document.createElement("h3"); title.textContent = friend.display_name;
+        const details = document.createElement("p"); details.textContent = [friend.age, friend.district].filter(Boolean).join(" · ");
+        const chat = document.createElement("button"); chat.className = "primary-btn"; chat.type = "button"; chat.textContent = "Chat";
+        chat.onclick = async () => {
+          chat.disabled = true;
+          try {
+            const opened = await api("/api/friends/" + encodeURIComponent(friend.friend_id) + "/chat", { method: "POST" });
+            selectedMatchId = opened.match_id; await loadAll(); render();
+          } catch (e) { chat.disabled = false; if (status) status.textContent = e.message || "Friend chat could not be opened."; }
+        };
+        row.append(title, details, chat); list.appendChild(row);
+      });
+      if (!requests.incoming?.length) incomingBox.innerHTML = "<p class='modal-description'>No pending friend requests.</p>";
+    } catch (e) { if (status) status.textContent = e.message || "Friends could not be loaded."; }
+  }
+
+  async function respondFriend(id, accept) {
+    try {
+      await api("/api/friends/requests/" + encodeURIComponent(id) + "/respond", { method: "POST", body: { accept } });
+      await loadFriendsPanel();
+    } catch (e) {
+      const status = body.querySelector("#friendsStatus"); if (status) status.textContent = e.message || "Request could not be updated.";
+    }
   }
 
   function msg(text, ok) { const el = body.querySelector("#pMsg"); if (el) { el.textContent = text; el.className = "nv-msg" + (ok ? " ok" : ""); } }
@@ -434,29 +581,24 @@
 
   // ----- edit profile -----
   function renderEdit() {
-    const vs = ["family", "kindness", "career", "faith", "communication", "lifestyle"];
-    const sel = (id, opts, cur) => `<select id="${id}">${opts.map((o) => `<option value="${o}" ${cur === o ? "selected" : ""}>${p(o)}</option>`).join("")}</select>`;
-    body.innerHTML = `<h2 class="modal-title">${p("editProfile")}</h2><p class="modal-description">${p("reviewNote")}</p>
-      <div class="field-grid"><div class="field"><label>${p("name")}</label><input id="eName" value="${esc(val("full_name"))}"></div><div class="field"><label>${p("age")}</label><input id="eAge" type="number" min="21" max="40" value="${esc(val("age"))}"></div></div>
-      <div class="field"><label>${p("place")}</label><input id="ePlace" value="${esc(val("district"))}"></div>
+    const vs = ["music", "movies", "gaming", "sports", "travel", "food", "art", "books", "technology", "fitness", "nature", "languages", "photography", "culture", "learning"];
+    body.innerHTML = `<h2 class="modal-title">${p("editProfile")}</h2><p class="modal-description">Update the details shown on your BEYOND profile. Your visibility is controlled separately.</p>
+      <div class="field-grid"><div class="field"><label>${p("name")}</label><input id="eName" value="${esc(val("full_name"))}"></div><div class="field"><label>${p("age")}</label><input id="eAge" type="number" min="18" max="100" value="${esc(val("age"))}"></div></div>
+      <div class="field"><label>City / region / country</label><input id="ePlace" maxlength="120" value="${esc(val("district"))}" placeholder="e.g. Kochi, India"></div>
       <div class="field"><label>${p("job")}</label><input id="eJob" value="${esc(val("job_title"))}"></div>
-      <div class="field"><label>${p("lookingFor")}</label>${sel("eLook", ["woman", "man", "any"], val("looking_for"))}</div>
-      <div class="field"><label>${p("relationship")}</label>${sel("eRel", ["marriage", "longterm"], val("relationship_intention"))}</div>
-      <div class="field-grid"><div class="field"><label>${p("minAge")}</label><input id="eMin" type="number" min="21" max="40" value="${esc(val("min_partner_age"))}"></div><div class="field"><label>${p("maxAge")}</label><input id="eMax" type="number" min="21" max="40" value="${esc(val("max_partner_age"))}"></div></div>
-      <label class="field-label">${p("values")}</label><div class="choice-grid">${vs.map((v) => `<label class="choice"><input type="checkbox" name="eVals" value="${v}" ${(profile.core_values || []).includes(v) ? "checked" : ""}> ${valName(v)}</label>`).join("")}</div>
+      <label class="field-label">Interests (up to 5)</label><div class="choice-grid">${vs.map((v) => `<label class="choice"><input type="checkbox" name="eVals" value="${v}" ${(profile.core_values || []).includes(v) ? "checked" : ""}> ${valName(v)}</label>`).join("")}</div>
       <div class="field"><label>${p("about")}</label><textarea id="eAbout" rows="4" maxlength="1000">${esc(val("bio"))}</textarea></div>
       <div class="nv-msg" id="pMsg"></div><div class="nv-row"><button class="primary-btn" id="eSave" type="button">${p("save")}</button><button class="back-btn" id="eBack" type="button">${p("close")}</button></div>`;
     const $ = (s) => body.querySelector(s);
     $("#eBack").onclick = render;
     $("#eSave").onclick = async () => {
       const vals = [...body.querySelectorAll("[name=eVals]:checked")].map((x) => x.value);
-      if (vals.length < 1 || vals.length > 3) return msg(L() === "ml" ? "1 മുതൽ 3 വരെ മൂല്യങ്ങൾ തിരഞ്ഞെടുക്കുക." : "Choose 1 to 3 values.");
+      if (vals.length < 1 || vals.length > 5) return msg(L() === "ml" ? "1 മുതൽ 5 വരെ താൽപര്യങ്ങൾ തിരഞ്ഞെടുക്കുക." : "Choose 1 to 5 interests.");
       $("#eSave").disabled = true; $("#eSave").textContent = p("saving");
       try {
         const r = await api("/api/profile", { method: "PUT", body: {
-          full_name: $("#eName").value, age: Number($("#eAge").value), district: $("#ePlace").value, job_title: $("#eJob").value,
-          bio: $("#eAbout").value, looking_for: $("#eLook").value, relationship_intention: $("#eRel").value,
-          min_partner_age: Number($("#eMin").value), max_partner_age: Number($("#eMax").value), core_values: vals } });
+          full_name: $("#eName").value, age: Number($("#eAge").value), district: $("#ePlace").value,
+          job_title: $("#eJob").value, bio: $("#eAbout").value, core_values: vals } });
         profile = r.profile; await loadAll(); render(); msg(r.message || p("saved"), true);
       } catch (e) { $("#eSave").disabled = false; $("#eSave").textContent = p("save"); msg(e.message); }
     };
@@ -467,23 +609,22 @@
     const box = body.querySelector("#matchBox");
     if (profile.approval_status !== "approved") { box.innerHTML = `<p class="modal-description">${p("needApproval")}</p>`; return; }
 
-    const canFind = dailyQuota.daily_used < dailyQuota.daily_limit && profile.profile_complete && !profile.suspended;
     const tabs = matches.length ? `<div class="nv-row" style="flex-wrap:wrap;gap:8px;margin-bottom:12px">${matches.map((item, i) =>
       `<button type="button" class="${match?.id === item.id ? "primary-btn" : "outline-btn"}" data-match-id="${esc(item.id)}">${p("chatTab")} ${i + 1}${item.status === "proposed" ? " · Pending" : ""}</button>`
     ).join("")}</div>` : "";
-    const find = `<div class="nv-row"><button class="primary-btn" id="mFind" type="button" ${canFind ? "" : "disabled"}>${p("findMatch")}</button></div>`;
-    let header = `<p class="modal-description">${p("dailyMatchesUsed")}: ${dailyQuota.daily_used}/${dailyQuota.daily_limit} (Kerala time). ${p("activeConversations")}: ${matches.length}</p>`;
-    if (dailyQuota.daily_used >= dailyQuota.daily_limit) header += `<p class="modal-description">${p("dailyLimitReached")}</p>`;
+    let header = `<p class="modal-description">${matches.length} conversation(s). Chats remain open until one member ends or blocks the connection.</p>`;
     if (!match) {
-      box.innerHTML = header + find + `<div class="nv-msg" id="mMsg"></div>`;
+      box.innerHTML = header + `<div class="nv-msg" id="mMsg"></div>`;
     } else {
       const m = match;
-      const anonymousBlock = m.is_shake_match && m.status === "active" && !m.reveal?.revealed
-        ? `<div class="summary-box"><b>${p("shakeAnonymousTitle")}</b><p>${p("shakeAnonymousInfo")}</p><p id="shakeRevealStatus">${m.reveal?.my_consented ? p("shakeWaitingReveal") : p("shakeReveal")}</p><div class="nv-row"><button class="outline-btn" id="shakeReveal" type="button">${m.reveal?.my_consented ? p("shakeRevealCheck") : p("shakeReveal")}</button>${m.reveal?.my_consented ? `<button class="nv-link" id="shakeWithdraw" type="button">${p("shakeWithdraw")}</button>` : ""}</div></div>`
-        : (m.is_shake_match && m.status === "active" && m.reveal?.revealed ? `<p class="modal-description">${p("shakeRevealDone")}</p>` : "");
-      let h = header + tabs + find + anonymousBlock + partnerHtml(m.partner);
+      const anonymousBlock = m.is_shake_match && m.status === "active" && m.reveal?.partner_hidden
+        ? `<div class="summary-box"><b>${p("shakeAnonymousTitle")}</b><p>The other member has chosen to keep their profile hidden. You can continue chatting anonymously.</p></div>`
+        : (m.is_shake_match && m.status === "active" && !m.reveal?.revealed
+          ? `<div class="summary-box"><b>${p("shakeAnonymousTitle")}</b><p>${p("shakeAnonymousInfo")}</p><p id="shakeRevealStatus">${m.reveal?.my_consented ? p("shakeWaitingReveal") : p("shakeReveal")}</p><div class="nv-row"><button class="outline-btn" id="shakeReveal" type="button">${m.reveal?.my_consented ? p("shakeRevealCheck") : p("shakeReveal")}</button>${m.reveal?.my_consented ? `<button class="nv-link" id="shakeWithdraw" type="button">${p("shakeWithdraw")}</button>` : ""}</div></div>`
+          : (m.is_shake_match && m.status === "active" && m.reveal?.revealed ? `<p class="modal-description">${p("shakeRevealDone")}</p>` : ""));
+      let h = header + tabs + anonymousBlock + partnerHtml(m.partner);
       if (["proposed", "active"].includes(m.status)) {
-        h += `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>
+        h += `${m.is_persistent_chat ? "" : `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>`}
           <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
           <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div><div class="voice-messages" id="voiceLog" aria-live="polite"></div><div class="voice-controls"><button class="outline-btn" id="voiceRecord" type="button">${p("voiceRecord")}</button><span class="nv-msg" id="voiceStatus" role="status"></span></div></div>`;
         if (m.status === "proposed") {
@@ -492,7 +633,7 @@
             : `<p class="modal-description">${p("waitingYou")}</p>`;
           h += `<div class="nv-row">${m.i_accepted ? "" : `<button class="primary-btn" id="mContinue" type="button">${p("continueMatch")}</button>`}<button class="outline-btn" id="mStop" type="button">${p("stopMatch")}</button></div>`;
         } else {
-          h += `<div class="nv-row"><button class="outline-btn" id="mEnd" type="button">${p("endMatch")}</button></div>`;
+          h += `<div class="nv-row"><button class="outline-btn" id="mEnd" type="button">${p("endMatch")}</button>${m.is_shake_match ? `<button class="primary-btn" id="friendRequest" type="button">Become friends</button>` : ""}</div>`;
         }
       }
       h += `<div class="nv-row nv-links"><button class="nv-link" id="mReport" type="button">${p("report")}</button><button class="nv-link" id="mBlock" type="button">${p("block")}</button></div><div id="safeBox"></div><div class="nv-msg" id="mMsg"></div>`;
@@ -506,21 +647,6 @@
         closeChat(); stopRealtime(); match = next; selectedMatchId = next.id; render();
       };
     });
-    const findButton = box.querySelector("#mFind");
-    if (findButton) findButton.onclick = async (ev) => {
-      ev.target.disabled = true; ev.target.textContent = p("finding");
-      try {
-        const r = await api("/api/match/find", { method: "POST" });
-        if (!r.found) {
-          const message = box.querySelector("#mMsg"); if (message) message.textContent = r.message || p("noMatchNow");
-          ev.target.disabled = !canFind; ev.target.textContent = p("findMatch"); return;
-        }
-        selectedMatchId = r.match?.id || selectedMatchId; await loadAll(); render();
-      } catch (e) {
-        const message = box.querySelector("#mMsg"); if (message) message.textContent = e.message;
-        ev.target.disabled = !canFind; ev.target.textContent = p("findMatch");
-      }
-    };
     if (!match) return;
     const m = match, $ = (s) => box.querySelector(s);
     $("#shakeReveal") && ($("#shakeReveal").onclick = async () => {
@@ -551,6 +677,14 @@
     $("#mContinue") && ($("#mContinue").onclick = () => respond(true));
     $("#mStop") && ($("#mStop").onclick = () => respond(false));
     $("#mEnd") && ($("#mEnd").onclick = async () => { if (!confirm(p("endConfirm"))) return; try { await api(`/api/match/${m.id}/end`, { method: "POST" }); await loadAll(); render(); } catch (e) { $("#mMsg").textContent = e.message; } });
+    $("#friendRequest") && ($("#friendRequest").onclick = async () => {
+      const button = $("#friendRequest"); button.disabled = true;
+      try {
+        const result = await api("/api/friends/request", { method: "POST", body: { match_id: m.id } });
+        button.textContent = result.status === "friends" ? "You are friends" : "Friend request sent";
+        if (result.status === "friends" && result.chat_id) { selectedMatchId = result.chat_id; await loadAll(); render(); }
+      } catch (e) { button.disabled = false; $("#mMsg").textContent = e.message || "Could not send friend request."; }
+    });
     $("#mReport") && ($("#mReport").onclick = () => reportForm(m.id));
     $("#mBlock") && ($("#mBlock").onclick = async () => { if (!confirm(p("blockConfirm"))) return; try { const r = await api("/api/safety/block", { method: "POST", body: { match_id: m.id } }); await loadAll(); render(); msg(r.message, true); } catch (e) { $("#mMsg").textContent = e.message; } });
     if (["proposed", "active"].includes(m.status)) startChat(m);
@@ -671,7 +805,7 @@
       el.textContent = s > 0 ? `${Math.floor(s / 3600)}h ${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}m ${String(s % 60).padStart(2, "0")}s` : p("closed");
       if (s <= 0) { clearInterval(tickTimer); closeChat(); loadAll().then(render).catch(() => {}); }
     };
-    tick(); tickTimer = setInterval(tick, 1000);
+    if (!m.is_persistent_chat) { tick(); tickTimer = setInterval(tick, 1000); }
 
     const pull = async () => {
       try {

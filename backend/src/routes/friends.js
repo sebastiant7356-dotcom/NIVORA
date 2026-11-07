@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
   const byId = new Map((profiles || []).map((p) => [p.id, p]));
   res.json({ success: true, friends: ids.map((id) => {
     const p = byId.get(id);
-    return { friend_id: id, display_name: p && p.profile_visibility !== "hidden" ? String(p.full_name || "").trim().split(/\s+/)[0] : "NIVORA friend",
+    return { friend_id: id, display_name: p && p.profile_visibility !== "hidden" ? String(p.full_name || "").trim().split(/\s+/)[0] : "BEYOND member",
       age: p && p.profile_visibility !== "hidden" ? p.age : null,
       district: p && p.profile_visibility !== "hidden" ? p.district : null,
       created_at: (data || []).find((row) => row.user_low === id || row.user_high === id)?.created_at || null };

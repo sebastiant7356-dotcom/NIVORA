@@ -52,7 +52,7 @@ test("SQL: RLS enabled and matching functions not callable by browser roles", ()
   assert.ok(!/grant (insert|update|delete)[^;]*to (anon|authenticated)/i.test(sql));
 });
 
-test("MELVO global social app uses persistent Shake chats, radius discovery and friends", () => {
+test("BEYOND global social app uses persistent Shake chats, radius discovery and friends", () => {
   const migration = text(path.join(ROOT, "backend", "migrations", "20261107000000_social_app_foundation.sql"));
   const route = text(path.join(ROOT, "backend", "src", "routes", "match.js"));
   const shake = text(path.join(ROOT, "backend", "src", "routes", "shake.js"));
@@ -156,4 +156,11 @@ test("account deletion preserves only registration identifiers for 180 days", ()
   assert.match(migration, /revoke all on table public\.account_deletion_retention from public, anon, authenticated/);
   assert.match(migration, /cron\.schedule/);
   assert.match(migration, /purge_expired_account_registration_records/);
+});
+
+
+test("anonymous post author foreign key has a supporting index migration", () => {
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261110000000_anonymous_posts_author_index.sql"));
+  assert.match(migration, /create index if not exists anonymous_posts_author_id_idx/);
+  assert.match(migration, /on public\.anonymous_posts\(author_id\)/);
 });
