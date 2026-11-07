@@ -1,4 +1,4 @@
--- NIVORA social app foundation: persistent Shake chats, radius controls,
+-- MELVO social app foundation: persistent Shake chats, radius controls,
 -- profile visibility, mutual friendships and worldwide anonymous posts.
 -- Additive migration. Review and apply to Supabase before deploying the backend.
 
@@ -66,6 +66,11 @@ alter table public.anonymous_posts add column if not exists longitude double pre
 create index if not exists anonymous_posts_feed_idx
   on public.anonymous_posts(status, created_at desc);
 update public.anonymous_posts set audience='global' where audience='kerala';
+alter table public.anonymous_posts alter column audience set default 'global';
+alter table public.anonymous_posts drop constraint if exists anonymous_posts_audience_check;
+alter table public.anonymous_posts add constraint anonymous_posts_audience_check
+  check (audience in ('global','radius') and
+    ((audience='global' and radius_km is null) or (audience='radius' and radius_km between 1 and 100)));
 
 alter table public.friend_requests enable row level security;
 alter table public.friendships enable row level security;
