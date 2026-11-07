@@ -42,7 +42,7 @@ Record Account A and Account B as test aliases only.
 | Voice message | Record, send, play, and reject invalid/oversized audio | Valid recordings up to 60 seconds / 2 MB work; invalid payloads are rejected; storage remains private |
 | Photo approval | Upload valid/invalid photos; inspect as staff and as another member | Up to four allowed formats/sizes; pending/rejected photos are not visible to other members |
 | Shake location | Deny permission, opt in, refresh, then switch off | No discovery without opt-in; off removes stored location and stops discovery |
-| 50 km discovery | Test a consenting compatible account inside and outside radius | Only eligible compatible accounts within 50 km are returned; only approximate distance is shown |
+| Radius discovery | Test a consenting account inside and outside selected 1–100 km radius | Only public Kerala members within the selected radius appear; only approximate distance and interests are shown |
 | Anonymous reveal | Mutual interest; consent on A only; then B; withdraw before B consents | Identity stays hidden until both consent; one-sided consent can be withdrawn; hidden profiles remain hidden |\n| Profile visibility | Set A public, then hidden; repeat discovery | Public profiles may appear anonymously; hidden profiles are excluded from discovery and remain hidden in chat |\n| Friend request | Send request from active Shake chat; accept on B | Friendship is created only after acceptance; persistent friend chat can be opened from Friends |\n| Anonymous posts | Publish to Kerala and nearby radius audiences | Posts show no member identity; radius audience uses opted-in location |\n| Anonymous post safety | Report, block author, and review as staff | Blocked author posts disappear for blocker; staff can audit, inspect and remove reported posts |
 | Block | A blocks B | Match ends; neither account is recommended to the other again |
 | Report | Submit a report and inspect staff workflow | Report is stored; only authorized staff can inspect the relevant reported account/evidence |
@@ -87,14 +87,14 @@ Severity:
 
 ## 6. Small Instagram pilot measurement
 
-Paid advertising for an online dating/matchmaking service on Meta platforms (including Instagram) requires Meta's prior written permission. Submit the dating-service advertiser application and wait for written approval before creating or boosting a paid ad. Do not try to disguise the service category or bypass review. Organic posts are a separate route, but must still be truthful and follow platform rules.\n\nDo not judge the campaign by reach or likes alone. Track aggregate counts only:
+NIVORA is a social discovery app, not a dating or matchmaking service. Check the current advertising and app-store policies for social discovery and user-generated content before paid promotion. Do not misrepresent the product category or bypass platform review.\n\nDo not judge the campaign by reach or likes alone. Track aggregate counts only:
 
 - Ad spend and impressions
 - Link clicks / landing-page visits
 - Google sign-ins started and completed
 - Profiles successfully completed
-- Members who receive at least one recommendation
-- Matches accepted and first messages sent
+- Members who use Shake discovery
+- Mutual interests and first messages sent\n- Friend requests accepted\n- Anonymous posts and moderation actions
 - Reports, blocks, and support requests
 - Bugs by severity and whether fixed
 
