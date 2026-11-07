@@ -84,6 +84,13 @@ router.post("/admin/reports/:id/resolve", requireStaff(), wrap(async (req, res) 
   await audit(req.user.id, "report_" + status, report.reported_id, { report_id: report.id, resolution });
   res.json({ success: true, status });
 }));
+router.get("/admin/enforcements", requireStaff("admin"), wrap(async (_req, res) => {
+  const { data, error } = await serviceClient().from("account_enforcements")
+    .select("user_id,status,reason,expires_at,created_at,updated_at")
+    .in("status", ["suspended", "banned"]).order("updated_at", { ascending: false }).limit(200);
+  if (error) throw error;
+  res.json({ success: true, accounts: data || [] });
+}));
 router.post("/admin/users/:id/enforcement", requireStaff("admin"), wrap(async (req, res) => {
   if (req.params.id === req.user.id) {
     return res.status(400).json({ success: false, message: "An admin cannot change their own account status." });
