@@ -1,42 +1,49 @@
-# Remaining manual launch checks — BEYOND Android
+# BEYOND — external setup and release gates
 
-The current product direction is Google OAuth only, global Shake & Chat, anonymous posts, mutual friendships, text chat and voice messages. The frontend is embedded in Android; no separate public frontend website is required. Phone OTP, Razorpay payments and live voice/video calling are not part of this release.
+## Current implementation
+The current minimal-data branch replaces persistent member-content routes with a volatile in-memory API. Google/Supabase Auth is the only intended persistent account identity store. Profile data, coordinates, interests, matches, messages, posts, friend state, blocks and reports are temporary process memory with a 12-hour inactivity TTL. Restarts/redeploys may erase them earlier. Profile photos, voice messages, payments and persistent history are disabled.
 
-## A. Google OAuth
+This is not yet a safe public launch. Reports and blocks are volatile, and there is no durable moderation queue. Strict login-only retention conflicts with durable safety evidence. The operator must decide this product/safety trade-off before public release.
 
+## A. Google OAuth — manual dashboard step
 1. In Supabase Authentication, confirm Google is the only customer sign-in method exposed.
 2. Confirm the Google OAuth client has the current Supabase callback URL.
-3. Add the exact Android redirect `in.melvo.social://auth/callback` to Supabase Authentication → URL Configuration → Redirect URLs. Keep the Google provider's authorised callback as the Supabase Auth callback URL.
-4. Test sign-in and sign-out using two separate customer Google accounts.
+3. Add the exact Android redirect `in.melvo.social://auth/callback` to Supabase Authentication → URL Configuration → Redirect URLs.
+4. Test sign-in, sign-out and account deletion using two separate test Google accounts.
 
-Public legal URLs on the existing backend host:
-- https://nivora-backend.onrender.com/legal/privacy.html
-- https://nivora-backend.onrender.com/legal/terms.html
+The redirect allow-list is a Supabase Auth dashboard setting and has not been changed by the repository code.
 
-Use the privacy URL in the Play Store listing; no separate public frontend website is required.
+## B. Deploy and verify
+1. Wait for all backend, test and Android build workflows on the latest PR commit to pass.
+2. Merge the reviewed PR to `main`; Render is configured to auto-deploy from `main`.
+3. Verify the Render deployment is live and `/api/health` returns `data_mode: "ephemeral"` and `member_content_persistence: false`.
+4. Confirm the app still signs in and all member-content routes use the ephemeral API.
+5. Only after no-new-write behaviour is confirmed, inventory and remove legacy database rows and stored files. Preserve `auth.users` accounts. The connected project currently has legacy profile/match/location rows and one private profile-photo object. The cleanup has not yet been run.
+6. The private `profile-photos` and `voice-messages` buckets remain configured in Supabase. Upload routes are disabled in the app; remove old objects and disable/remove unused buckets using Supabase Storage controls.
 
-## B. Two-customer end-to-end test
+## C. Two-account Android test
+Use two independent Google test accounts and real Android devices. Verify:
+- Both accounts can sign in with Google and complete a profile with declared age 18+.
+- Profile details are session-only; edits work; hidden profiles stay hidden.
+- Location is opt-in, radius is constrained to 1–100 km, exact coordinates are not shown to other members, and discovery returns only members within both selected radii.
+- A mutual interest opens an anonymous text chat.
+- One-sided reveal does not expose identity; both-sided reveal exposes only a public profile.
+- A member can end a chat, block another member, send a friend request, and accept/decline the request.
+- Anonymous posts respect global/radius audience selection; a user can delete their own post.
+- Profile-photo and voice uploads remain disabled.
+- Explicit logout clears the user's active volatile state; account deletion removes the Supabase Auth identity.
+- A controlled backend restart clears temporary data, as disclosed.
+- Reports and blocks are understood to be temporary and not guaranteed to reach a durable moderation queue.
 
-Use two real test accounts in different locations and verify:
-- First login and customer profile creation with city/region/country.
-- Dashboard redirect on later login.
-- Shake discovery within selected 1–100 km radius, including across national borders.
-- Persistent Shake and friend chats with no automatic time limit; text and voice messages.
-- Location permission on/off, physical Shake, mutual interest, anonymous chat and profile visibility.
-- One-sided reveal consent keeps identity hidden; both-sided consent reveals a public profile; hidden profiles remain hidden.
-- Mutual friend acceptance, global anonymous posts, radius-audience posts, post report/block, staff removal, account export and account deletion.
+## D. Remaining release requirements
+- Replace process-local memory with a reliable authenticated ephemeral realtime/presence service before scaling or multi-instance production use.
+- Decide whether limited durable report evidence is permitted. If durable reports are required, the "only login details persist" policy must be revised explicitly.
+- Test GPS permission and physical shake on real devices.
+- Generate a signed Android App Bundle, complete Play Console testing requirements and pass Google review.
+- Obtain qualified legal review for India and every intended target market, including age eligibility, privacy, cross-border processing, user-generated content and grievance handling.
 
-Do not use staff accounts as customer test profiles.
-
-## C. Legal and grievance review
-
-Privacy Notice and Terms in Malayalam and English are drafts. Before a public worldwide launch, obtain qualified legal review for India and each target market, including privacy, data transfers, age eligibility, user-generated content, child safety, moderation, consumer rules and grievance handling.
-
-Public support / grievance contact currently listed: nivora.helpdesk@gmail.com. The operator is an individual; there is no registered company at launch. Play Store release also requires a signed Android App Bundle, developer account, applicable closed testing and Google review.
-
-## D. Free-tier and security limitations
-
-- Render and Supabase free-tier limits, sleep/cold-start behaviour and quotas apply.
-- Supabase Security Advisor currently warns that leaked-password protection is disabled and unavailable on the current Free plan. Google OAuth is the only BEYOND login method, but do not describe this provider warning as resolved.
-- Keep the Supabase service-role key in Render backend environment variables only.
-- External AI screening remains off by default.
+## E. Known provider and plan limitations
+- Render and Supabase plan quotas, sleep/cold-start behaviour and restarts apply.
+- Keep the Supabase service-role key in Render backend environment variables only; never put it in the Android app.
+- Leaked-password protection is not relevant to Google-only OAuth passwords, but any Supabase Security Advisor warning must still be reviewed rather than described as fixed.
+- No payment processor, media upload or persistent chat-history feature is active.

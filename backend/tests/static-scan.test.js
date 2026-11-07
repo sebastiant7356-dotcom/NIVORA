@@ -52,50 +52,31 @@ test("SQL: RLS enabled and matching functions not callable by browser roles", ()
   assert.ok(!/grant (insert|update|delete)[^;]*to (anon|authenticated)/i.test(sql));
 });
 
-test("BEYOND global social app uses persistent Shake chats, radius discovery and friends", () => {
-  const migration = text(path.join(ROOT, "backend", "migrations", "20261107000000_social_app_foundation.sql"));
-  const route = text(path.join(ROOT, "backend", "src", "routes", "match.js"));
-  const shake = text(path.join(ROOT, "backend", "src", "routes", "shake.js"));
-  const matches = text(path.join(ROOT, "backend", "src", "lib", "matches.js"));
-  const friends = text(path.join(ROOT, "backend", "src", "routes", "friends.js"));
-  const community = text(path.join(ROOT, "backend", "src", "routes", "community.js"));
-  assert.match(migration, /radius_km integer not null default 25/);
-  assert.match(migration, /profile_visibility/);
-  assert.match(migration, /create table if not exists public\.friendships/);
-  assert.match(migration, /create table if not exists public\.anonymous_posts/);
-  assert.match(migration, /values\(p_user,p_partner,\x27active\x27,now\(\),null,true,true,\x27friend\x27\)/);
-  assert.match(route, /daily_matching_disabled/);
-  assert.match(shake, /mine\.radius_km/);
-  assert.doesNotMatch(shake, /isKeralaDistrict|kerala_only/);
-  assert.match(matches, /is_persistent_chat: persistentMatch/);
-  assert.match(matches, /\["shake", "friend"\]/);
-  assert.match(friends, /nivora_open_friend_chat/);
-  assert.match(community, /anonymous_post_reported/);
-  assert.match(community, /anonymous_post_author_blocked/);
-  assert.match(community, /audience === "global"/);
+test("BEYOND minimal-data mode mounts volatile session APIs, not legacy persistence routes", () => {
+  const server = text(path.join(ROOT, "backend", "src", "server.js"));
+  const api = text(path.join(ROOT, "backend", "src", "routes", "ephemeral-api.js"));
+  const portal = text(path.join(ROOT, "frontend", "portal.js"));
+  assert.ok(server.includes('app.use("/api", require("./routes/ephemeral-api"))'));
+  for (const route of ["profile", "match", "shake", "friends", "community", "chat", "safety", "account", "admin"]) {
+    assert.ok(!server.includes('require("./routes/' + route + '")'), "legacy route mounted: " + route);
+  }
+  assert.ok(!api.includes(".from("));
+  assert.ok(!api.includes(".storage."));
+  assert.ok(api.includes("new EphemeralStore"));
+  assert.ok(api.includes("mutual"));
+  assert.ok(api.includes("profile_visibility"));
+  assert.ok(portal.includes("Photo sharing is disabled"));
 });
 
-test("voice messages stay private, size-limited and restricted to match members", () => {
-  const migration = text(path.join(ROOT, "backend", "migrations", "20261101184818_voice_messages.sql"));
-  const hardeningMigration = text(path.join(ROOT, "backend", "migrations", "20261101184824_staff_separation_security_performance.sql"));
-  const route = text(path.join(ROOT, "backend", "src", "routes", "chat.js"));
+test("voice and photo uploads are disabled in minimal-data mode", () => {
+  const api = text(path.join(ROOT, "backend", "src", "routes", "ephemeral-api.js"));
   const server = text(path.join(ROOT, "backend", "src", "server.js"));
   const portal = text(path.join(ROOT, "frontend", "portal.js"));
-  const staff = text(path.join(ROOT, "backend", "src", "routes", "admin.js"));
-  const middleware = text(path.join(ROOT, "backend", "src", "middleware.js"));
-  assert.match(migration, /public\.voice_messages/);
-  assert.match(migration, /values \('voice-messages', 'voice-messages', false, 2097152/);
-  assert.match(migration, /revoke all on table public\.voice_messages from public, anon, authenticated/);
-  assert.match(hardeningMigration, /voice_messages_deny_browser/);
-  assert.match(route, /assertChatMatch\(req\.params\.matchId, req\.user\.id\)/);
-  assert.match(route, /MAX_VOICE_BYTES = 2 \* 1024 \* 1024/);
-  assert.match(route, /duration > 60/);
-  assert.match(route, /count >= 20/);
-  assert.match(middleware, /X-Voice-Duration/);
-  assert.match(server, /\/api\/chat\/:matchId\/voice.*express\.raw/);
-  assert.match(portal, /MediaRecorder/);
-  assert.match(portal, /\/api\/chat\/.*\/voice/);
-  assert.match(staff, /viewed_reported_voice/);
+  assert.ok(api.includes("voice_disabled"));
+  assert.ok(api.includes("photos_disabled"));
+  assert.ok(!server.includes("express.raw"));
+  assert.ok(!portal.includes('id="voiceRecord"'));
+  assert.ok(!portal.includes('id="photoInput"'));
 });
 
 test("staff accounts cannot become customer profiles or receive matches", () => {

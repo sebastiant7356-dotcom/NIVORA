@@ -6,11 +6,11 @@
 
   const P = {
     en: {
-      myspace: "My space", messagesTab: "Messages", matchTab: "Chat", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Shake to discover someone nearby.", shakeIntro: "Choose your distance, shake your phone, and meet people around the world.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Your exact location is private. Only an approximate distance is shown.", shakeEnable: "Enable nearby discovery", shakeDisable: "Turn off location sharing", shakeRefresh: "Find people nearby", shakeLoading: "Finding people within your selected radius…", shakeNoPeople: "No members are available within your radius right now.", shakePermission: "Allow location access in BEYOND to continue.", shakeEnabled: "Nearby discovery is enabled. Your exact location stays private.", shakeLike: "Interested", shakeLikeBack: "Like back", shakeWaiting: "Interest sent. Waiting for a mutual interest.", shakeMatched: "It’s a mutual interest! Your chat is ready in Messages.", shakeAnonymousTitle: "You are chatting anonymously", shakeAnonymousInfo: "Your name, photos and profile details stay hidden until both of you choose to reveal.", shakeReveal: "I am comfortable revealing my profile", shakeWaitingReveal: "Your choice is saved. Waiting for the other person to consent.", shakeRevealDone: "Both of you agreed. Profiles are now visible.", shakeRevealCheck: "Check reveal status", shakeWithdraw: "Withdraw my consent", shakeDistance: "km away", shakeError: "Could not load Shake & Chat. Please try again.", shakeConsent: "Choose a search radius from 1 to 100 km. You can turn discovery off at any time.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
+      myspace: "My space", messagesTab: "Messages", matchTab: "Chat", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Shake to discover someone nearby.", shakeIntro: "Choose your distance, shake your phone, and meet people around the world.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Your exact location is private. Only an approximate distance is shown.", shakeEnable: "Enable nearby discovery", shakeDisable: "Turn off location sharing", shakeRefresh: "Find people nearby", shakeLoading: "Finding people within your selected radius…", shakeNoPeople: "No members are available within your radius right now.", shakePermission: "Allow location access in BEYOND to continue.", shakeEnabled: "Nearby discovery is enabled. Your exact location is used temporarily and is not saved to account history.", shakeLike: "Interested", shakeLikeBack: "Like back", shakeWaiting: "Interest sent. Waiting for a mutual interest.", shakeMatched: "It’s a mutual interest! Your chat is ready in Messages.", shakeAnonymousTitle: "You are chatting anonymously", shakeAnonymousInfo: "Your name, photos and profile details stay hidden until both of you choose to reveal.", shakeReveal: "I am comfortable revealing my profile", shakeWaitingReveal: "Your choice is saved. Waiting for the other person to consent.", shakeRevealDone: "Both of you agreed. Profiles are now visible.", shakeRevealCheck: "Check reveal status", shakeWithdraw: "Withdraw my consent", shakeDistance: "km away", shakeError: "Could not load Shake & Chat. Please try again.", shakeConsent: "Choose a search radius from 1 to 100 km. You can turn discovery off at any time.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
       noProfile: "You have not created a profile yet.", staffAccount: "This is a BEYOND staff account. Customer profiles and matching are disabled for staff.", staffConsole: "Open staff console", createProfile: "Create my profile",
       status_pending: "Awaiting staff review", status_approved: "Approved", status_rejected: "Not approved", status_changes_requested: "Changes requested",
       suspended: "Your account is suspended. Please contact support.", incomplete: "Your profile is missing a few details. Please edit it before using Shake & Chat.",
-      reason: "Staff note", editProfile: "Edit profile", save: "Save changes", saving: "Saving…", saved: "Saved.", reviewNote: "Your profile changes are saved immediately. Keep your details accurate and use Report or Block if needed.",
+      reason: "Staff note", editProfile: "Edit profile", save: "Save changes", saving: "Saving…", saved: "Updated for this session.", reviewNote: "Profile details are held temporarily in server memory, not saved as account history, and may disappear after inactivity or a server restart.",
       rejectedNote: "This profile was not approved and cannot be edited here.",
       matching: "Conversations", findMatch: "Find my match", finding: "Searching…", noMatchNow: "No suitable profile is available right now. Please check again later.",
       dailyMatchesUsed: "Conversations", activeConversations: "Active conversations", dailyLimitReached: "", chatTab: "Chat",
@@ -18,14 +18,14 @@
       accept: "Accept", decline: "Decline", continueMatch: "Continue", stopMatch: "Stop", waitingPartner: "You chose Continue. Waiting for the other person.", waitingYou: "Choose Continue or Stop to proceed.",
       proposalEnds: "Respond before", endMatch: "End match", endConfirm: "End this match? Chat and voice messages will close.",
       timeLeft: "Chat window left", closed: "Closed", chat: "Chat", typeMsg: "Write a message…", send: "Send", live: "Live", reconnecting: "Reconnecting…",
-      chatClosed: "This conversation is unavailable or has been ended.", voiceRecord: "Record voice message", voiceStop: "Stop recording", voiceUploading: "Uploading voice message…", voiceSent: "Voice message sent.", voiceError: "Voice message could not be sent.", voiceUnsupported: "Voice recording is not supported in this browser.",
-      report: "Report", block: "Block", blockConfirm: "Block this person? The match ends and you will never be matched again.",
-      reportTitle: "Report this person", reportSend: "Send report", reportThanks: "Report received. Our team will review it.",
+      chatClosed: "This conversation is unavailable or has been ended.", voiceRecord: "Record voice message", voiceStop: "Stop recording", voiceUploading: "Uploading voice message…", voiceSent: "Voice message sent.", voiceError: "Voice messages are disabled in this version.", voiceUnsupported: "Voice recording is not supported in this browser.",
+      report: "Report", block: "Block", blockConfirm: "Block this person for the current server session? The match ends, but the block may be lost if the server restarts.",
+      reportTitle: "Report this person", reportSend: "Send report", reportThanks: "Report received temporarily. It may be lost if the server restarts; contact support for urgent concerns.",
       r_harassment: "Harassment", r_fake_profile: "Fake profile", r_scam: "Scam / money request", r_inappropriate_content: "Inappropriate content", r_underage: "Looks underage", r_other: "Other",
       details: "Details (optional)", feedback: "Feedback", wantContinue: "I would like to continue getting to know them", dontContinue: "I do not want to continue", sendFeedback: "Send feedback", feedbackThanks: "Thank you for your feedback.",
       pastMatches: "Past matches", none: "None yet.", from: "Started",
       
-      account: "Account & privacy", export: "Download my data", del: "Delete my account", delWarn: "This permanently deletes your profile, matches and chats. Type DELETE to confirm.", delDone: "Your account was deleted.",
+      account: "Account & privacy", export: "Download current session data", del: "Delete my account", delWarn: "This deletes your Google login account and clears current session data. Type DELETE to confirm.", delDone: "Your login account was deleted.",
       photos: "Profile photos", photoHelp: "Upload up to 4 clear photos (JPEG, PNG or WebP, max 5 MB each). Photos become visible to other members only after staff approval. Account reviews are otherwise report-led.", addPhoto: "Choose photo", photoPending: "Awaiting review", photoApproved: "Approved", photoRejected: "Not approved", photoDelete: "Remove", photoLimit: "You have reached the 4-photo limit.", photoUpload: "Uploading…", photoError: "Photo upload failed.", values: "Interests", intention: "Interests", sharedValues: "Shared interests",
       v_music: "Music", v_movies: "Movies", v_gaming: "Gaming", v_sports: "Sports", v_travel: "Travel", v_food: "Food", v_art: "Art", v_books: "Books", v_technology: "Technology", v_fitness: "Fitness", v_nature: "Nature", v_languages: "Languages", v_photography: "Photography", v_culture: "Culture", v_learning: "Learning", v_family: "Family", v_kindness: "Kindness & respect", v_career: "Career", v_faith: "Culture / faith", v_communication: "Communication", v_lifestyle: "Lifestyle",
       marriage: "Marriage", longterm: "Long-term relationship", woman: "Woman", man: "Man", other: "Other", any: "Open to possibilities",
@@ -202,7 +202,7 @@
         ${!profile.profile_complete ? `<p class="nv-msg">${p("incomplete")}</p>` : ""}
         <div class="nv-row">${st !== "rejected" ? `<button class="outline-btn" id="pEdit" type="button">${p("editProfile")}</button>` : `<small>${p("rejectedNote")}</small>`}</div>`;
 
-      h += `<h3 class="nv-h">${p("photos")}</h3><div id="photoBox"><p class="modal-description">${p("photoHelp")}</p><div class="nv-row"><label class="outline-btn" for="photoInput">${p("addPhoto")}</label><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden ${photos.length >= 4 ? "disabled" : ""}></div><div class="photo-grid">${photos.map((ph) => `<div class="photo-card"><img src="${esc(ph.url || "")}" alt="Your profile photo"><small>${p("photo" + ph.approval_status[0].toUpperCase() + ph.approval_status.slice(1))}</small><button class="nv-link" data-photo-delete="${esc(ph.id)}" type="button">${p("photoDelete")}</button>${ph.review_reason ? `<small>${esc(ph.review_reason)}</small>` : ""}</div>`).join("")}</div><div class="nv-msg" id="photoMsg" role="status"></div></div>`;
+      h += `<h3 class="nv-h">${p("photos")}</h3><p class="modal-description">Photo sharing is disabled. BEYOND does not upload or retain profile photos.</p>`;
       h += `<h3 class="nv-h">${p("matching")}</h3><div id="matchBox"></div>`;
       if (history.length) {
         h += `<h3 class="nv-h">${p("pastMatches")}</h3><ul class="nv-list">${history.filter((x) => !["proposed", "active"].includes(x.status)).map((x) =>
@@ -220,7 +220,7 @@
     const $ = (s) => body.querySelector(s);
     $("#pCreate") && ($("#pCreate").onclick = () => { close(); window.openWizard && window.openWizard(); });
     $("#pEdit") && ($("#pEdit").onclick = renderEdit);
-    $("#pSignOut").onclick = async () => { await client().auth.signOut(); close(); };
+    $("#pSignOut").onclick = async () => { try { await api("/api/session", { method: "DELETE" }); } finally { await client().auth.signOut(); close(); } };
     $("#pExport").onclick = exportData;
     $("#pDelete").onclick = deleteAccount;
     body.querySelectorAll("[data-fb]").forEach((b) => (b.onclick = () => feedbackForm(b.dataset.fb)));
@@ -337,7 +337,7 @@
       try {
         const result = await api("/api/profile/visibility", { method: "PUT", body: { visibility: visibilitySelect.value } });
         profile.profile_visibility = result.visibility;
-        privacySettings.querySelector("#visibilityStatus").textContent = "Privacy setting saved.";
+        privacySettings.querySelector("#visibilityStatus").textContent = "Visibility updated for this session.";
       } catch (e) {
         privacySettings.querySelector("#visibilityStatus").textContent = e.message || "Could not update privacy setting.";
         visibilitySelect.value = profile.profile_visibility || "public";
@@ -423,7 +423,7 @@
         action.onclick = async () => {
           action.disabled = true;
           try {
-            const response = await api("/api/shake/interest", { method: "POST", body: { target_user_id: person.user_id } });
+            const response = await api("/api/shake/interest", { method: "POST", body: { candidate_token: person.candidate_token } });
             if (response.mutual) {
               status.textContent = p("shakeMatched");
               selectedMatchId = response.match_id;
@@ -469,7 +469,7 @@
           body: field.value, audience: body.querySelector("#communityAudience")?.value || "global",
           radius_km: Number(body.querySelector("#shakeRadius")?.value || 25)
         }});
-        field.value = ""; status.textContent = "Posted anonymously."; await loadCommunityPanel();
+        field.value = ""; status.textContent = "Posted anonymously for this active session."; await loadCommunityPanel();
       } catch (e) { status.textContent = e.message || "Post could not be published."; }
       finally { publish.disabled = false; }
     };
@@ -626,7 +626,7 @@
       if (["proposed", "active"].includes(m.status)) {
         h += `${m.is_persistent_chat ? "" : `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>`}
           <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
-          <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div><div class="voice-messages" id="voiceLog" aria-live="polite"></div><div class="voice-controls"><button class="outline-btn" id="voiceRecord" type="button">${p("voiceRecord")}</button><span class="nv-msg" id="voiceStatus" role="status"></span></div></div>`;
+          <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div></div>`;
         if (m.status === "proposed") {
           h += m.i_accepted
             ? `<p class="modal-description">${p("waitingPartner")}</p>`

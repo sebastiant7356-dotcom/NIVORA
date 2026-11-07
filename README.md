@@ -9,12 +9,12 @@ BEYOND is the working product name for a global, adults-only social discovery ap
 - Adults aged 18+; age is self-declared and not independently verified.
 - Shake-to-discover people anywhere in the world within a user-selected 1–100 km radius.
 - Anonymous chat starts after mutual interest. Names, photos and profile details remain hidden until both members separately consent to reveal.
-- Shake and accepted-friend chats do not automatically expire. Either member can end or block a conversation.
+- Text chat and other member content exist only in volatile server memory for up to 12 hours of inactivity; restarts may erase them sooner. Either member can end or block an active conversation.
 - Mutual friend requests; a friendship exists only after the other person accepts.
-- Anonymous text posts can be shared globally or within a selected nearby radius.
+- Anonymous text posts can be shared globally or within a selected nearby radius; they are temporary and are not archived.
 - Members control whether their profile appears in discovery; hidden profiles remain hidden.
-- Report, block, staff moderation, account export and account deletion.
-- Profile photos remain hidden from other members until staff approval.
+- Temporary block and report actions, current-session export, and Google account deletion. Durable staff moderation is not enabled in this strict minimal-data version.
+- Profile-photo and voice-message uploads are disabled. Persistent history, payments and durable friend lists are not available.
 - Free at this stage. Payments, live voice calls and video calls are not part of the current release.
 
 ## Existing services
@@ -24,7 +24,7 @@ BEYOND is the working product name for a global, adults-only social discovery ap
 - Terms: https://nivora-backend.onrender.com/legal/terms.html
 - Support / grievance email currently configured: nivora.helpdesk@gmail.com
 
-Supabase provides Google OAuth, PostgreSQL and private storage. Render hosts the API. The frontend is bundled inside the Android app, not deployed as a separate public website. Free-tier quotas and cold starts may apply.
+Supabase provides Google OAuth and account authentication. Render hosts the API. The current branch uses process-local volatile memory for member content; legacy Supabase tables and one legacy profile-photo object still require cleanup. The frontend is bundled inside the Android app, not deployed as a separate public website. Free-tier quotas and cold starts may apply.
 
 ## Android build
 
@@ -57,6 +57,6 @@ Before Android Google sign-in works, add the exact redirect `in.melvo.social://a
 
 ## Important limitations
 
-BEYOND is not yet a production-ready worldwide service. The code changes are in a draft pull request and have not been merged or deployed. A worldwide product also requires country-specific legal review, privacy and data-transfer compliance, child-safety controls, moderation coverage, and capacity planning. Do not advertise worldwide availability until the database migration, backend deployment, OAuth configuration and real-device testing are complete.
+BEYOND is not yet a production-ready public service. The session-only implementation is in a draft pull request and has not been merged or deployed. Process-local memory can be lost on restart and does not support multiple backend instances consistently. Reports and blocks are not durable, and no staff moderation queue is active. Existing legacy database rows and a profile-photo object have not yet been deleted. Do not publicly launch until OAuth configuration, legacy-data cleanup, real-device tests, legal review, safety coverage and a reliable ephemeral realtime architecture are complete.
 
 The operator is an individual, not a registered company. Keep secrets only in provider secret settings; never commit OAuth client secrets or Supabase service-role keys.
