@@ -30,7 +30,7 @@ function createApp() {
   app.get("/terms", (req, res) => res.redirect(302, "/legal/terms.html"));
   app.get("/legal/:file", (req, res, next) => {
     if (!legalFiles.has(req.params.file)) return next();
-    res.sendFile(path.resolve(__dirname, "../../frontend", req.params.file));
+    res.sendFile(path.resolve(__dirname, "../legal", req.params.file));
   });
 
   // Public, non-secret runtime settings for the frontend.
