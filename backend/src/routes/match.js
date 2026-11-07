@@ -3,7 +3,7 @@ const express = require("express");
 const { serviceClient } = require("../lib/clients");
 const { requireAuth } = require("../middleware");
 const { isUuid } = require("../lib/validation");
-const { expire, getMatchFor, matchView } = require("../lib/matches");
+const { rpcError, expire, getMatchFor, matchView } = require("../lib/matches");
 
 const router = express.Router();
 router.use(requireAuth);
