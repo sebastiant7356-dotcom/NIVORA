@@ -91,7 +91,7 @@ function saveProfile(req, res, creating) {
   const current = profileOf(req.user.id);
   if (creating && current) return fail(res, 409, "profile_exists", "A profile already exists. Edit it instead.");
   const p = {
-    ...(current || {}), id: req.user.id, full_name: name, first_name: name.split(/\\s+/)[0], age, district, profile_complete: true, suspended: false,
+    ...(current || {}), id: req.user.id, full_name: name, first_name: name.split(/\s+/)[0], age, district, profile_complete: true, suspended: false,
     gender: ["woman", "man", "other"].includes(b.gender) ? b.gender : "other",
     job_title: clean(b.job_title || "").slice(0, 100), bio: clean(b.bio || "").slice(0, 1000),
     looking_for: ["woman", "man", "any"].includes(b.looking_for) ? b.looking_for : "any",
