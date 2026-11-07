@@ -43,7 +43,7 @@ async function assertLiveMatch(matchId, userId) {
   await expire();
   const match = await getMatchFor(matchId, userId);
   if (!match) return { status: 404, code: "match_not_found", message: "Match not found." };
-  if (match.status !== "active" || !match.expires_at || new Date(match.expires_at) <= new Date()) {
+  if (match.status !== "active" || (match.match_source !== "shake" && (!match.expires_at || new Date(match.expires_at) <= new Date()))) {
     return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
@@ -120,7 +120,7 @@ async function matchView(match, userId) {
   if (live) {
     const db = serviceClient();
     const [{ data: partner }, { data: me }, { data: consentRows, error: consentError }] = await Promise.all([
-      db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values, is_active, suspended_at").eq("id", partnerId).maybeSingle(),
+      db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values, is_active, suspended_at, profile_visibility").eq("id", partnerId).maybeSingle(),
       db.from("profiles").select("core_values, is_active, suspended_at").eq("id", userId).maybeSingle(),
       shakeMatch
         ? db.from("shake_reveal_consents").select("user_id").eq("match_id", match.id)
@@ -144,7 +144,7 @@ async function matchView(match, userId) {
 
     // For Shake & Chat, fail closed: do not return profile fields or signed photos
     // until BOTH members have recorded consent on the server.
-    if (partner && accountsActive && revealed) {
+    if (partner && accountsActive && revealed && partner.profile_visibility !== "hidden") {
       const { data: photos } = await db.from("profile_photos")
         .select("id, object_path, sort_order").eq("user_id", partnerId)
         .eq("approval_status", "approved").order("sort_order");
