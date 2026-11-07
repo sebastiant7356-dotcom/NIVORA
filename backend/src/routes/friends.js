@@ -74,6 +74,7 @@ router.post("/requests/:id/respond", writeLimit, async (req, res) => {
   });
   if (error) {
     if (String(error.message || "").trim() === "request_not_found") return res.status(404).json({ success: false, message: "Friend request not found." });
+    if (String(error.message || "").trim() === "blocked") return res.status(403).json({ success: false, message: "This connection is unavailable." });
     return res.status(500).json({ success: false, message: "Friend request could not be updated." });
   }
   res.json({ success: true, ...data });
