@@ -694,6 +694,7 @@
       try {
         const result = await api("/api/friends/request", { method: "POST", body: { match_id: m.id } });
         button.textContent = result.status === "friends" ? "You are friends" : "Friend request sent";
+        if (result.status === "friends" && result.chat_id) { selectedMatchId = result.chat_id; await loadAll(); render(); }
       } catch (e) { button.disabled = false; $("#mMsg").textContent = e.message || "Could not send friend request."; }
     });
     $("#mReport") && ($("#mReport").onclick = () => reportForm(m.id));
