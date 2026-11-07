@@ -1,5 +1,5 @@
 -- NIVORA social app foundation: persistent Shake chats, radius controls,
--- profile visibility, mutual friendships and anonymous Kerala posts.
+-- profile visibility, mutual friendships and worldwide anonymous posts.
 -- Additive migration. Review and apply to Supabase before deploying the backend.
 
 alter table public.shake_locations
@@ -54,17 +54,18 @@ create table if not exists public.anonymous_posts (
   id uuid primary key default gen_random_uuid(),
   author_id uuid not null references auth.users(id) on delete cascade,
   body text not null check (char_length(body) between 1 and 2000),
-  audience text not null default 'kerala' check (audience in ('kerala','radius')),
+  audience text not null default 'global' check (audience in ('global','kerala','radius')),
   radius_km integer,
   status text not null default 'published' check (status in ('published','removed')),
   created_at timestamptz not null default now(),
-  check ((audience = 'kerala' and radius_km is null) or
+  check ((audience in ('global','kerala') and radius_km is null) or
          (audience = 'radius' and radius_km between 1 and 100))
 );
 alter table public.anonymous_posts add column if not exists latitude double precision;
 alter table public.anonymous_posts add column if not exists longitude double precision;
 create index if not exists anonymous_posts_feed_idx
   on public.anonymous_posts(status, created_at desc);
+update public.anonymous_posts set audience='global' where audience='kerala';
 
 alter table public.friend_requests enable row level security;
 alter table public.friendships enable row level security;
@@ -125,8 +126,6 @@ begin
   select * into pb from public.profiles where id=p_target;
   if pa.id is null or pb.id is null or pa.approval_status <> 'approved' or pb.approval_status <> 'approved'
      or not pa.is_active or not pb.is_active or pa.suspended_at is not null or pb.suspended_at is not null
-     or lower(coalesce(pa.district,'')) not in ('thiruvananthapuram','trivandrum','kollam','pathanamthitta','alappuzha','alleppey','kottayam','idukki','ernakulam','kochi','cochin','thrissur','palakkad','malappuram','kozhikode','calicut','wayanad','kannur','kannanore','kasaragod','kasargod')
-     or lower(coalesce(pb.district,'')) not in ('thiruvananthapuram','trivandrum','kollam','pathanamthitta','alappuzha','alleppey','kottayam','idukki','ernakulam','kochi','cochin','thrissur','palakkad','malappuram','kozhikode','calicut','wayanad','kannur','kannanore','kasaragod','kasargod')
      or pb.profile_visibility = 'hidden' then raise exception 'profile_unavailable'; end if;
   if exists (select 1 from public.blocks where (blocker_id=p_user and blocked_id=p_target) or (blocker_id=p_target and blocked_id=p_user)) then raise exception 'blocked'; end if;
 
@@ -137,8 +136,8 @@ begin
     power(sin(radians(loc_b.latitude-loc_a.latitude)/2),2) +
     cos(radians(loc_a.latitude))*cos(radians(loc_b.latitude))*power(sin(radians(loc_b.longitude-loc_a.longitude)/2),2)
   ));
-  if loc_a.latitude not between 8 and 13 or loc_a.longitude not between 74.5 and 77.8
-     or loc_b.latitude not between 8 and 13 or loc_b.longitude not between 74.5 and 77.8 then
+  if loc_a.latitude not between -90 and 90 or loc_a.longitude not between -180 and 180
+     or loc_b.latitude not between -90 and 90 or loc_b.longitude not between -180 and 180 then
     raise exception 'location_not_enabled';
   end if;
   if km > loc_a.radius_km then raise exception 'outside_radius'; end if;
