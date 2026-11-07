@@ -252,4 +252,3 @@ begin
 end $$;
 revoke all on function public.nivora_respond_friend_request(uuid,uuid,boolean) from public, anon, authenticated;
 grant execute on function public.nivora_respond_friend_request(uuid,uuid,boolean) to service_role;
-grant execute on function public.nivora_respond_friend_request(uuid,uuid,boolean) to service_role;
