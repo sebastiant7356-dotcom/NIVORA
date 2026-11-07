@@ -18,6 +18,9 @@ async function purgeExpiredReports() {
   if (Date.now() - lastPurge < 60 * 60 * 1000) return;
   const { error } = await serviceClient().from("reports").delete().lt("created_at", new Date(Date.now() - 90 * 86400000).toISOString());
   if (error) throw error;
+  const { error: auditError } = await serviceClient().from("audit_log").delete()
+    .lt("created_at", new Date(Date.now() - 365 * 86400000).toISOString());
+  if (auditError) throw auditError;
   lastPurge = Date.now();
 }
 async function persistReport({ reporterId, reportedId, reason, details = "" }) {
