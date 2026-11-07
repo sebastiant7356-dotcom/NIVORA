@@ -33,3 +33,20 @@ revoke all on public.reports from anon, authenticated;
 grant all on public.reports to service_role;
 revoke all on public.audit_log from anon, authenticated;
 grant all on public.audit_log to service_role;
+
+-- Scheduled cleanup: report and appeal records older than 90 days; audit events older than 365 days.
+create or replace function private.purge_expired_beyond_safety_records()
+returns void
+language plpgsql
+security definer
+set search_path = pg_catalog, public, private
+as $$
+begin
+  delete from public.reports where created_at < now() - interval '90 days';
+  delete from public.account_appeals where created_at < now() - interval '90 days';
+  delete from public.audit_log where created_at < now() - interval '365 days';
+end;
+$$;
+revoke all on function private.purge_expired_beyond_safety_records() from public, anon, authenticated, service_role;
+select cron.unschedule(jobid) from cron.job where jobname = 'beyond-purge-safety-retention';
+select cron.schedule('beyond-purge-safety-retention', '30 2 * * *', 'select private.purge_expired_beyond_safety_records();');
