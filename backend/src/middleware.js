@@ -71,7 +71,7 @@ async function requireAuth(req, res, next) {
     // Restricted users may still export or delete their own account.
     const accountDataRight = req.path === "/account" || req.path === "/account/export" || req.path === "/account/appeal";
     if (activeEnforcement && !accountDataRight) {
-      return res.status(403).json({ success: false, code: "account_restricted", message: enforcement.status === "banned" ? "This account is permanently banned." : "This account is temporarily suspended." });
+      return res.status(403).json({ success: false, code: "account_restricted", message: enforcement.status === "banned" ? "This account is permanently banned. If you believe this is a mistake, sign in at /appeal.html to request a review." : "This account is temporarily suspended. If you believe this is a mistake, sign in at /appeal.html to request a review." });
     }
     req.user = { id: u.id }; // immutable id only
     return next();
