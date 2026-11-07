@@ -260,28 +260,22 @@
     const matchPanel = wrap("dashboard-match", p("matchTab"), matchNodes);
     const welcome = document.createElement("section");
     welcome.className = "dashboard-welcome";
-    const remaining = Math.max(0, (dailyQuota.daily_limit || 5) - (dailyQuota.daily_used || 0));
     const ml = L() === "ml";
     welcome.innerHTML = `
       <div class="dashboard-welcome-copy">
-        <span class="dashboard-eyebrow"><i></i> ${ml ? "അർത്ഥവത്തായ ബന്ധങ്ങളിലേക്കൊരു ചുവട്" : "A LITTLE CLOSER TO SOMETHING MEANINGFUL"}</span>
-        <h1>${ml ? "സന്തോഷം, വീണ്ടും കണ്ടതിൽ" : "Good to see you"},<br><em>${esc((profile.full_name || "").split(" ")[0])}</em></h1>
-        <p>${ml ? "ഒരു ചെറിയ hello-യിൽ നിന്ന് മനോഹരമായൊരു ബന്ധം തുടങ്ങാം." : "One simple hello could be the start of something meaningful."}</p>
+        <span class="dashboard-eyebrow"><i></i> KERALA SOCIAL DISCOVERY</span>
+        <h1>${ml ? "സ്വാഗതം" : "Welcome"},<br><em>${esc((profile.full_name || "").split(" ")[0])}</em></h1>
+        <p>${ml ? "പുതിയ ആളുകളെ കണ്ടെത്തൂ. സംസാരിക്കൂ. ഇരുവരും ആഗ്രഹിച്ചാൽ സുഹൃത്തുക്കളാകൂ." : "Discover people nearby. Chat freely. Become friends only when both agree."}</p>
         <div class="dashboard-hero-actions">
-          <button type="button" class="dashboard-hero-primary" data-open-tab="match">${ml ? "Match കണ്ടെത്താം" : "Discover matches"} <span>↗</span></button>
-          <button type="button" class="dashboard-hero-secondary" data-open-tab="shake">${ml ? "Shake & Chat" : "Explore nearby"} <span>⌖</span></button>
+          <button type="button" class="dashboard-hero-primary" data-open-tab="shake">${ml ? "Shake ചെയ്യാം" : "Shake to discover"} <span>⌖</span></button>
+          <button type="button" class="dashboard-hero-secondary" data-open-tab="community">${ml ? "Anonymous Posts" : "Anonymous posts"} <span>◌</span></button>
         </div>
-        <div class="dashboard-hero-footnote"><span>✦</span> ${ml ? "നിങ്ങളുടെ വേഗത്തിൽ, നിങ്ങളുടെ തിരഞ്ഞെടുപ്പിൽ" : "Your pace. Your choice. Your story."}</div>
+        <div class="dashboard-hero-footnote"><span>✦</span> ${ml ? "നിങ്ങളുടെ സ്വകാര്യത, നിങ്ങളുടെ തീരുമാനം" : "Your privacy. Your choice."}</div>
       </div>
       <div class="dashboard-hero-side">
         <div class="dashboard-stat-grid">
-          <div class="dashboard-stat dashboard-stat-featured"><span>♡</span><b>${remaining}</b><small>${ml ? "ഇന്നത്തെ matches ബാക്കി" : "Matches left today"}</small></div>
-          <div class="dashboard-stat"><span>✉</span><b>${matches.filter(x => ["proposed","active"].includes(x.status)).length}</b><small>${ml ? "സജീവ സംഭാഷണങ്ങൾ" : "Active conversations"}</small></div>
-        </div>
-        <div class="dashboard-daily-card">
-          <div><span>${ml ? "ഇന്നത്തെ കണ്ടെത്തൽ" : "TODAY’S DISCOVERY"}</span><b>${Math.min(dailyQuota.daily_used || 0, dailyQuota.daily_limit || 5)} / ${dailyQuota.daily_limit || 5}</b></div>
-          <div class="dashboard-progress"><i style="width:${Math.min(100, Math.max(0, ((dailyQuota.daily_used || 0) / Math.max(1, dailyQuota.daily_limit || 5)) * 100))}%"></i></div>
-          <small>${ml ? "ഓരോ ദിവസവും പുതിയ സാധ്യതകൾ" : "A fresh chance to connect, every day."}</small>
+          <div class="dashboard-stat dashboard-stat-featured"><span>✉</span><b>${matches.filter(x => ["proposed","active"].includes(x.status)).length}</b><small>${ml ? "സംഭാഷണങ്ങൾ" : "Conversations"}</small></div>
+          <div class="dashboard-stat"><span>♡</span><b>∞</b><small>${ml ? "സമയപരിധിയില്ല" : "No chat timer"}</small></div>
         </div>
       </div>
       <span class="dashboard-hero-orbit" aria-hidden="true"></span><span class="dashboard-hero-spark" aria-hidden="true">✦</span>`;
