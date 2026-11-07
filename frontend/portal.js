@@ -333,6 +333,30 @@
     if (accountHeading) profilePanel.appendChild(accountHeading);
     if (accountRow) profilePanel.appendChild(accountRow);
     if (accountMsg) profilePanel.appendChild(accountMsg);
+
+    const privacySettings = document.createElement("section");
+    privacySettings.className = "dashboard-panel";
+    privacySettings.innerHTML = "<h3 class='nv-h'>Profile visibility</h3><p class='modal-description'>Choose whether your profile can be shown after both people agree to reveal it.</p><select id='profileVisibility'><option value='public'>Visible</option><option value='hidden'>Hidden</option></select><div class='nv-msg' id='visibilityStatus' role='status'></div>";
+    profilePanel.appendChild(privacySettings);
+    const visibilitySelect = privacySettings.querySelector("#profileVisibility");
+    visibilitySelect.value = profile.profile_visibility || "public";
+    visibilitySelect.onchange = async () => {
+      visibilitySelect.disabled = true;
+      try {
+        const result = await api("/api/profile/visibility", { method: "PUT", body: { visibility: visibilitySelect.value } });
+        profile.profile_visibility = result.visibility;
+        privacySettings.querySelector("#visibilityStatus").textContent = "Privacy setting saved.";
+      } catch (e) {
+        privacySettings.querySelector("#visibilityStatus").textContent = e.message || "Could not update privacy setting.";
+        visibilitySelect.value = profile.profile_visibility || "public";
+      } finally { visibilitySelect.disabled = false; }
+    };
+
+    const friendsPanel = document.createElement("section");
+    friendsPanel.className = "dashboard-panel";
+    friendsPanel.innerHTML = "<h3 class='nv-h'>Friend requests</h3><div id='friendRequests' class='shake-people'></div><h3 class='nv-h'>Friends</h3><div id='friendList' class='shake-people'></div><div class='nv-msg' id='friendsStatus'></div>";
+    profilePanel.appendChild(friendsPanel);
+    loadFriendsPanel();
   }
 
   async function loadShakePanel() {
