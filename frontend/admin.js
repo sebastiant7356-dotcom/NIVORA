@@ -22,7 +22,7 @@
     $("#auth").style.display = "none"; $("#app").style.display = "block";
     $("#who").style.display = "inline-block"; $("#who").textContent = role;
     $("#signOut").style.display = "inline-block";
-    $("#tabs").innerHTML = [["open","Open reports"],["appeals","Appeals"],["actioned","Actioned"],["dismissed","Dismissed"],...(role === "admin" ? [["restricted","Restricted accounts"]] : [])]
+    $("#tabs").innerHTML = [["open","Open reports"],["appeals","Appeals"],["actioned","Actioned"],["dismissed","Dismissed"],...(role === "admin" ? [["restricted","Restricted accounts"],["audit","Audit log"]] : [])]
       .map(([v,l]) => '<button class="tab" data-status="' + v + '" type="button">' + l + '</button>').join("");
     $("#tabs").onclick = (e) => { const b = e.target.closest("[data-status]"); if (b) { status = b.dataset.status; load(); } };
     load();
@@ -40,9 +40,21 @@
         const r = await api("/api/admin/appeals");
         return renderAppeals(r.appeals || []);
       }
+      if (status === "audit") {
+        const r = await api("/api/admin/audit");
+        return renderAudit(r.entries || []);
+      }
       const r = await api("/api/admin/reports?status=" + encodeURIComponent(status));
       render(r.reports || []);
     } catch (e) { $("#list").innerHTML = ""; msg(e.message); }
+  }
+
+  function renderAudit(entries) {
+    if (!entries.length) { $("#list").innerHTML = "<p>No moderation actions recorded.</p>"; return; }
+    $("#list").innerHTML = '<table class="audit"><tr><th>When</th><th>Moderator</th><th>Action</th><th>Target</th></tr>' +
+      entries.map(a => '<tr><td>' + fmt(a.created_at) + '</td><td>' + esc(a.actor_id || "system") +
+        '</td><td>' + esc(a.action) + '</td><td>' + esc(a.target_type || "") + ' ' + esc(a.target_id || "") +
+        '<small>' + esc(a.details?.resolution || a.details?.reason || "") + '</small></td></tr>').join("") + '</table>';
   }
 
   function renderAppeals(appeals) {
