@@ -6,7 +6,7 @@ const { createLimiter, byUser } = require("../lib/ratelimit");
 const { EphemeralStore } = require("../lib/ephemeral-store");
 const { serviceClient } = require("../lib/clients");
 const { clean, isUuid } = require("../lib/validation");
-const { persistReport } = require("./moderation-api");
+const { persistReport, exportSafetyRecords } = require("./moderation-api");
 
 const router = express.Router();
 router.use(requireAuth);
@@ -341,15 +341,8 @@ router.delete("/session", (req, res) => {
 router.get("/account/export", async (req,res) => {
   const profile=profileOf(req.user.id);
   try {
-    const { data: reports, error: reportError } = await serviceClient().from("reports")
-      .select("id,reported_id,reason,details,status,resolution,created_at,resolved_at")
-      .eq("reporter_id", req.user.id).order("created_at", { ascending: false }).limit(200);
-    if (reportError) return fail(res,503,"export_unavailable","Your safety-report export is temporarily unavailable.");
-    const { data: appeals, error: appealError } = await serviceClient().from("account_appeals")
-      .select("id,reason,status,resolution,created_at,resolved_at")
-      .eq("user_id", req.user.id).order("created_at", { ascending: false }).limit(100);
-    if (appealError) return fail(res,503,"export_unavailable","Your appeal export is temporarily unavailable.");
-    res.json({success:true,exported_at:now(),profile,matches:[],feedback:[],messages:[],payments:[],photos:[],voice_messages:[],safety_reports:reports||[],appeals:appeals||[]});
+    const safety = await exportSafetyRecords(req.user.id);
+    res.json({success:true,exported_at:now(),profile,matches:[],feedback:[],messages:[],payments:[],photos:[],voice_messages:[],safety_reports:safety.reports,appeals:safety.appeals});
   } catch {
     fail(res,503,"export_unavailable","Your account export is temporarily unavailable.");
   }
