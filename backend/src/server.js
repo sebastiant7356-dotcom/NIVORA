@@ -25,7 +25,7 @@ function createApp() {
   app.get("/api/health", (req, res) => res.json({ success: true, app: "BEYOND", message: "Backend is running" }));
 
   // Public legal documents required by the Android app and Play Store listing.
-  const legalFiles = new Set(["privacy.html", "privacy_ml.html", "terms.html", "terms_ml.html", "styles.css"]);
+  const legalFiles = new Set(["privacy.html", "terms.html", "styles.css"]);
   app.get("/privacy", (req, res) => res.redirect(302, "/legal/privacy.html"));
   app.get("/terms", (req, res) => res.redirect(302, "/legal/terms.html"));
   app.get("/legal/:file", (req, res, next) => {
