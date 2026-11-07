@@ -101,7 +101,7 @@
       container.innerHTML = `<h2 class="modal-title">${L() === "ml" ? "Sign in" : "Sign in"}</h2>
         <p class="modal-description">${L() === "ml" ? "Google അക്കൗണ്ട് ഉപയോഗിച്ച് സുരക്ഷിതമായി തുടരുക." : "Continue securely with your Google account."}</p>
         <div class="nv-msg" id="nvPortalErr" role="status"></div>
-        <button class="primary-btn" id="nvPortalGoogle" type="button">Google ഉപയോഗിച്ച് തുടരുക / Continue with Google</button>
+        <button class="primary-btn" id="nvPortalGoogle" type="button">Continue with Google</button>
         <button class="back-btn" id="nvPortalCancel" type="button">${L() === "ml" ? "റദ്ദാക്കുക" : "Cancel"}</button>`;
       container.querySelector("#nvPortalGoogle").onclick = async () => {
         const btn = container.querySelector("#nvPortalGoogle");
@@ -110,7 +110,7 @@
         catch (e) {
           sessionStorage.removeItem("nivora_pending_portal");
           container.querySelector("#nvPortalErr").textContent = e.message || "Google sign-in failed.";
-          btn.disabled = false; btn.textContent = "Google ഉപയോഗിച്ച് തുടരുക / Continue with Google";
+          btn.disabled = false; btn.textContent = "Continue with Google";
         }
       };
       container.querySelector("#nvPortalCancel").onclick = () => { onCancel && onCancel(); reject(new Error("cancelled")); };
