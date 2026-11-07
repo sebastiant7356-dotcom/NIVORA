@@ -21,7 +21,7 @@ modalKicker:"YOUR FIRST STEP",back:"Back",continue:"Continue",modalDisclaimer:"Y
 
 let language = 'ml';
 let currentStep = 1;
-let profile = {name:'',age:'',place:'',gender:'',job:'',lookingFor:'',relationship:'marriage',minAge:'',maxAge:'',values:[],about:'',agree:false,privacyAgree:false};
+let profile = {name:'',age:'',place:'',gender:'other',job:'',lookingFor:'any',relationship:'longterm',minAge:'21',maxAge:'40',values:['kindness'],about:'',agree:false,privacyAgree:false};
 let done = false;
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -38,7 +38,7 @@ $$('.nav-links a').forEach(a=>a.addEventListener('click',()=>$('.nav-links').cla
 $('#year').textContent = new Date().getFullYear();
 
 const modal = $('#profileModal');
-function openWizard(){currentStep=1;done=false;profile={name:'',age:'',place:'',gender:'',job:'',lookingFor:'',relationship:'marriage',minAge:'',maxAge:'',values:[],about:'',agree:false,privacyAgree:false};modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderStep();}
+function openWizard(){currentStep=1;done=false;profile={name:'',age:'',place:'',gender:'other',job:'',lookingFor:'any',relationship:'longterm',minAge:'21',maxAge:'40',values:['kindness'],about:'',agree:false,privacyAgree:false};modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderStep();}
 function closeWizard(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';}
 async function startFlow(){try{if(window.NV&&await window.NV.session()){window.NivoraPortal.openPortal(openWizard);return;}}catch(e){}openWizard();}
 ['#openProfile','#heroStart','#previewStart'].forEach(s=>$(s)?.addEventListener('click',startFlow));
@@ -127,7 +127,7 @@ async function resumeGoogleProfile(){
   try { session = await window.NV.session(); } catch (_) { return; }
   if (!session) return;
   try {
-    profile = pending; currentStep = 4; done = false;
+    profile = pending; currentStep = 3; done = false;
     modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
     renderStep(); saveFields();
     $('#nextStep').disabled = true; $('#wizardError').textContent = language==='ml'?'Google sign-in വിജയിച്ചു. Profile സേവ് ചെയ്യുന്നു…':'Google sign-in succeeded. Saving your profile…';
@@ -145,49 +145,43 @@ function field(id,label,type='text',value='',extra=''){return `<div class="field
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderStep(){
   $('#wizardError').textContent='';
-  $('#stepCounter').textContent=`0${currentStep} / 04`;
-  $('#progressBar').style.width=`${currentStep*25}%`;
+  $('#stepCounter').textContent=`0${currentStep} / 03`;
+  $('#progressBar').style.width=`${Math.round(currentStep/3*100)}%`;
   $('#backStep').disabled=currentStep===1;
   $('#nextStep').innerHTML=`<span data-i18n="continue">${t('continue')}</span> <span class="arrow">→</span>`;
   const content=$('#wizardContent');
   if(currentStep===1){
-    content.innerHTML=`<h2 class="modal-title">${t('step1Head')}</h2><p class="modal-description">${t('step1Desc')}</p>
-    <div class="field-grid">${field('name',t('name'),'text',profile.name,'autocomplete="name" required')}${field('age',t('age'),'number',profile.age,'min="21" max="40" inputmode="numeric" required')}</div>
-    ${field('place',t('place'),'text',profile.place,'autocomplete="address-level2" required')}
-    <div class="field"><label for="gender">${t('gender')}</label><select id="gender" required><option value="">—</option>${[['woman','woman'],['man','man'],['other','other']].map(([v,k])=>`<option value="${v}" ${profile.gender===v?'selected':''}>${t(k)}</option>`).join('')}</select></div>
-    ${field('job',t('job'),'text',profile.job,'')}`;
+    content.innerHTML=`<h2 class="modal-title"> ${language==='ml'?'നിങ്ങളുടെ Profile':'Your profile'} </h2><p class="modal-description">${language==='ml'?'പുതിയ ആളുകൾക്ക് നിങ്ങളെ പരിചയപ്പെടാൻ സഹായിക്കുന്ന കുറച്ച് വിവരങ്ങൾ.':'Share a few details so people can get to know you.'}</p>
+      <div class="field-grid">${field('name',t('name'),'text',profile.name,'autocomplete="name" required')}${field('age',t('age'),'number',profile.age,'min="21" max="40" inputmode="numeric" required')}</div>
+      ${field('place',language==='ml'?'കേരളത്തിലെ ജില്ല':'Kerala district','text',profile.place,'autocomplete="address-level2" required')}
+      ${field('job',t('job'),'text',profile.job,'')}
+      <div class="field"><label for="about">${language==='ml'?'നിങ്ങളെക്കുറിച്ച്':'About you'}</label><textarea id="about" rows="3" maxlength="400">${escapeHtml(profile.about)}</textarea></div>`;
   }else if(currentStep===2){
-    content.innerHTML=`<h2 class="modal-title">${t('step2Head')}</h2><p class="modal-description">${t('step2Desc')}</p>
-    <div class="field"><label for="lookingFor">${t('lookingFor')}</label><select id="lookingFor"><option value="">—</option>${[['woman','partnerWoman'],['man','partnerMan'],['any','partnerAny']].map(([v,k])=>`<option value="${v}" ${profile.lookingFor===v?'selected':''}>${t(k)}</option>`).join('')}</select></div>
-    <div class="field"><label for="relationship">${t('relationship')}</label><select id="relationship"><option value="marriage" ${profile.relationship==='marriage'?'selected':''}>${t('marriage')}</option><option value="longterm" ${profile.relationship==='longterm'?'selected':''}>${t('longterm')}</option></select></div>
-    <label class="field-label">${t('ageRange')}</label><div class="field-grid">${field('minAge','Min age','number',profile.minAge,'min="21" max="40" placeholder="24"')}${field('maxAge','Max age','number',profile.maxAge,'min="21" max="40" placeholder="32"')}</div>`;
-  }else if(currentStep===3){
     const options=[['family','family'],['kindness','kindness'],['career','career'],['faith','faith'],['communication','communication'],['lifestyle','lifestyle']];
-    content.innerHTML=`<h2 class="modal-title">${t('step3Head')}</h2><p class="modal-description">${t('step3Desc')}</p><label class="field-label">${t('valuesLabel')}</label><div class="choice-grid">${options.map(([v,k])=>`<label class="choice"><input type="checkbox" name="values" value="${v}" ${profile.values.includes(v)?'checked':''}> ${t(k)}</label>`).join('')}</div><div class="field"><label for="about">${t('about')}</label><textarea id="about" rows="3" maxlength="400" placeholder="${language==='ml'?'നിങ്ങൾക്ക് ഇഷ്ടമുള്ള കാര്യങ്ങൾ, ജീവിത ലക്ഷ്യങ്ങൾ...':'Your interests, hopes and what matters to you...'}">${escapeHtml(profile.about)}</textarea></div>`;
+    content.innerHTML=`<h2 class="modal-title">${language==='ml'?'നിങ്ങളുടെ താൽപര്യങ്ങൾ':'Your interests'}</h2><p class="modal-description">${language==='ml'?'നിങ്ങൾക്ക് ഇഷ്ടമുള്ള വിഷയങ്ങൾ തിരഞ്ഞെടുക്കൂ.':'Choose a few topics you enjoy.'}</p><label class="field-label">${language==='ml'?'താൽപര്യങ്ങൾ (പരമാവധി 3)':'Interests (up to 3)'}</label><div class="choice-grid">${options.map(([v,k])=>`<label class="choice"><input type="checkbox" name="values" value="${v}" ${profile.values.includes(v)?'checked':''}> ${t(k)}</label>`).join('')}</div>`;
   }else{
-    const selectedValues=profile.values.map(v=>t(v)).join(', ')||t('notProvided');
-    content.innerHTML=`<h2 class="modal-title">${t('step4Head')}</h2><p class="modal-description">${t('step4Desc')}</p><div class="summary-box"><b>${escapeHtml(profile.name||'—')}, ${escapeHtml(profile.age||'—')}</b><br>${escapeHtml(profile.place||'—')} · ${escapeHtml(profile.job||t('notProvided'))}<br><br><b>${t('lookingFor')}:</b> ${escapeHtml(profile.lookingFor?t(profile.lookingFor==='woman'?'partnerWoman':profile.lookingFor==='man'?'partnerMan':'partnerAny'):t('notProvided'))}<br><b>${t('relationship')}:</b> ${escapeHtml(t(profile.relationship||'marriage'))}<br><b>${t('valuesLabel')}:</b> ${escapeHtml(selectedValues)}<br><b>${t('about')}:</b> ${escapeHtml(profile.about||t('notProvided'))}</div><label class="checkline"><input type="checkbox" id="agree" ${profile.agree?'checked':''}> <span>${t('agree')} <a href="${language==='ml'?'terms_ml.html':'terms.html'}" target="_blank" rel="noopener">Terms</a></span></label><label class="checkline"><input type="checkbox" id="privacyAgree" ${profile.privacyAgree?'checked':''}> <span>${t('privacyAgree')} <a href="${language==='ml'?'privacy_ml.html':'privacy.html'}" target="_blank" rel="noopener">Privacy Notice</a></span></label>`;
+    content.innerHTML=`<h2 class="modal-title">${language==='ml'?'സ്വകാര്യതയും സമ്മതവും':'Privacy and consent'}</h2><p class="modal-description">${language==='ml'?'തുടരുന്നതിന് മുമ്പ് നിബന്ധനകളും സ്വകാര്യതാ അറിയിപ്പും പരിശോധിക്കുക.':'Review the terms and privacy notice before continuing.'}</p><div class="summary-box"><b>${escapeHtml(profile.name||'—')}, ${escapeHtml(profile.age||'—')}</b><br>${escapeHtml(profile.place||'—')} · ${escapeHtml(profile.job||t('notProvided'))}<br><br><b>${language==='ml'?'താൽപര്യങ്ങൾ':'Interests'}:</b> ${escapeHtml(profile.values.map(v=>t(v)).join(', '))}<br><b>${t('about')}:</b> ${escapeHtml(profile.about||t('notProvided'))}</div><label class="checkline"><input type="checkbox" id="agree" ${profile.agree?'checked':''}> <span>${language==='ml'?'എനിക്ക് 21–40 വയസ്സാണ്; Terms അംഗീകരിക്കുന്നു.':'I confirm I am aged 21–40 and accept the Terms of Use.'} <a href="${language==='ml'?'terms_ml.html':'terms.html'}" target="_blank" rel="noopener">Terms</a></span></label><label class="checkline"><input type="checkbox" id="privacyAgree" ${profile.privacyAgree?'checked':''}> <span>${language==='ml'?'Privacy Notice വായിച്ച് സമ്മതിക്കുന്നു.':'I have read and agree to the Privacy Notice.'} <a href="${language==='ml'?'privacy_ml.html':'privacy.html'}" target="_blank" rel="noopener">Privacy Notice</a></span></label>`;
   }
   $$('#wizardContent input, #wizardContent select, #wizardContent textarea').forEach(el=>el.addEventListener('input',()=>$('#wizardError').textContent=''));
 }
 function saveFields(){
   const val=id=>document.getElementById(id)?.value??profile[id]??'';
-  ['name','age','place','gender','job','lookingFor','relationship','minAge','maxAge','about'].forEach(k=>{if(document.getElementById(k))profile[k]=val(k);});
-  if(currentStep===3)profile.values=$$('input[name="values"]:checked').map(el=>el.value);
-  if(currentStep===4){profile.agree=$('#agree')?.checked||false;profile.privacyAgree=$('#privacyAgree')?.checked||false;}
+  ['name','age','place','job','about'].forEach(k=>{if(document.getElementById(k))profile[k]=val(k);});
+  if(currentStep===2)profile.values=$$('input[name="values"]:checked').map(el=>el.value);
+  if(currentStep===3){profile.agree=$('#agree')?.checked||false;profile.privacyAgree=$('#privacyAgree')?.checked||false;}
 }
 function validateStep(){
   saveFields();let msg='';
-  if(currentStep===1){if(!profile.name.trim()||!profile.age||!profile.place.trim()||!profile.gender)msg=t('required');else if(+profile.age<21||+profile.age>40)msg=t('ageError');}
-  if(currentStep===2){if(!profile.lookingFor||!profile.relationship)msg=t('required');if(profile.minAge&&profile.maxAge&&+profile.minAge>+profile.maxAge)msg=t('required');if((profile.minAge&&(+profile.minAge<21||+profile.minAge>40))||(profile.maxAge&&(+profile.maxAge<21||+profile.maxAge>40)))msg=t('ageError');}
-  if(currentStep===3&&!profile.values.length)msg=t('chooseValue');if(currentStep===3&&profile.values.length>3)msg=language==='ml'?'പരമാവധി 3 മൂല്യങ്ങൾ.':'Choose at most 3 values.';
-  if(currentStep===4&&(!profile.agree||!profile.privacyAgree))msg=t('agreeError');
+  if(currentStep===1){if(!profile.name.trim()||!profile.age||!profile.place.trim())msg=t('required');else if(+profile.age<21||+profile.age>40)msg=t('ageError');}
+  if(currentStep===2&&!profile.values.length)msg=language==='ml'?'കുറഞ്ഞത് ഒരു താൽപര്യം തിരഞ്ഞെടുക്കുക.':'Choose at least one interest.';
+  if(currentStep===2&&profile.values.length>3)msg=language==='ml'?'പരമാവധി 3 താൽപര്യങ്ങൾ.':'Choose at most 3 interests.';
+  if(currentStep===3&&(!profile.agree||!profile.privacyAgree))msg=t('agreeError');
   if(msg){$('#wizardError').textContent=msg;return false;}return true;
 }
 
 function renderSuccess(saved){
   const p=saved||{};
-  $('#stepCounter').textContent='04 / 04';$('#progressBar').style.width='100%';$('#backStep').disabled=true;
+  $('#stepCounter').textContent='03 / 03';$('#progressBar').style.width='100%';$('#backStep').disabled=true;
   $('#nextStep').innerHTML=`<span>${t('startAgain')}</span> ↻`;
   const vals=(p.core_values||[]).map(v=>t(v)).join(', ');
   $('#wizardContent').innerHTML=`<div class="success-panel"><div class="success-icon">✓</div><span class="section-kicker" style="justify-content:center">${t('demoLabel')}</span><h2 class="modal-title" style="margin-top:12px">${t('reviewTitle')}</h2><p class="modal-description">${t('reviewDesc')}</p><div class="summary-box"><b>${escapeHtml(p.full_name)}, ${escapeHtml(p.age)}</b><br>${escapeHtml(p.district)}<br>${escapeHtml(p.job_title||t('notProvided'))}<br><br><b>${t('valuesLabel')}:</b> ${escapeHtml(vals)}<br><b>${t('about')}:</b> ${escapeHtml(p.bio||t('notProvided'))}</div><button class="outline-btn" id="doneClose" type="button">${language==='ml'?'അടയ്ക്കുക':'Close'} ↗</button></div>`;
