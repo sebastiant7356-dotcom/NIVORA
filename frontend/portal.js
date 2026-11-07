@@ -488,6 +488,14 @@
           const remove = document.createElement("button"); remove.className = "nv-link"; remove.type = "button"; remove.textContent = "Delete post";
           remove.onclick = async () => { try { await api("/api/community/posts/" + encodeURIComponent(post.id), { method: "DELETE" }); await loadCommunityPanel(); } catch (e) { status.textContent = e.message; } };
           card.appendChild(remove);
+        } else {
+          const report = document.createElement("button"); report.className = "nv-link"; report.type = "button"; report.textContent = "Report post";
+          report.onclick = async () => {
+            if (!confirm("Report this anonymous post?")) return;
+            try { await api("/api/community/posts/" + encodeURIComponent(post.id) + "/report", { method: "POST", body: { reason: "inappropriate_content" } }); status.textContent = "Report received."; }
+            catch (e) { status.textContent = e.message || "Report could not be submitted."; }
+          };
+          card.appendChild(report);
         }
         feed.appendChild(card);
       });
