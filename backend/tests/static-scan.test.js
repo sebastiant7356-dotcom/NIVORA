@@ -52,7 +52,7 @@ test("SQL: RLS enabled and matching functions not callable by browser roles", ()
   assert.ok(!/grant (insert|update|delete)[^;]*to (anon|authenticated)/i.test(sql));
 });
 
-test("MELVO global social app uses persistent Shake chats, radius discovery and friends", () => {
+test("BEYOND global social app uses persistent Shake chats, radius discovery and friends", () => {
   const migration = text(path.join(ROOT, "backend", "migrations", "20261107000000_social_app_foundation.sql"));
   const route = text(path.join(ROOT, "backend", "src", "routes", "match.js"));
   const shake = text(path.join(ROOT, "backend", "src", "routes", "shake.js"));
