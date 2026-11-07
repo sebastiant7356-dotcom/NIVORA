@@ -1,5 +1,6 @@
 "use strict";
 const express = require("express");
+const path = require("node:path");
 const config = require("./config");
 const mw = require("./middleware");
 const { createLimiter } = require("./lib/ratelimit");
@@ -22,6 +23,15 @@ function createApp() {
   app.use(express.json({ limit: "20kb" }));
 
   app.get("/api/health", (req, res) => res.json({ success: true, app: "NIVORA", message: "Backend is running" }));
+
+  // Public legal documents required by the Android app and Play Store listing.
+  const legalFiles = new Set(["privacy.html", "privacy_ml.html", "terms.html", "terms_ml.html", "styles.css"]);
+  app.get("/privacy", (req, res) => res.redirect(302, "/legal/privacy.html"));
+  app.get("/terms", (req, res) => res.redirect(302, "/legal/terms.html"));
+  app.get("/legal/:file", (req, res, next) => {
+    if (!legalFiles.has(req.params.file)) return next();
+    res.sendFile(path.resolve(__dirname, "../../frontend", req.params.file));
+  });
 
   // Public, non-secret runtime settings for the frontend.
   app.get("/api/config", (req, res) => res.json({
