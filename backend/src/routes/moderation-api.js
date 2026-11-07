@@ -53,6 +53,9 @@ router.post("/admin/reports/:id/resolve", requireStaff(), wrap(async (req, res) 
   if (!["actioned", "dismissed"].includes(status) || resolution.length < 5) {
     return res.status(400).json({ success: false, message: "Choose a valid outcome and enter a resolution note (at least 5 characters)." });
   }
+  if (req.body?.suspend_user === true && req.staffRole !== "admin") {
+    return res.status(403).json({ success: false, message: "Only admins can suspend accounts." });
+  }
   const { data: report, error: readError } = await serviceClient().from("reports")
     .select("id,reported_id,status").eq("id", req.params.id).maybeSingle();
   if (readError) throw readError;
@@ -62,7 +65,6 @@ router.post("/admin/reports/:id/resolve", requireStaff(), wrap(async (req, res) 
   }).eq("id", report.id);
   if (error) throw error;
   if (req.body?.suspend_user === true) {
-    if (req.staffRole !== "admin") return res.status(403).json({ success: false, message: "Only admins can suspend accounts." });
     const reason = resolution;
     const { error: enforceError } = await serviceClient().from("account_enforcements").upsert({
       user_id: report.reported_id, status: "suspended", reason, expires_at: null, created_by: req.user.id, updated_at: new Date().toISOString()
@@ -74,6 +76,9 @@ router.post("/admin/reports/:id/resolve", requireStaff(), wrap(async (req, res) 
   res.json({ success: true, status });
 }));
 router.post("/admin/users/:id/enforcement", requireStaff("admin"), wrap(async (req, res) => {
+  if (req.params.id === req.user.id) {
+    return res.status(400).json({ success: false, message: "An admin cannot change their own account status." });
+  }
   const status = req.body?.status;
   const reason = clean(req.body?.reason || "").slice(0, 1000);
   const hours = Number(req.body?.duration_hours);
