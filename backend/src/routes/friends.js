@@ -22,11 +22,25 @@ router.get("/", async (req, res) => {
   const byId = new Map((profiles || []).map((p) => [p.id, p]));
   res.json({ success: true, friends: ids.map((id) => {
     const p = byId.get(id);
-    return { display_name: p && p.profile_visibility !== "hidden" ? String(p.full_name || "").trim().split(/\s+/)[0] : "NIVORA friend",
+    return { friend_id: id, display_name: p && p.profile_visibility !== "hidden" ? String(p.full_name || "").trim().split(/\s+/)[0] : "NIVORA friend",
       age: p && p.profile_visibility !== "hidden" ? p.age : null,
       district: p && p.profile_visibility !== "hidden" ? p.district : null,
       created_at: (data || []).find((row) => row.user_low === id || row.user_high === id)?.created_at || null };
   }) });
+});
+
+router.post("/:id/chat", writeLimit, async (req, res) => {
+  if (!isUuid(req.params.id)) return res.status(400).json({ success: false, message: "Invalid friend." });
+  const { data, error } = await serviceClient().rpc("nivora_open_friend_chat", {
+    p_user: req.user.id, p_partner: req.params.id
+  });
+  if (error) {
+    const message = String(error.message || "").trim();
+    if (message === "not_friends") return res.status(403).json({ success: false, message: "You are not friends yet." });
+    if (message === "blocked") return res.status(403).json({ success: false, message: "This connection is unavailable." });
+    return res.status(500).json({ success: false, message: "Friend chat could not be opened." });
+  }
+  res.json({ success: true, match_id: data });
 });
 
 router.get("/requests", async (req, res) => {
