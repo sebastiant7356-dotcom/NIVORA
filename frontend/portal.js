@@ -423,7 +423,7 @@
         action.onclick = async () => {
           action.disabled = true;
           try {
-            const response = await api("/api/shake/interest", { method: "POST", body: { target_user_id: person.user_id } });
+            const response = await api("/api/shake/interest", { method: "POST", body: { candidate_token: person.candidate_token } });
             if (response.mutual) {
               status.textContent = p("shakeMatched");
               selectedMatchId = response.match_id;
