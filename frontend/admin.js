@@ -1,4 +1,4 @@
-/* MELVO staff screen. All authorisation happens on the server (/api/admin/* checks staff_roles). */
+/* BEYOND staff screen. All authorisation happens on the server (/api/admin/* checks staff_roles). */
 (function () {
   "use strict";
   const { api, client, session, authPanel, esc } = window.NV;
@@ -17,7 +17,7 @@
     try { role = (await api("/api/admin/me")).role; }
     catch (e) {
       $("#auth").style.display = "block";
-      $("#auth").innerHTML = `<div class="card"><h3>Not authorised</h3><p>${e.status === 403 ? "This account is not a staff member." : esc(e.message)}</p><a class="outline-btn" href="index.html">Back to MELVO</a></div>`;
+      $("#auth").innerHTML = `<div class="card"><h3>Not authorised</h3><p>${e.status === 403 ? "This account is not a staff member." : esc(e.message)}</p><a class="outline-btn" href="index.html">Back to BEYOND</a></div>`;
       $("#signOut").style.display = "inline-block"; return;
     }
     $("#auth").style.display = "none"; $("#app").style.display = "block";
