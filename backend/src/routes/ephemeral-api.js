@@ -11,8 +11,9 @@ const { persistReport } = require("./moderation-api");
 const router = express.Router();
 router.use(requireAuth);
 
-// All member-generated data lives only in this process and expires after 12 hours
-// of inactivity. It is never written to Supabase tables or Storage.
+// Profiles, locations, matches, chats, posts, friend state and blocks live only in
+// process memory and expire after 12 hours of inactivity. Safety reports are written
+// separately by moderation-api.js with limited fields and a 90-day retention period.
 const TTL = 12 * 60 * 60 * 1000;
 const state = new EphemeralStore({ defaultTtlMs: TTL, maxEntries: 50000 });
 const limited = createLimiter({ windowMs: 60 * 60_000, max: 100, keyFn: byUser });
