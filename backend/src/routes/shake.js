@@ -94,12 +94,12 @@ router.get("/discover", discoverLimit, async (req, res) => {
     for (const b of blocks || []) hidden.add(b.blocker_id === req.user.id ? b.blocked_id : b.blocker_id);
     const sent = new Set((outgoing || []).map((x) => x.to_user));
     const received = new Set((incoming || []).map((x) => x.from_user));
-    const alreadyMatched = new Set((activeMatches || []).filter((x) => x.status === "active" && x.match_source === "shake" || (() => { const expiry = x.status === "proposed" ? x.proposal_expires_at : x.expires_at; return expiry && new Date(expiry).getTime() > Date.now(); })()).map((x) => x.user_one === req.user.id ? x.user_two : x.user_one));
+    const alreadyMatched = new Set((activeMatches || []).filter((x) => x.status === "active" && ["shake", "friend"].includes(x.match_source) || (() => { const expiry = x.status === "proposed" ? x.proposal_expires_at : x.expires_at; return expiry && new Date(expiry).getTime() > Date.now(); })()).map((x) => x.user_one === req.user.id ? x.user_two : x.user_one));
     const byId = new Map((profiles || []).map((p) => [p.id, p]));
     const people = nearby.filter((n) => !hidden.has(n.id) && !alreadyMatched.has(n.id) && !sent.has(n.id))
       .map((n) => {
         const person = byId.get(n.id);
-        if (!person || !compatible(customer.profile, person) || person.suspended_at) return null;
+        if (!person || !isKeralaDistrict(person.district) || !compatible(customer.profile, person) || person.suspended_at) return null;
         return {
           user_id: person.id,
           display_name: "NIVORA member",
