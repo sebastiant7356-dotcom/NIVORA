@@ -101,10 +101,10 @@ router.get("/discover", discoverLimit, async (req, res) => {
         const person = byId.get(n.id);
         if (!person || !compatible(customer.profile, person) || person.suspended_at) return null;
         return {
-          user_id: person.id, first_name: String(person.full_name || "").trim().split(/\s+/)[0],
-          age: person.age, district: person.district, job_title: person.job_title,
-          bio: person.bio, relationship_intention: person.relationship_intention,
-          core_values: person.core_values || [], distance_km: Math.max(1, Math.round(n.distance)),
+          user_id: person.id,
+          display_name: "NIVORA member",
+          interests: person.core_values || [],
+          distance_km: Math.max(1, Math.round(n.distance)),
           interested_in_you: received.has(n.id)
         };
       }).filter(Boolean).sort((a, b) => a.distance_km - b.distance_km).slice(0, 50);
