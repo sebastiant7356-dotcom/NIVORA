@@ -34,7 +34,7 @@ router.post("/block", blockLimit, async (req, res) => {
   const { data: friendChats } = await serviceClient().from("match_history").select("id")
     .eq("match_source", "friend").eq("status", "active")
     .or(`and(user_one.eq.${req.user.id},user_two.eq.${ctx.partnerId}),and(user_one.eq.${ctx.partnerId},user_two.eq.${req.user.id})`);
-  for (const chat of friendChats || []) {
+  for (const chat of (Array.isArray(friendChats) ? friendChats : [])) {
     await serviceClient().rpc("nivora_end_match", { p_user: req.user.id, p_match: chat.id, p_reason: "blocked" });
   }
   // Close any live match with that person immediately (chat/voice stop with it).
