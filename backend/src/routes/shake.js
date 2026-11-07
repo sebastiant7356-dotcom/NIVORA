@@ -38,7 +38,7 @@ router.get("/status", async (req, res) => {
   const db = serviceClient();
   const { data, error } = await db.from("shake_locations").select("enabled,updated_at").eq("user_id", req.user.id).maybeSingle();
   if (error) return res.status(500).json({ success: false, message: "Could not check discovery settings." });
-  res.json({ success: true, enabled: Boolean(data?.enabled), updated_at: data?.updated_at || null });
+  res.json({ success: true, enabled: Boolean(data?.enabled), radius_km: data?.radius_km || 25, updated_at: data?.updated_at || null });
 });
 
 router.post("/location", locationLimit, async (req, res) => {
