@@ -220,7 +220,7 @@
     const $ = (s) => body.querySelector(s);
     $("#pCreate") && ($("#pCreate").onclick = () => { close(); window.openWizard && window.openWizard(); });
     $("#pEdit") && ($("#pEdit").onclick = renderEdit);
-    $("#pSignOut").onclick = async () => { await client().auth.signOut(); close(); };
+    $("#pSignOut").onclick = async () => { try { await api("/api/session", { method: "DELETE" }); } finally { await client().auth.signOut(); close(); } };
     $("#pExport").onclick = exportData;
     $("#pDelete").onclick = deleteAccount;
     body.querySelectorAll("[data-fb]").forEach((b) => (b.onclick = () => feedbackForm(b.dataset.fb)));
