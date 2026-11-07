@@ -16,6 +16,7 @@ router.use(requireAuth);
 const TTL = 12 * 60 * 60 * 1000;
 const state = new EphemeralStore({ defaultTtlMs: TTL, maxEntries: 50000 });
 const limited = createLimiter({ windowMs: 60 * 60_000, max: 100, keyFn: byUser });
+const reportLimited = createLimiter({ windowMs: 60 * 60_000, max: 5, keyFn: byUser });
 const REASONS = ["harassment", "fake_profile", "scam", "inappropriate_content", "underage", "other"];
 const key = (type, id) => type + ":" + id;
 const get = (k) => { const v = state.get(k); if (v !== undefined) state.set(k, v, TTL); return v; };
@@ -300,7 +301,7 @@ router.post("/safety/block", limited, (req,res) => {
   const partner=m.user_one===req.user.id?m.user_two:m.user_one; blockUser(req.user.id,partner);
   res.json({success:true,message:"Member blocked. The active conversation is closed."});
 });
-router.post("/safety/report", limited, (req,res) => {
+router.post("/safety/report", reportLimited, (req,res) => {
   const m=matchOf(req.body?.match_id,req.user.id); if(!m) return fail(res,404,"match_not_found","Match not found.");
   if(!REASONS.includes(req.body?.reason)) return fail(res,400,"invalid_reason","Choose a valid report reason.");
   const partner=m.user_one===req.user.id?m.user_two:m.user_one;
