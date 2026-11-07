@@ -134,10 +134,8 @@ router.post("/admin/appeals/:id/resolve", requireStaff(), wrap(async (req, res) 
   }).eq("id", appeal.id);
   if (error) throw error;
   if (status === "approved" && appeal.user_id) {
-    const { error: reinstateError } = await serviceClient().from("account_enforcements").upsert({
-      user_id: appeal.user_id, status: "active", reason: "Restriction lifted after appeal: " + resolution,
-      expires_at: null, created_by: req.user.id, updated_at: new Date().toISOString()
-    });
+    const { error: reinstateError } = await serviceClient().from("account_enforcements")
+      .delete().eq("user_id", appeal.user_id);
     if (reinstateError) throw reinstateError;
   }
   await audit(req.user.id, "appeal_" + status, appeal.user_id || appeal.id, { appeal_id: appeal.id, resolution });
@@ -162,9 +160,12 @@ router.post("/admin/users/:id/enforcement", requireStaff("admin"), wrap(async (r
   }
   const expiresAt = status === "suspended" && Number.isInteger(hours) && hours > 0 && hours <= 8760
     ? new Date(Date.now() + hours * 3600000).toISOString() : null;
-  const { error } = await serviceClient().from("account_enforcements").upsert({
-    user_id: req.params.id, status, reason, expires_at: expiresAt, created_by: req.user.id, updated_at: new Date().toISOString()
-  });
+  const enforcementQuery = status === "active"
+    ? serviceClient().from("account_enforcements").delete().eq("user_id", req.params.id)
+    : serviceClient().from("account_enforcements").upsert({
+        user_id: req.params.id, status, reason, expires_at: expiresAt, created_by: req.user.id, updated_at: new Date().toISOString()
+      });
+  const { error } = await enforcementQuery;
   if (error) throw error;
   await audit(req.user.id, "account_" + status, req.params.id, { reason, expires_at: expiresAt });
   res.json({ success: true, status, expires_at: expiresAt });
