@@ -18,7 +18,7 @@ const OWN_COLUMNS = "id, full_name, age, district, gender, job_title, bio, looki
 const writeLimit = createLimiter({ windowMs: 60 * 60_000, max: 30, keyFn: byUser });
 
 function isComplete(p) {
-  return Boolean(p.gender && p.looking_for && p.relationship_intention && p.core_values?.length && p.district);
+  return Boolean(p.full_name && Number(p.age) >= 18 && p.district && p.core_values?.length);
 }
 function present(p) {
   if (!p) return null;
