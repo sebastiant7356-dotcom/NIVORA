@@ -157,3 +157,10 @@ test("account deletion preserves only registration identifiers for 180 days", ()
   assert.match(migration, /cron\.schedule/);
   assert.match(migration, /purge_expired_account_registration_records/);
 });
+
+
+test("anonymous post author foreign key has a supporting index migration", () => {
+  const migration = text(path.join(ROOT, "backend", "migrations", "20261110000000_anonymous_posts_author_index.sql"));
+  assert.match(migration, /create index if not exists anonymous_posts_author_id_idx/);
+  assert.match(migration, /on public\.anonymous_posts\(author_id\)/);
+});
