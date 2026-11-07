@@ -44,7 +44,7 @@ The Android app embeds the `frontend/` assets; a public frontend website is not 
 
 GitHub Actions also builds a debug APK and uploads it as the `nivora-android-debug` artifact. The native Google OAuth callback is `in.nivora.social://auth/callback`; add that exact URL to Supabase Authentication → URL Configuration → Redirect URLs before testing sign-in in the Android app. Google OAuth's provider callback remains the Supabase Auth callback URL.
 
-A debug APK is for testing only. Play Store release requires a signed Android App Bundle, a developer account, closed testing where applicable, and Google review. The existing backend host also serves the public legal pages at `/legal/privacy.html` and `/legal/terms.html`; these are legal documents only, not a separate frontend website.
+A debug APK is for testing only. Play Store release requires a signed Android App Bundle, a developer account, closed testing where applicable, and Google review. The existing backend host also serves the public legal pages at `https://nivora-backend.onrender.com/legal/privacy.html` and `https://nivora-backend.onrender.com/legal/terms.html`; these are legal documents only, not a separate frontend website.
 
 ## Local development
 
