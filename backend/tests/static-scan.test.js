@@ -110,6 +110,11 @@ test("staff moderation is limited to reported accounts", () => {
   assert.match(safetyApi, /router\.post\("\/account\/appeal"/);
   assert.match(safetyApi, /appealLimited/);
   assert.match(ui, /renderAppeals/);
+  const appealUi = text(path.join(ROOT, "frontend", "appeal.js"));
+  const appealPage = text(path.join(ROOT, "frontend", "appeal.html"));
+  assert.match(appealUi, /\/api\/account\/appeal/);
+  assert.match(appealPage, /same Google account/);
+  assert.match(safetyApi, /router\.post\("\/admin\/appeals\/:id\/resolve"/);
 });
 
 
