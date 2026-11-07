@@ -42,7 +42,8 @@ router.get("/status", async (req, res) => {
 });
 
 router.post("/location", locationLimit, async (req, res) => {
-  const lat = Number(req.body?.latitude), lon = Number(req.body?.longitude);\n  const radius = Number(req.body?.radius_km ?? 25);
+  const lat = Number(req.body?.latitude), lon = Number(req.body?.longitude);
+  const radius = Number(req.body?.radius_km ?? 25);
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180 || !Number.isInteger(radius) || radius < 1 || radius > 100) {
     return res.status(400).json({ success: false, message: "Valid location coordinates are required." });
   }
