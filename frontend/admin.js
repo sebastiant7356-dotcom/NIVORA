@@ -22,7 +22,7 @@
     $("#auth").style.display = "none"; $("#app").style.display = "block";
     $("#who").style.display = "inline-block"; $("#who").textContent = role;
     $("#signOut").style.display = "inline-block";
-    $("#tabs").innerHTML = [["open","Open reports"],["actioned","Actioned"],["dismissed","Dismissed"],...(role === "admin" ? [["restricted","Restricted accounts"]] : [])]
+    $("#tabs").innerHTML = [["open","Open reports"],["appeals","Appeals"],["actioned","Actioned"],["dismissed","Dismissed"],...(role === "admin" ? [["restricted","Restricted accounts"]] : [])]
       .map(([v,l]) => '<button class="tab" data-status="' + v + '" type="button">' + l + '</button>').join("");
     $("#tabs").onclick = (e) => { const b = e.target.closest("[data-status]"); if (b) { status = b.dataset.status; load(); } };
     load();
@@ -36,9 +36,42 @@
         const r = await api("/api/admin/enforcements");
         return renderEnforcements(r.accounts || []);
       }
+      if (status === "appeals") {
+        const r = await api("/api/admin/appeals");
+        return renderAppeals(r.appeals || []);
+      }
       const r = await api("/api/admin/reports?status=" + encodeURIComponent(status));
       render(r.reports || []);
     } catch (e) { $("#list").innerHTML = ""; msg(e.message); }
+  }
+
+  function renderAppeals(appeals) {
+    if (!appeals.length) { $("#list").innerHTML = "<p>No open appeals.</p>"; return; }
+    $("#list").innerHTML = appeals.map(a => `
+      <section class="card" data-id="${esc(a.id)}">
+        <h3>Account restriction appeal</h3>
+        <small>Account ${esc(a.user_id || "deleted account")} · Filed ${fmt(a.created_at)}</small>
+        <p>${esc(a.reason)}</p>
+        <textarea rows="2" maxlength="500" placeholder="Required decision note (at least 5 characters)"></textarea>
+        <div class="admin-actions">
+          ${role === "admin" ? '<button data-appeal="approved" type="button">Approve & reinstate</button>' : ""}
+          <button data-appeal="rejected" class="alt" type="button">Reject appeal</button>
+        </div>
+      </section>`).join("");
+    $("#list").onclick = async (e) => {
+      const decision = e.target.dataset.appeal;
+      if (!decision) return;
+      const card = e.target.closest("[data-id]");
+      const resolution = card.querySelector("textarea")?.value.trim() || "";
+      if (resolution.length < 5) { msg("Enter a decision note of at least 5 characters."); return; }
+      if (!confirm("Confirm appeal decision: " + decision + "?")) return;
+      try {
+        await api("/api/admin/appeals/" + encodeURIComponent(card.dataset.id) + "/resolve", {
+          method: "POST", body: { status: decision, resolution }
+        });
+        msg("Appeal decision saved.", true); load();
+      } catch (er) { msg(er.message); }
+    };
   }
 
   function renderEnforcements(accounts) {
