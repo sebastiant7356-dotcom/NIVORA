@@ -1,4 +1,4 @@
-/* NIVORA member portal: profile, matching, chat, voice messages, safety and account. Depends on common.js */
+/* MELVO member portal: profile, matching, chat, voice messages, safety and account. Depends on common.js */
 (function () {
   "use strict";
   const { api, client, session, signInWithGoogle, esc } = window.NV;
@@ -6,8 +6,8 @@
 
   const P = {
     en: {
-      myspace: "My space", messagesTab: "Messages", matchTab: "Chat", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Shake to discover someone nearby.", shakeIntro: "Choose your distance, shake your phone, and meet people across Kerala.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Your exact location is private. Only an approximate distance is shown.", shakeEnable: "Enable nearby discovery", shakeDisable: "Turn off location sharing", shakeRefresh: "Find people nearby", shakeLoading: "Finding people within your selected radius…", shakeNoPeople: "No members are available within your radius right now.", shakePermission: "Allow location access in NIVORA to continue.", shakeEnabled: "Nearby discovery is enabled. Your exact location stays private.", shakeLike: "Interested", shakeLikeBack: "Like back", shakeWaiting: "Interest sent. Waiting for a mutual interest.", shakeMatched: "It’s a mutual interest! Your chat is ready in Messages.", shakeAnonymousTitle: "You are chatting anonymously", shakeAnonymousInfo: "Your name, photos and profile details stay hidden until both of you choose to reveal.", shakeReveal: "I am comfortable revealing my profile", shakeWaitingReveal: "Your choice is saved. Waiting for the other person to consent.", shakeRevealDone: "Both of you agreed. Profiles are now visible.", shakeRevealCheck: "Check reveal status", shakeWithdraw: "Withdraw my consent", shakeDistance: "km away", shakeError: "Could not load Shake & Chat. Please try again.", shakeConsent: "Choose a search radius from 1 to 100 km. You can turn discovery off at any time.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
-      noProfile: "You have not created a profile yet.", staffAccount: "This is a NIVORA staff account. Customer profiles and matching are disabled for staff.", staffConsole: "Open staff console", createProfile: "Create my profile",
+      myspace: "My space", messagesTab: "Messages", matchTab: "Chat", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "Your active conversations appear here.", noConversations: "No conversations yet. Shake to discover someone nearby.", shakeIntro: "Choose your distance, shake your phone, and meet people around the world.", shakeComing: "Shake & Chat is coming soon", shakePrivacy: "Your exact location is private. Only an approximate distance is shown.", shakeEnable: "Enable nearby discovery", shakeDisable: "Turn off location sharing", shakeRefresh: "Find people nearby", shakeLoading: "Finding people within your selected radius…", shakeNoPeople: "No members are available within your radius right now.", shakePermission: "Allow location access in MELVO to continue.", shakeEnabled: "Nearby discovery is enabled. Your exact location stays private.", shakeLike: "Interested", shakeLikeBack: "Like back", shakeWaiting: "Interest sent. Waiting for a mutual interest.", shakeMatched: "It’s a mutual interest! Your chat is ready in Messages.", shakeAnonymousTitle: "You are chatting anonymously", shakeAnonymousInfo: "Your name, photos and profile details stay hidden until both of you choose to reveal.", shakeReveal: "I am comfortable revealing my profile", shakeWaitingReveal: "Your choice is saved. Waiting for the other person to consent.", shakeRevealDone: "Both of you agreed. Profiles are now visible.", shakeRevealCheck: "Check reveal status", shakeWithdraw: "Withdraw my consent", shakeDistance: "km away", shakeError: "Could not load Shake & Chat. Please try again.", shakeConsent: "Choose a search radius from 1 to 100 km. You can turn discovery off at any time.", signIn: "Sign in", signOut: "Sign out", loading: "Loading…", close: "Close",
+      noProfile: "You have not created a profile yet.", staffAccount: "This is a MELVO staff account. Customer profiles and matching are disabled for staff.", staffConsole: "Open staff console", createProfile: "Create my profile",
       status_pending: "Awaiting staff review", status_approved: "Approved", status_rejected: "Not approved", status_changes_requested: "Changes requested",
       suspended: "Your account is suspended. Please contact support.", incomplete: "Your profile is missing a few details. Please edit it before using Shake & Chat.",
       reason: "Staff note", editProfile: "Edit profile", save: "Save changes", saving: "Saving…", saved: "Saved.", reviewNote: "Your profile changes are saved immediately. Keep your details accurate and use Report or Block if needed.",
@@ -32,8 +32,8 @@
       name: "Name", age: "Age", place: "Location", job: "Work / study", about: "About you", lookingFor: "I'm looking for", relationship: "Relationship intention", minAge: "Partner min age", maxAge: "Partner max age"
     },
     ml: {
-      myspace: "എന്റെ ഇടം", messagesTab: "Messages", matchTab: "Chat", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "നിങ്ങളുടെ സജീവ സംഭാഷണങ്ങൾ ഇവിടെ കാണാം.", noConversations: "ഇതുവരെ സംഭാഷണങ്ങളില്ല. സമീപത്തുള്ളവരെ കണ്ടെത്താൻ Shake ചെയ്യൂ.", shakeIntro: "നിങ്ങൾക്ക് ഇഷ്ടമുള്ള ദൂരം തിരഞ്ഞെടുക്കൂ. ഫോൺ Shake ചെയ്ത് കേരളത്തിലുള്ളവരെ പരിചയപ്പെടാം.", shakeComing: "Shake & Chat ഉടൻ വരുന്നു", shakePrivacy: "നിങ്ങളുടെ കൃത്യമായ Location മറ്റുള്ളവർക്ക് കാണിക്കില്ല. ഏകദേശ ദൂരം മാത്രമേ കാണൂ.", shakeEnable: "സമീപത്തുള്ളവരെ കണ്ടെത്തുക", shakeDisable: "Location പങ്കിടൽ നിർത്തുക", shakeRefresh: "സമീപത്തുള്ളവരെ തിരയുക", shakeLoading: "നിങ്ങൾ തിരഞ്ഞെടുത്ത Radius-ൽ തിരയുന്നു…", shakeNoPeople: "നിങ്ങളുടെ Radius-ൽ ഇപ്പോൾ അംഗങ്ങളെ കണ്ടെത്താനായില്ല.", shakePermission: "NIVORA-യിൽ തുടരാൻ Location permission നൽകുക.", shakeEnabled: "Nearby discovery പ്രവർത്തനക്ഷമമാണ്. കൃത്യമായ സ്ഥലം സ്വകാര്യമാണ്.", shakeLike: "താൽപര്യമുണ്ട്", shakeLikeBack: "തിരിച്ചും താൽപര്യമുണ്ട്", shakeWaiting: "താൽപര്യം അയച്ചു. മറുവശത്തുനിന്നുള്ള താൽപര്യം കാത്തിരിക്കുന്നു.", shakeMatched: "പരസ്പര താൽപര്യം ലഭിച്ചു! Messages-ൽ chat തുടങ്ങാം.", shakeAnonymousTitle: "നിങ്ങൾ ഇപ്പോൾ അജ്ഞാതരായി chat ചെയ്യുന്നു", shakeAnonymousInfo: "നിങ്ങൾ രണ്ടുപേരും സമ്മതിക്കുന്നതുവരെ പേര്, ഫോട്ടോ, profile വിവരങ്ങൾ മറച്ചുവെക്കും.", shakeReveal: "എന്റെ profile വെളിപ്പെടുത്താൻ എനിക്ക് സമ്മതമാണ്", shakeWaitingReveal: "നിങ്ങളുടെ സമ്മതം സേവ് ചെയ്തു. മറ്റേയാളുടെ സമ്മതം കാത്തിരിക്കുന്നു.", shakeRevealDone: "രണ്ടുപേരും സമ്മതിച്ചു. ഇപ്പോൾ profile കാണാം.", shakeRevealCheck: "Reveal നില പരിശോധിക്കുക", shakeWithdraw: "എന്റെ സമ്മതം പിൻവലിക്കുക", shakeDistance: "km അകലെ", shakeError: "Shake & Chat തുറക്കാനായില്ല. വീണ്ടും ശ്രമിക്കുക.", shakeConsent: "1 മുതൽ 100 km വരെ നിങ്ങൾക്ക് ഇഷ്ടമുള്ള Radius തിരഞ്ഞെടുക്കാം. എപ്പോൾ വേണമെങ്കിലും Discovery നിർത്താം.", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
-      noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", staffAccount: "ഇത് NIVORA staff account ആണ്. Staff അംഗങ്ങൾക്ക് customer profile അല്ലെങ്കിൽ matching ലഭ്യമല്ല.", staffConsole: "Staff console തുറക്കുക", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
+      myspace: "എന്റെ ഇടം", messagesTab: "Messages", matchTab: "Chat", shakeTab: "Shake & Chat", profileTab: "Profile", inboxIntro: "നിങ്ങളുടെ സജീവ സംഭാഷണങ്ങൾ ഇവിടെ കാണാം.", noConversations: "ഇതുവരെ സംഭാഷണങ്ങളില്ല. സമീപത്തുള്ളവരെ കണ്ടെത്താൻ Shake ചെയ്യൂ.", shakeIntro: "നിങ്ങൾക്ക് ഇഷ്ടമുള്ള ദൂരം തിരഞ്ഞെടുക്കൂ. ഫോൺ Shake ചെയ്ത് ലോകമെമ്പാടുമുള്ളവരെ പരിചയപ്പെടാം.", shakeComing: "Shake & Chat ഉടൻ വരുന്നു", shakePrivacy: "നിങ്ങളുടെ കൃത്യമായ Location മറ്റുള്ളവർക്ക് കാണിക്കില്ല. ഏകദേശ ദൂരം മാത്രമേ കാണൂ.", shakeEnable: "സമീപത്തുള്ളവരെ കണ്ടെത്തുക", shakeDisable: "Location പങ്കിടൽ നിർത്തുക", shakeRefresh: "സമീപത്തുള്ളവരെ തിരയുക", shakeLoading: "നിങ്ങൾ തിരഞ്ഞെടുത്ത Radius-ൽ തിരയുന്നു…", shakeNoPeople: "നിങ്ങളുടെ Radius-ൽ ഇപ്പോൾ അംഗങ്ങളെ കണ്ടെത്താനായില്ല.", shakePermission: "MELVO-യിൽ തുടരാൻ Location permission നൽകുക.", shakeEnabled: "Nearby discovery പ്രവർത്തനക്ഷമമാണ്. കൃത്യമായ സ്ഥലം സ്വകാര്യമാണ്.", shakeLike: "താൽപര്യമുണ്ട്", shakeLikeBack: "തിരിച്ചും താൽപര്യമുണ്ട്", shakeWaiting: "താൽപര്യം അയച്ചു. മറുവശത്തുനിന്നുള്ള താൽപര്യം കാത്തിരിക്കുന്നു.", shakeMatched: "പരസ്പര താൽപര്യം ലഭിച്ചു! Messages-ൽ chat തുടങ്ങാം.", shakeAnonymousTitle: "നിങ്ങൾ ഇപ്പോൾ അജ്ഞാതരായി chat ചെയ്യുന്നു", shakeAnonymousInfo: "നിങ്ങൾ രണ്ടുപേരും സമ്മതിക്കുന്നതുവരെ പേര്, ഫോട്ടോ, profile വിവരങ്ങൾ മറച്ചുവെക്കും.", shakeReveal: "എന്റെ profile വെളിപ്പെടുത്താൻ എനിക്ക് സമ്മതമാണ്", shakeWaitingReveal: "നിങ്ങളുടെ സമ്മതം സേവ് ചെയ്തു. മറ്റേയാളുടെ സമ്മതം കാത്തിരിക്കുന്നു.", shakeRevealDone: "രണ്ടുപേരും സമ്മതിച്ചു. ഇപ്പോൾ profile കാണാം.", shakeRevealCheck: "Reveal നില പരിശോധിക്കുക", shakeWithdraw: "എന്റെ സമ്മതം പിൻവലിക്കുക", shakeDistance: "km അകലെ", shakeError: "Shake & Chat തുറക്കാനായില്ല. വീണ്ടും ശ്രമിക്കുക.", shakeConsent: "1 മുതൽ 100 km വരെ നിങ്ങൾക്ക് ഇഷ്ടമുള്ള Radius തിരഞ്ഞെടുക്കാം. എപ്പോൾ വേണമെങ്കിലും Discovery നിർത്താം.", signIn: "Sign in", signOut: "Sign out", loading: "ലോഡ് ചെയ്യുന്നു…", close: "അടയ്ക്കുക",
+      noProfile: "നിങ്ങൾ ഇതുവരെ profile ഉണ്ടാക്കിയിട്ടില്ല.", staffAccount: "ഇത് MELVO staff account ആണ്. Staff അംഗങ്ങൾക്ക് customer profile അല്ലെങ്കിൽ matching ലഭ്യമല്ല.", staffConsole: "Staff console തുറക്കുക", createProfile: "എന്റെ profile ഉണ്ടാക്കാം",
       status_pending: "Staff review കാത്തിരിക്കുന്നു", status_approved: "അംഗീകരിച്ചു", status_rejected: "അംഗീകരിച്ചില്ല", status_changes_requested: "മാറ്റങ്ങൾ ആവശ്യപ്പെട്ടിട്ടുണ്ട്",
       suspended: "നിങ്ങളുടെ account suspend ചെയ്തിരിക്കുന്നു. Support-നെ ബന്ധപ്പെടുക.", incomplete: "Profile-ൽ കുറച്ച് വിവരങ്ങൾ കുറവാണ്. Shake & Chat ഉപയോഗിക്കുന്നതിന് മുമ്പ് edit ചെയ്യുക.",
       reason: "Staff കുറിപ്പ്", editProfile: "Profile edit ചെയ്യുക", save: "സേവ് ചെയ്യുക", saving: "സേവ് ചെയ്യുന്നു…", saved: "സേവ് ചെയ്തു.", reviewNote: "Profile-ലെ മാറ്റങ്ങൾ ഉടൻ save ആകും. വിവരങ്ങൾ ശരിയായി നൽകുക; ആവശ്യമെങ്കിൽ Report / Block ഉപയോഗിക്കുക.",
@@ -138,7 +138,7 @@
   // Called after Google redirects back to the page, if a "My space" sign-in was in progress.
   async function resumePortalLogin() {
     // Run on every homepage load, not only when a particular sign-in button set a flag.
-    // This also restores the dashboard for an already-authenticated customer reopening NIVORA.
+    // This also restores the dashboard for an already-authenticated customer reopening MELVO.
     let pending = false;
     try { pending = sessionStorage.getItem("nivora_pending_portal") === "1"; } catch (_) { /* ignore */ }
     let s;
@@ -165,10 +165,8 @@
     const existing = await api("/api/profile");
     if (existing.profile) return { existing: true, profile: existing.profile };
     const payload = {
-      full_name: form.name.trim(), age: Number(form.age), district: form.place.trim(), gender: form.gender,
-      job_title: form.job.trim(), bio: form.about.trim(), looking_for: form.lookingFor,
-      relationship_intention: form.relationship, core_values: form.values,
-      min_partner_age: form.minAge ? Number(form.minAge) : 21, max_partner_age: form.maxAge ? Number(form.maxAge) : 40,
+      full_name: form.name.trim(), age: Number(form.age), district: form.place.trim(),
+      job_title: form.job.trim(), bio: form.about.trim(), core_values: form.values,
       consents: { terms: !!form.agree, privacy: !!form.privacyAgree }
     };
     return api("/api/profile", { method: "POST", body: payload });
@@ -263,7 +261,7 @@
     const ml = L() === "ml";
     welcome.innerHTML = `
       <div class="dashboard-welcome-copy">
-        <span class="dashboard-eyebrow"><i></i> KERALA SOCIAL DISCOVERY</span>
+        <span class="dashboard-eyebrow"><i></i> GLOBAL SOCIAL DISCOVERY</span>
         <h1>${ml ? "സ്വാഗതം" : "Welcome"},<br><em>${esc((profile.full_name || "").split(" ")[0])}</em></h1>
         <p>${ml ? "പുതിയ ആളുകളെ കണ്ടെത്തൂ. സംസാരിക്കൂ. ഇരുവരും ആഗ്രഹിച്ചാൽ സുഹൃത്തുക്കളാകൂ." : "Discover people nearby. Chat freely. Become friends only when both agree."}</p>
         <div class="dashboard-hero-actions">
@@ -282,7 +280,7 @@
     const topbar = document.createElement("header");
     topbar.className = "dashboard-topbar";
     topbar.innerHTML = `
-      <a class="dashboard-brand" href="dashboard.html" aria-label="NIVORA home"><span class="dashboard-brand-mark">N</span><span><b>NIVORA</b><small>${ml ? "ബന്ധങ്ങൾ അർത്ഥവത്താകട്ടെ" : "MEANINGFUL CONNECTIONS"}</small></span></a>
+      <a class="dashboard-brand" href="dashboard.html" aria-label="MELVO home"><span class="dashboard-brand-mark">N</span><span><b>MELVO</b><small>${ml ? "ബന്ധങ്ങൾ അർത്ഥവത്താകട്ടെ" : "MEANINGFUL CONNECTIONS"}</small></span></a>
       <span class="dashboard-top-note"><i></i>${ml ? "നിങ്ങളുടെ സുരക്ഷിത ഇടം" : "Your space, your pace"}</span>`;
     body.prepend(welcome);
     body.prepend(topbar);
@@ -300,12 +298,12 @@
       inboxList.appendChild(button);
     });
     const shake = document.createElement("section"); shake.className = "dashboard-panel"; shake.id = "dashboard-shake";
-    shake.innerHTML = "<h2 class='modal-title'>" + p("shakeTab") + "</h2><p class='modal-description'>" + p("shakeIntro") + "</p><div class='shake-coming'><span>⌖</span><b>NIVORA Shake</b><small>" + p("shakePrivacy") + "</small><p class='modal-description'>" + p("shakeConsent") + "</p><div class='field'><label for='shakeRadius'>Search radius</label><select id='shakeRadius'><option value='1'>1 km</option><option value='5'>5 km</option><option value='10'>10 km</option><option value='25' selected>25 km</option><option value='50'>50 km</option><option value='75'>75 km</option><option value='100'>100 km</option></select></div><div class='nv-row'><button class='primary-btn' id='shakeEnable' type='button'>" + p("shakeEnable") + "</button><button class='outline-btn' id='shakeNow' type='button' hidden>Shake now</button><button class='outline-btn' id='shakeRefresh' type='button' hidden>" + p("shakeRefresh") + "</button><button class='outline-btn' id='shakeDisable' type='button' hidden>" + p("shakeDisable") + "</button></div><div class='nv-msg' id='shakeStatus' role='status'></div></div><div id='shakePeople' class='shake-people' aria-live='polite'></div>";
+    shake.innerHTML = "<h2 class='modal-title'>" + p("shakeTab") + "</h2><p class='modal-description'>" + p("shakeIntro") + "</p><div class='shake-coming'><span>⌖</span><b>MELVO Shake</b><small>" + p("shakePrivacy") + "</small><p class='modal-description'>" + p("shakeConsent") + "</p><div class='field'><label for='shakeRadius'>Search radius</label><select id='shakeRadius'><option value='1'>1 km</option><option value='5'>5 km</option><option value='10'>10 km</option><option value='25' selected>25 km</option><option value='50'>50 km</option><option value='75'>75 km</option><option value='100'>100 km</option></select></div><div class='nv-row'><button class='primary-btn' id='shakeEnable' type='button'>" + p("shakeEnable") + "</button><button class='outline-btn' id='shakeNow' type='button' hidden>Shake now</button><button class='outline-btn' id='shakeRefresh' type='button' hidden>" + p("shakeRefresh") + "</button><button class='outline-btn' id='shakeDisable' type='button' hidden>" + p("shakeDisable") + "</button></div><div class='nv-msg' id='shakeStatus' role='status'></div></div><div id='shakePeople' class='shake-people' aria-live='polite'></div>";
     const nav = document.createElement("nav"); nav.className = "customer-bottom-nav"; nav.setAttribute("aria-label", "Customer navigation");
     const tabData = [["messages","✉",p("messagesTab")],["match","♡",L() === "ml" ? "Chat" : "Chat"],["shake","⌖",p("shakeTab")],["community","◌",L() === "ml" ? "Posts" : "Posts"],["profile","◉",p("profileTab")]];
     nav.innerHTML = tabData.map((t) => "<button type='button' data-dashboard='" + t[0] + "' aria-pressed='false'><span>" + t[1] + "</span><small>" + t[2] + "</small></button>").join("");
     const community = document.createElement("section"); community.className = "dashboard-panel"; community.id = "dashboard-community";
-    community.innerHTML = "<h2 class='modal-title'>Anonymous posts</h2><p class='modal-description'>Share thoughts without showing your profile.</p><textarea id='communityBody' maxlength='2000' rows='4' placeholder='Write an anonymous post…'></textarea><div class='field'><label for='communityAudience'>Who can see this?</label><select id='communityAudience'><option value='kerala'>All NIVORA users in Kerala</option><option value='radius'>People within my radius</option></select></div><div class='nv-row'><button class='primary-btn' id='communityPublish' type='button'>Post anonymously</button></div><div class='nv-msg' id='communityStatus' role='status'></div><div id='communityFeed' class='shake-people'></div>";
+    community.innerHTML = "<h2 class='modal-title'>Anonymous posts</h2><p class='modal-description'>Share thoughts without showing your profile.</p><textarea id='communityBody' maxlength='2000' rows='4' placeholder='Write an anonymous post…'></textarea><div class='field'><label for='communityAudience'>Who can see this?</label><select id='communityAudience'><option value='kerala'>All MELVO users worldwide</option><option value='radius'>People within my radius</option></select></div><div class='nv-row'><button class='primary-btn' id='communityPublish' type='button'>Post anonymously</button></div><div class='nv-msg' id='communityStatus' role='status'></div><div id='communityFeed' class='shake-people'></div>";
     body.append(inbox, shake, community, nav);
     bindMotionShake();
     const panels = [inbox, matchPanel, shake, community, profilePanel];
@@ -416,7 +414,7 @@
       peopleToShow.forEach((person) => {
         const card = document.createElement("article"); card.className = "shake-person";
         const heading = document.createElement("h3");
-        heading.textContent = person.display_name || "NIVORA member";
+        heading.textContent = person.display_name || "MELVO member";
         const meta = document.createElement("p");
         meta.textContent = person.distance_km + " " + p("shakeDistance");
         const about = document.createElement("p"); about.textContent = (person.interests || []).map(valName).join(" · ");
@@ -468,7 +466,7 @@
       publish.disabled = true; status.textContent = "Publishing anonymously…";
       try {
         await api("/api/community/posts", { method: "POST", body: {
-          body: field.value, audience: body.querySelector("#communityAudience")?.value || "kerala",
+          body: field.value, audience: body.querySelector("#communityAudience")?.value || "global",
           radius_km: Number(body.querySelector("#shakeRadius")?.value || 25)
         }});
         field.value = ""; status.textContent = "Posted anonymously."; await loadCommunityPanel();
@@ -583,10 +581,10 @@
 
   // ----- edit profile -----
   function renderEdit() {
-    const vs = ["family", "kindness", "career", "faith", "communication", "lifestyle"];
-    body.innerHTML = `<h2 class="modal-title">${p("editProfile")}</h2><p class="modal-description">Update the details shown on your NIVORA profile. Your visibility is controlled separately.</p>
-      <div class="field-grid"><div class="field"><label>${p("name")}</label><input id="eName" value="${esc(val("full_name"))}"></div><div class="field"><label>${p("age")}</label><input id="eAge" type="number" min="21" max="40" value="${esc(val("age"))}"></div></div>
-      <div class="field"><label>Kerala district</label><select id="ePlace">${["Thiruvananthapuram","Kollam","Pathanamthitta","Alappuzha","Kottayam","Idukki","Ernakulam","Thrissur","Palakkad","Malappuram","Kozhikode","Wayanad","Kannur","Kasaragod"].map((d) => `<option value="${d}" ${String(val("district")).toLowerCase()===d.toLowerCase() || (d==="Ernakulam" && ["kochi","cochin"].includes(String(val("district")).toLowerCase())) ? "selected" : ""}>${d}</option>`).join("")}</select></div>
+    const vs = ["music", "movies", "gaming", "sports", "travel", "food", "art", "books", "technology", "fitness", "nature", "languages", "photography", "culture", "learning"];
+    body.innerHTML = `<h2 class="modal-title">${p("editProfile")}</h2><p class="modal-description">Update the details shown on your MELVO profile. Your visibility is controlled separately.</p>
+      <div class="field-grid"><div class="field"><label>${p("name")}</label><input id="eName" value="${esc(val("full_name"))}"></div><div class="field"><label>${p("age")}</label><input id="eAge" type="number" min="18" max="100" value="${esc(val("age"))}"></div></div>
+      <div class="field"><label>City / region / country</label><input id="ePlace" maxlength="120" value="${esc(val("district"))}" placeholder="e.g. Kochi, India"></div>
       <div class="field"><label>${p("job")}</label><input id="eJob" value="${esc(val("job_title"))}"></div>
       <label class="field-label">Interests (up to 3)</label><div class="choice-grid">${vs.map((v) => `<label class="choice"><input type="checkbox" name="eVals" value="${v}" ${(profile.core_values || []).includes(v) ? "checked" : ""}> ${valName(v)}</label>`).join("")}</div>
       <div class="field"><label>${p("about")}</label><textarea id="eAbout" rows="4" maxlength="1000">${esc(val("bio"))}</textarea></div>
@@ -595,7 +593,7 @@
     $("#eBack").onclick = render;
     $("#eSave").onclick = async () => {
       const vals = [...body.querySelectorAll("[name=eVals]:checked")].map((x) => x.value);
-      if (vals.length < 1 || vals.length > 3) return msg(L() === "ml" ? "1 മുതൽ 3 വരെ താൽപര്യങ്ങൾ തിരഞ്ഞെടുക്കുക." : "Choose 1 to 3 interests.");
+      if (vals.length < 1 || vals.length > 5) return msg(L() === "ml" ? "1 മുതൽ 5 വരെ താൽപര്യങ്ങൾ തിരഞ്ഞെടുക്കുക." : "Choose 1 to 5 interests.");
       $("#eSave").disabled = true; $("#eSave").textContent = p("saving");
       try {
         const r = await api("/api/profile", { method: "PUT", body: {
