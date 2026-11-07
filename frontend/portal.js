@@ -411,6 +411,92 @@
     } catch (e) { status.textContent = e.message || p("shakeError"); }
   }
 
+
+  let motionShakeBound = false, lastMotionShakeAt = 0;
+  function bindMotionShake() {
+    if (motionShakeBound || !window.addEventListener || !("DeviceMotionEvent" in window)) return;
+    motionShakeBound = true;
+    window.addEventListener("devicemotion", (event) => {
+      if (document.visibilityState === "hidden" || Date.now() - lastMotionShakeAt < 2500) return;
+      const a = event.accelerationIncludingGravity || event.acceleration;
+      if (!a) return;
+      const magnitude = Math.sqrt((a.x || 0) ** 2 + (a.y || 0) ** 2 + (a.z || 0) ** 2);
+      const panel = body.querySelector("#dashboard-shake");
+      if (magnitude > 22 && panel && !panel.hidden) {
+        lastMotionShakeAt = Date.now();
+        discoverShakePeople();
+      }
+    }, { passive: true });
+  }
+
+  async function loadCommunityPanel() {
+    const status = body.querySelector("#communityStatus"), feed = body.querySelector("#communityFeed");
+    const publish = body.querySelector("#communityPublish");
+    if (!feed || !publish) return;
+    publish.onclick = async () => {
+      const field = body.querySelector("#communityBody");
+      if (!field || !field.value.trim()) { status.textContent = "Write something first."; return; }
+      publish.disabled = true; status.textContent = "Publishing anonymously…";
+      try {
+        await api("/api/community/posts", { method: "POST", body: {
+          body: field.value, audience: body.querySelector("#communityAudience")?.value || "kerala",
+          radius_km: Number(body.querySelector("#shakeRadius")?.value || 25)
+        }});
+        field.value = ""; status.textContent = "Posted anonymously."; await loadCommunityPanel();
+      } catch (e) { status.textContent = e.message || "Post could not be published."; }
+      finally { publish.disabled = false; }
+    };
+    try {
+      const result = await api("/api/community/feed");
+      feed.innerHTML = "";
+      if (!result.posts?.length) { feed.innerHTML = "<p class='modal-description'>No posts yet. Start the conversation anonymously.</p>"; return; }
+      result.posts.forEach((post) => {
+        const card = document.createElement("article"); card.className = "shake-person";
+        const heading = document.createElement("h3"); heading.textContent = "Anonymous · " + fmt(post.created_at);
+        const textNode = document.createElement("p"); textNode.textContent = post.body;
+        card.append(heading, textNode);
+        if (post.mine) {
+          const remove = document.createElement("button"); remove.className = "nv-link"; remove.type = "button"; remove.textContent = "Delete post";
+          remove.onclick = async () => { try { await api("/api/community/posts/" + encodeURIComponent(post.id), { method: "DELETE" }); await loadCommunityPanel(); } catch (e) { status.textContent = e.message; } };
+          card.appendChild(remove);
+        }
+        feed.appendChild(card);
+      });
+    } catch (e) { status.textContent = e.message || "Community feed could not be loaded."; }
+  }
+
+  async function loadFriendsPanel() {
+    const incomingBox = body.querySelector("#friendRequests"), list = body.querySelector("#friendList"), status = body.querySelector("#friendsStatus");
+    if (!incomingBox || !list) return;
+    try {
+      const results = await Promise.all([api("/api/friends/requests"), api("/api/friends")]);
+      const requests = results[0], friends = results[1];
+      incomingBox.innerHTML = "";
+      (requests.incoming || []).forEach((request) => {
+        const row = document.createElement("article"); row.className = "shake-person";
+        const label = document.createElement("p"); label.textContent = "Someone wants to become your friend.";
+        const accept = document.createElement("button"); accept.className = "primary-btn"; accept.textContent = "Accept";
+        const decline = document.createElement("button"); decline.className = "outline-btn"; decline.textContent = "Decline";
+        accept.onclick = () => respondFriend(request.id, true);
+        decline.onclick = () => respondFriend(request.id, false);
+        row.append(label, accept, decline); incomingBox.appendChild(row);
+      });
+      list.innerHTML = (friends.friends || []).length
+        ? (friends.friends || []).map((friend) => "<article class='shake-person'><h3>" + esc(friend.display_name) + "</h3><p>" + esc([friend.age, friend.district].filter(Boolean).join(" · ")) + "</p></article>").join("")
+        : "<p class='modal-description'>No friends yet. Start with a chat.</p>";
+      if (!requests.incoming?.length) incomingBox.innerHTML = "<p class='modal-description'>No pending friend requests.</p>";
+    } catch (e) { if (status) status.textContent = e.message || "Friends could not be loaded."; }
+  }
+
+  async function respondFriend(id, accept) {
+    try {
+      await api("/api/friends/requests/" + encodeURIComponent(id) + "/respond", { method: "POST", body: { accept } });
+      await loadFriendsPanel();
+    } catch (e) {
+      const status = body.querySelector("#friendsStatus"); if (status) status.textContent = e.message || "Request could not be updated.";
+    }
+  }
+
   function msg(text, ok) { const el = body.querySelector("#pMsg"); if (el) { el.textContent = text; el.className = "nv-msg" + (ok ? " ok" : ""); } }
 
   async function uploadPhoto(file) {
