@@ -416,10 +416,10 @@
       peopleToShow.forEach((person) => {
         const card = document.createElement("article"); card.className = "shake-person";
         const heading = document.createElement("h3");
-        heading.textContent = [person.first_name, person.age].filter(Boolean).join(", ");
+        heading.textContent = person.display_name || "NIVORA member";
         const meta = document.createElement("p");
-        meta.textContent = [person.district, person.job_title, person.distance_km + " " + p("shakeDistance")].filter(Boolean).join(" · ");
-        const about = document.createElement("p"); about.textContent = person.bio || "";
+        meta.textContent = person.distance_km + " " + p("shakeDistance");
+        const about = document.createElement("p"); about.textContent = (person.interests || []).map(valName).join(" · ");
         const action = document.createElement("button"); action.type = "button"; action.className = "primary-btn";
         action.textContent = person.interested_in_you ? p("shakeLikeBack") : p("shakeLike");
         action.onclick = async () => {
