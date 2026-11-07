@@ -133,9 +133,6 @@ begin
   if pa.id is null or pb.id is null or pa.approval_status <> 'approved' or pb.approval_status <> 'approved'
      or not pa.is_active or not pb.is_active or pa.suspended_at is not null or pb.suspended_at is not null
      or pb.profile_visibility = 'hidden' then raise exception 'profile_unavailable'; end if;
-  if not ((pa.looking_for='any' or pa.looking_for=pb.gender) and (pb.looking_for='any' or pb.looking_for=pa.gender)
-      and pb.age between pa.min_partner_age and pa.max_partner_age
-      and pa.age between pb.min_partner_age and pb.max_partner_age) then raise exception 'not_compatible'; end if;
   if exists (select 1 from public.blocks where (blocker_id=p_user and blocked_id=p_target) or (blocker_id=p_target and blocked_id=p_user)) then raise exception 'blocked'; end if;
 
   select * into loc_a from public.shake_locations where user_id=p_user and enabled;
