@@ -22,7 +22,7 @@ function createApp() {
 
   app.use(express.json({ limit: "20kb" }));
 
-  app.get("/api/health", (req, res) => res.json({ success: true, app: "NIVORA", message: "Backend is running" }));
+  app.get("/api/health", (req, res) => res.json({ success: true, app: "MELVO", message: "Backend is running" }));
 
   // Public legal documents required by the Android app and Play Store listing.
   const legalFiles = new Set(["privacy.html", "privacy_ml.html", "terms.html", "terms_ml.html", "styles.css"]);
@@ -58,12 +58,12 @@ function createApp() {
 if (require.main === module) {
   const missing = config.missing();
   if (missing.length) {
-    console.error("NIVORA backend cannot start. Missing required settings: " + missing.join(", "));
+    console.error("MELVO backend cannot start. Missing required settings: " + missing.join(", "));
     console.error("Copy .env.example to .env and fill them in.");
     process.exit(1);
   }
   createApp().listen(config.port, "0.0.0.0", () => {
-    console.log(`NIVORA backend running on port ${config.port} (${config.isProd ? "production" : "development"})`);
+    console.log(`MELVO backend running on port ${config.port} (${config.isProd ? "production" : "development"})`);
   });
 }
 
