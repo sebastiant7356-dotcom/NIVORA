@@ -65,7 +65,7 @@ async function assertChatMatch(matchId, userId) {
   const match = await getMatchFor(matchId, userId);
   if (!match) return { status: 404, code: "match_not_found", message: "Match not found." };
   if (!["proposed", "active"].includes(match.status) ||
-      !match.expires_at || new Date(match.expires_at) <= new Date()) {
+      (match.match_source !== "shake" && (!match.expires_at || new Date(match.expires_at) <= new Date()))) {
     return { status: 403, code: "match_not_live", message: "This conversation is closed (match ended or the 72-hour window is over)." };
   }
   const partnerId = match.user_one === userId ? match.user_two : match.user_one;
@@ -112,9 +112,9 @@ async function matchView(match, userId) {
     started_at: match.started_at,
     expires_at: match.expires_at,
     ended_reason: match.ended_reason,
-    chat_open: live && match.expires_at && new Date(match.expires_at) > new Date(),
-    can_voice_message: match.status === "active" && match.expires_at && new Date(match.expires_at) > new Date(),
-    seconds_left: live && match.expires_at
+    chat_open: live && (shakeMatch || (match.expires_at && new Date(match.expires_at) > new Date())),
+    can_voice_message: match.status === "active" && (shakeMatch || (match.expires_at && new Date(match.expires_at) > new Date())),
+    seconds_left: !shakeMatch && live && match.expires_at
       ? Math.max(0, Math.floor((new Date(match.expires_at) - Date.now()) / 1000)) : null
   };
   if (live) {
