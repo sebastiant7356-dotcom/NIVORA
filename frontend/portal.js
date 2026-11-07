@@ -202,7 +202,7 @@
         ${!profile.profile_complete ? `<p class="nv-msg">${p("incomplete")}</p>` : ""}
         <div class="nv-row">${st !== "rejected" ? `<button class="outline-btn" id="pEdit" type="button">${p("editProfile")}</button>` : `<small>${p("rejectedNote")}</small>`}</div>`;
 
-      h += `<h3 class="nv-h">${p("photos")}</h3><div id="photoBox"><p class="modal-description">${p("photoHelp")}</p><div class="nv-row"><label class="outline-btn" for="photoInput">${p("addPhoto")}</label><input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden ${photos.length >= 4 ? "disabled" : ""}></div><div class="photo-grid">${photos.map((ph) => `<div class="photo-card"><img src="${esc(ph.url || "")}" alt="Your profile photo"><small>${p("photo" + ph.approval_status[0].toUpperCase() + ph.approval_status.slice(1))}</small><button class="nv-link" data-photo-delete="${esc(ph.id)}" type="button">${p("photoDelete")}</button>${ph.review_reason ? `<small>${esc(ph.review_reason)}</small>` : ""}</div>`).join("")}</div><div class="nv-msg" id="photoMsg" role="status"></div></div>`;
+      h += `<h3 class="nv-h">${p("photos")}</h3><p class="modal-description">Photo sharing is disabled. BEYOND does not upload or retain profile photos.</p>`;
       h += `<h3 class="nv-h">${p("matching")}</h3><div id="matchBox"></div>`;
       if (history.length) {
         h += `<h3 class="nv-h">${p("pastMatches")}</h3><ul class="nv-list">${history.filter((x) => !["proposed", "active"].includes(x.status)).map((x) =>
@@ -626,7 +626,7 @@
       if (["proposed", "active"].includes(m.status)) {
         h += `${m.is_persistent_chat ? "" : `<div class="countdown">${p("timeLeft")}: <b id="mLeft"></b></div>`}
           <div class="chat" id="chat"><div class="chat-status" id="chatStatus">${p("live")}</div><div class="chat-log" id="chatLog" aria-live="polite"></div>
-          <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div><div class="voice-messages" id="voiceLog" aria-live="polite"></div><div class="voice-controls"><button class="outline-btn" id="voiceRecord" type="button">${p("voiceRecord")}</button><span class="nv-msg" id="voiceStatus" role="status"></span></div></div>`;
+          <div class="chat-input"><input id="chatText" maxlength="2000" placeholder="${p("typeMsg")}"><button class="primary-btn" id="chatSend" type="button">${p("send")}</button></div></div>`;
         if (m.status === "proposed") {
           h += m.i_accepted
             ? `<p class="modal-description">${p("waitingPartner")}</p>`
