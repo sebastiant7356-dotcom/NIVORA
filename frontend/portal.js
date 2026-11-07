@@ -400,7 +400,7 @@
 
   async function disableShakeLocation() {
     const status = body.querySelector("#shakeStatus");
-    try { await api("/api/shake/location", { method: "DELETE" }); await loadShakePanel(); }
+    try { await api("/api/shake/location", { method: "DELETE" }); await loadShakePanel(); if (status) status.textContent = L() === "ml" ? "Location sharing നിർത്തി; nearby-radius posts-ഉം നീക്കം ചെയ്തു." : "Location sharing disabled; your nearby-radius posts were also removed."; }
     catch (e) { if (status) status.textContent = e.message || p("shakeError"); }
   }
 
