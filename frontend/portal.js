@@ -373,7 +373,7 @@
       if (state.enabled) await discoverShakePeople();
     } catch (e) { status.textContent = e.message || p("shakeError"); }
     enable.onclick = enableShakeLocation;
-    const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.onclick = discoverShakePeople;
+    const shakeNow = body.querySelector("#shakeNow"); if (shakeNow) shakeNow.onclick = () => discoverShakePeople(true);
     const radius = body.querySelector("#shakeRadius"); if (radius) radius.onchange = enableShakeLocation;
     refresh.onclick = discoverShakePeople;
     disable.onclick = disableShakeLocation;
@@ -401,7 +401,7 @@
     catch (e) { if (status) status.textContent = e.message || p("shakeError"); }
   }
 
-  async function discoverShakePeople() {
+  async function discoverShakePeople(randomOne = false) {
     const status = body.querySelector("#shakeStatus"), people = body.querySelector("#shakePeople");
     if (!people) return;
     status.textContent = p("shakeLoading"); people.innerHTML = "";
@@ -409,7 +409,7 @@
       const result = await api("/api/shake/discover");
       if (!result.people?.length) { status.textContent = p("shakeNoPeople"); return; }
       status.textContent = p("shakeEnabled");
-      result.people.forEach((person) => {
+      const peopleToShow = randomOne && result.people.length ? [result.people[Math.floor(Math.random() * result.people.length)]] : result.people;\n      peopleToShow.forEach((person) => {
         const card = document.createElement("article"); card.className = "shake-person";
         const heading = document.createElement("h3");
         heading.textContent = [person.first_name, person.age].filter(Boolean).join(", ");
@@ -449,7 +449,7 @@
       const panel = body.querySelector("#dashboard-shake");
       if (magnitude > 22 && panel && !panel.hidden) {
         lastMotionShakeAt = Date.now();
-        discoverShakePeople();
+        discoverShakePeople(true);
       }
     }, { passive: true });
   }
@@ -796,7 +796,7 @@
       el.textContent = s > 0 ? `${Math.floor(s / 3600)}h ${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}m ${String(s % 60).padStart(2, "0")}s` : p("closed");
       if (s <= 0) { clearInterval(tickTimer); closeChat(); loadAll().then(render).catch(() => {}); }
     };
-    tick(); tickTimer = setInterval(tick, 1000);
+    if (!m.is_shake_match) { tick(); tickTimer = setInterval(tick, 1000); }
 
     const pull = async () => {
       try {
