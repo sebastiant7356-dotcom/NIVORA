@@ -47,6 +47,17 @@ async function persistReport({ reporterId, reportedId, reason, details = "" }) {
   if (error) throw error;
   return data;
 }
+async function exportSafetyRecords(userId) {
+  const { data: reports, error: reportError } = await serviceClient().from("reports")
+    .select("id,reported_id,reason,details,status,resolution,created_at,resolved_at")
+    .eq("reporter_id", userId).order("created_at", { ascending: false }).limit(200);
+  if (reportError) throw reportError;
+  const { data: appeals, error: appealError } = await serviceClient().from("account_appeals")
+    .select("id,reason,status,resolution,created_at,resolved_at")
+    .eq("user_id", userId).order("created_at", { ascending: false }).limit(100);
+  if (appealError) throw appealError;
+  return { reports: reports || [], appeals: appeals || [] };
+}
 const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
 router.post("/account/appeal", appealLimited, wrap(async (req, res) => {
@@ -177,4 +188,4 @@ router.get("/admin/audit", requireStaff(), wrap(async (_req, res) => {
   if (error) throw error;
   res.json({ success: true, entries: data || [] });
 }));
-module.exports = { router, persistReport };
+module.exports = { router, persistReport, exportSafetyRecords };
