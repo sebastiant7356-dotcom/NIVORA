@@ -26,6 +26,7 @@ function distanceKm(aLat, aLon, bLat, bLon) {
 
 router.get("/feed", async (req, res) => {
   const db = serviceClient();
+  if (!(await eligibleKeralaMember(db, req.user.id))) return res.status(403).json({ success: false, message: "NIVORA community is currently for members in Kerala only." });
   const { data: rows, error } = await db.from("anonymous_posts")
     .select("id,author_id,body,audience,radius_km,latitude,longitude,created_at")
     .eq("status", "published").order("created_at", { ascending: false }).limit(100);
