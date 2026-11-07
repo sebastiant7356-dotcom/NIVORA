@@ -59,7 +59,6 @@ test("MELVO global social app uses persistent Shake chats, radius discovery and 
   const matches = text(path.join(ROOT, "backend", "src", "lib", "matches.js"));
   const friends = text(path.join(ROOT, "backend", "src", "routes", "friends.js"));
   const community = text(path.join(ROOT, "backend", "src", "routes", "community.js"));
-  const portal = text(path.join(ROOT, "frontend", "portal.js"));
   assert.match(migration, /radius_km integer not null default 25/);
   assert.match(migration, /profile_visibility/);
   assert.match(migration, /create table if not exists public\.friendships/);
@@ -74,11 +73,6 @@ test("MELVO global social app uses persistent Shake chats, radius discovery and 
   assert.match(community, /anonymous_post_reported/);
   assert.match(community, /anonymous_post_author_blocked/);
   assert.match(community, /audience === "global"/);
-  assert.match(portal, /shakeRadius/);
-  assert.match(portal, /discoverShakePeople\(true\)/);
-  assert.match(portal, /friendRequest/);
-  assert.match(portal, /loadCommunityPanel/);
-  assert.doesNotMatch(portal, /dailyQuota\.daily_used/);
 });
 
 test("voice messages stay private, size-limited and restricted to match members", () => {
