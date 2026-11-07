@@ -7,7 +7,7 @@ const ERROR_MAP = {
   profile_missing: [404, "Create your profile first."],
   not_approved: [403, "Your profile must be approved by staff first."],
   inactive: [403, "Your account is not active."],
-  profile_incomplete: [409, "Please complete your profile (gender, preferences, values) first."],
+  profile_incomplete: [409, "Please complete your profile and choose interests first."],
   staff_not_customer: [403, "Staff accounts do not use customer matching."],
   daily_match_limit_reached: [429, "You have used all five match recommendations for today. Come back tomorrow."],
   active_match_exists: [409, "You already have an active match."],
@@ -88,10 +88,8 @@ function partnerView(p, myValues = [], photos = []) {
     first_name: firstName(p.full_name),
     age: p.age,
     district: p.district,
-    gender: p.gender,
     job_title: p.job_title,
     bio: p.bio,
-    relationship_intention: p.relationship_intention,
     core_values: p.core_values || [],
     shared_values: (p.core_values || []).filter((v) => myValues.includes(v))
   };
@@ -122,7 +120,7 @@ async function matchView(match, userId) {
   if (live) {
     const db = serviceClient();
     const [{ data: partner }, { data: me }, { data: consentRows, error: consentError }] = await Promise.all([
-      db.from("profiles").select("full_name, age, district, gender, job_title, bio, relationship_intention, core_values, is_active, suspended_at, profile_visibility").eq("id", partnerId).maybeSingle(),
+      db.from("profiles").select("full_name, age, district, job_title, bio, core_values, is_active, suspended_at, profile_visibility").eq("id", partnerId).maybeSingle(),
       db.from("profiles").select("core_values, is_active, suspended_at").eq("id", userId).maybeSingle(),
       shakeMatch
         ? db.from("shake_reveal_consents").select("user_id").eq("match_id", match.id)
