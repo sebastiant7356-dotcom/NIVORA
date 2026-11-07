@@ -21,6 +21,9 @@ async function purgeExpiredReports() {
   const { error: auditError } = await serviceClient().from("audit_log").delete()
     .lt("created_at", new Date(Date.now() - 365 * 86400000).toISOString());
   if (auditError) throw auditError;
+  const { error: appealError } = await serviceClient().from("account_appeals").delete()
+    .lt("created_at", new Date(Date.now() - 90 * 86400000).toISOString());
+  if (appealError) throw appealError;
   lastPurge = Date.now();
 }
 async function persistReport({ reporterId, reportedId, reason, details = "" }) {
@@ -44,6 +47,25 @@ async function persistReport({ reporterId, reportedId, reason, details = "" }) {
 }
 const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
+router.post("/account/appeal", wrap(async (req, res) => {
+  const reason = clean(req.body?.reason || "").slice(0, 1000);
+  if (reason.length < 5) return res.status(400).json({ success: false, message: "Enter an appeal reason of at least 5 characters." });
+  const { data: enforcement, error: enforcementError } = await serviceClient().from("account_enforcements")
+    .select("status").eq("user_id", req.user.id).maybeSingle();
+  if (enforcementError) throw enforcementError;
+  if (!enforcement || !["suspended", "banned"].includes(enforcement.status)) {
+    return res.status(409).json({ success: false, message: "There is no active restriction to appeal." });
+  }
+  await purgeExpiredReports();
+  const { data: pending, error: pendingError } = await serviceClient().from("account_appeals")
+    .select("id").eq("user_id", req.user.id).eq("status", "open").limit(1);
+  if (pendingError) throw pendingError;
+  if (pending?.length) return res.status(409).json({ success: false, message: "You already have an appeal under review." });
+  const { data, error } = await serviceClient().from("account_appeals")
+    .insert({ user_id: req.user.id, reason }).select("id,status,created_at").single();
+  if (error) throw error;
+  res.status(201).json({ success: true, appeal: data });
+}));
 router.get("/admin/me", requireStaff(), (req, res) => res.json({ success: true, role: req.staffRole }));
 router.get("/admin/reports", requireStaff(), wrap(async (req, res) => {
   await purgeExpiredReports();
@@ -82,6 +104,41 @@ router.post("/admin/reports/:id/resolve", requireStaff(), wrap(async (req, res) 
     await audit(req.user.id, "account_suspended", report.reported_id, { report_id: report.id, reason });
   }
   await audit(req.user.id, "report_" + status, report.reported_id, { report_id: report.id, resolution });
+  res.json({ success: true, status });
+}));
+router.get("/admin/appeals", requireStaff(), wrap(async (_req, res) => {
+  await purgeExpiredReports();
+  const { data, error } = await serviceClient().from("account_appeals")
+    .select("id,user_id,reason,status,resolution,created_at,resolved_at")
+    .eq("status", "open").order("created_at", { ascending: true }).limit(200);
+  if (error) throw error;
+  res.json({ success: true, appeals: data || [] });
+}));
+router.post("/admin/appeals/:id/resolve", requireStaff(), wrap(async (req, res) => {
+  const status = req.body?.status;
+  const resolution = clean(req.body?.resolution || "").slice(0, 500);
+  if (!["approved", "rejected"].includes(status) || resolution.length < 5) {
+    return res.status(400).json({ success: false, message: "Choose an outcome and enter a resolution note (at least 5 characters)." });
+  }
+  if (status === "approved" && req.staffRole !== "admin") {
+    return res.status(403).json({ success: false, message: "Only an admin can reinstate an account after appeal." });
+  }
+  const { data: appeal, error: readError } = await serviceClient().from("account_appeals")
+    .select("id,user_id,status").eq("id", req.params.id).maybeSingle();
+  if (readError) throw readError;
+  if (!appeal || appeal.status !== "open") return res.status(404).json({ success: false, message: "Open appeal not found." });
+  const { error } = await serviceClient().from("account_appeals").update({
+    status, resolution, resolved_by: req.user.id, resolved_at: new Date().toISOString()
+  }).eq("id", appeal.id);
+  if (error) throw error;
+  if (status === "approved" && appeal.user_id) {
+    const { error: reinstateError } = await serviceClient().from("account_enforcements").upsert({
+      user_id: appeal.user_id, status: "active", reason: "Restriction lifted after appeal: " + resolution,
+      expires_at: null, created_by: req.user.id, updated_at: new Date().toISOString()
+    });
+    if (reinstateError) throw reinstateError;
+  }
+  await audit(req.user.id, "appeal_" + status, appeal.user_id || appeal.id, { appeal_id: appeal.id, resolution });
   res.json({ success: true, status });
 }));
 router.get("/admin/enforcements", requireStaff("admin"), wrap(async (_req, res) => {
