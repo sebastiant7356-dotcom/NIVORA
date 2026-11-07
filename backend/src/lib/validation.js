@@ -1,11 +1,7 @@
 "use strict";
 
-const GENDERS = ["woman", "man", "other"];
-const LOOKING_FOR = ["woman", "man", "any"];
-const INTENTIONS = ["marriage", "longterm"];
-const VALUES = ["family", "kindness", "career", "faith", "communication", "lifestyle"];
-// Legacy field list retained for compatibility; customer profile edits now remain auto-approved.
-const REVIEW_FIELDS = ["full_name", "age", "gender", "district", "job_title", "bio"];
+const VALUES = ["music", "movies", "gaming", "sports", "travel", "food", "art", "books", "technology", "fitness", "nature", "languages", "photography", "culture", "learning", "family", "kindness", "career", "faith", "communication", "lifestyle"];
+const REVIEW_FIELDS = ["full_name", "age", "district", "job_title", "bio"];
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
@@ -24,21 +20,15 @@ function str(body, key, { min = 0, max, required = false, label }) {
   return { value: v };
 }
 
-/**
- * Validate profile input on the server. Never trusts client-supplied id/role/status.
- * @param {object} body
- * @param {{create:boolean}} opts  create=true => all core fields + consents required
- * @returns {{error?:string, value?:object}}
- */
+/** Validate a global adult social profile. Client-supplied roles and status are ignored. */
 function parseProfileInput(body, { create }) {
   if (!body || typeof body !== "object" || Array.isArray(body)) return { error: "Invalid request body." };
   const out = {};
   const fail = (error) => ({ error });
-
   const rules = [
     ["full_name", { min: 2, max: 100, required: create, label: "Name" }],
-    ["district", { max: 100, required: create, min: create ? 2 : 0, label: "Location" }],
-    ["job_title", { max: 100, label: "Work/study" }],
+    ["district", { max: 120, required: create, min: create ? 2 : 0, label: "City / region / country" }],
+    ["job_title", { max: 100, label: "Work / study" }],
     ["bio", { max: 1000, label: "About you" }]
   ];
   for (const [key, rule] of rules) {
@@ -49,46 +39,23 @@ function parseProfileInput(body, { create }) {
 
   if (create || has(body, "age")) {
     const age = typeof body.age === "string" && /^\d+$/.test(body.age) ? Number(body.age) : body.age;
-    if (!Number.isInteger(age) || age < 21 || age > 40) return fail("Age must be between 21 and 40.");
+    if (!Number.isInteger(age) || age < 18 || age > 100) return fail("Age must be 18 or older.");
     out.age = age;
   }
 
-  const enums = [
-    ["gender", GENDERS, "Gender"],
-    ["looking_for", LOOKING_FOR, "Partner preference"],
-    ["relationship_intention", INTENTIONS, "Relationship intention"]
-  ];
-  for (const [key, allowed, label] of enums) {
-    if (create || has(body, key)) {
-      if (typeof body[key] !== "string" || !allowed.includes(body[key])) return fail(`${label} is invalid.`);
-      out[key] = body[key];
-    }
-  }
-
   if (create || has(body, "core_values")) {
-    const v = body.core_values;
-    if (!Array.isArray(v) || v.length < 1 || v.length > 3 ||
-        new Set(v).size !== v.length || !v.every((x) => VALUES.includes(x))) {
-      return fail("Choose between 1 and 3 values from the list.");
+    const values = body.core_values;
+    if (!Array.isArray(values) || values.length < 1 || values.length > 5 ||
+        new Set(values).size !== values.length || !values.every((value) => VALUES.includes(value))) {
+      return fail("Choose between 1 and 5 interests from the list.");
     }
-    out.core_values = v;
-  }
-
-  if (create || has(body, "min_partner_age") || has(body, "max_partner_age")) {
-    const toAge = (x, d) => (x === undefined || x === null || x === "" ? d : Number(x));
-    const min = toAge(body.min_partner_age, 21);
-    const max = toAge(body.max_partner_age, 40);
-    if (!Number.isInteger(min) || !Number.isInteger(max) || min < 21 || max > 40 || min > max) {
-      return fail("Preferred age range must be within 21–40 and min must not exceed max.");
-    }
-    out.min_partner_age = min;
-    out.max_partner_age = max;
+    out.core_values = values;
   }
 
   if (create) {
     const c = body.consents;
     if (!c || c.terms !== true || c.privacy !== true) {
-      return fail("You must accept both the terms/data-use consent and the privacy & safety notice.");
+      return fail("You must accept both the terms and the privacy & safety notice.");
     }
   }
 
@@ -97,16 +64,10 @@ function parseProfileInput(body, { create }) {
 }
 
 function needsReview(updates) {
-  return REVIEW_FIELDS.some((f) => has(updates, f));
+  return REVIEW_FIELDS.some((field) => has(updates, field));
 }
 
-function isUuid(v) { return typeof v === "string" && UUID_RE.test(v); }
+function isUuid(value) { return typeof value === "string" && UUID_RE.test(value); }
+function firstName(fullName) { return String(fullName || "").trim().split(/\s+/)[0] || ""; }
 
-function firstName(fullName) {
-  return String(fullName || "").trim().split(/\s+/)[0] || "";
-}
-
-module.exports = {
-  GENDERS, LOOKING_FOR, INTENTIONS, VALUES, REVIEW_FIELDS,
-  parseProfileInput, needsReview, isUuid, firstName, clean
-};
+module.exports = { VALUES, REVIEW_FIELDS, parseProfileInput, needsReview, isUuid, firstName, clean };
