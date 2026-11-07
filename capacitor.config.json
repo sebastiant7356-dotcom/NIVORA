@@ -1,6 +1,6 @@
 {
-  "appId": "in.nivora.social",
-  "appName": "NIVORA",
+  "appId": "in.melvo.social",
+  "appName": "MELVO",
   "webDir": "frontend",
   "server": {
     "androidScheme": "https"
