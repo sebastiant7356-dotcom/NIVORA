@@ -132,6 +132,8 @@ begin
   select * into pb from public.profiles where id=p_target;
   if pa.id is null or pb.id is null or pa.approval_status <> 'approved' or pb.approval_status <> 'approved'
      or not pa.is_active or not pb.is_active or pa.suspended_at is not null or pb.suspended_at is not null
+     or lower(coalesce(pa.district,'')) not in ('thiruvananthapuram','trivandrum','kollam','pathanamthitta','alappuzha','alleppey','kottayam','idukki','ernakulam','kochi','cochin','thrissur','palakkad','malappuram','kozhikode','calicut','wayanad','kannur','kannanore','kasaragod','kasargod')
+     or lower(coalesce(pb.district,'')) not in ('thiruvananthapuram','trivandrum','kollam','pathanamthitta','alappuzha','alleppey','kottayam','idukki','ernakulam','kochi','cochin','thrissur','palakkad','malappuram','kozhikode','calicut','wayanad','kannur','kannanore','kasaragod','kasargod')
      or pb.profile_visibility = 'hidden' then raise exception 'profile_unavailable'; end if;
   if exists (select 1 from public.blocks where (blocker_id=p_user and blocked_id=p_target) or (blocker_id=p_target and blocked_id=p_user)) then raise exception 'blocked'; end if;
 
@@ -142,6 +144,10 @@ begin
     power(sin(radians(loc_b.latitude-loc_a.latitude)/2),2) +
     cos(radians(loc_a.latitude))*cos(radians(loc_b.latitude))*power(sin(radians(loc_b.longitude-loc_a.longitude)/2),2)
   ));
+  if loc_a.latitude not between 8 and 13 or loc_a.longitude not between 74.5 and 77.8
+     or loc_b.latitude not between 8 and 13 or loc_b.longitude not between 74.5 and 77.8 then
+    raise exception 'location_not_enabled';
+  end if;
   if km > loc_a.radius_km then raise exception 'outside_radius'; end if;
 
   insert into public.shake_interests(from_user,to_user) values(p_user,p_target) on conflict do nothing;
