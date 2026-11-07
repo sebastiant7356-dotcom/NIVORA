@@ -1,0 +1,42 @@
+name: Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/kerala-social-android-app
+    paths:
+      - "frontend/**"
+      - "backend/**"
+      - "package.json"
+      - "capacitor.config.json"
+      - "scripts/**"
+      - ".github/workflows/android-apk.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Capacitor and build tools
+        run: npm install
+      - name: Bundle native OAuth bridge
+        run: npm run build:native
+      - name: Generate Android project
+        run: npx cap add android
+      - name: Sync app assets
+        run: npx cap sync android
+      - name: Configure Google OAuth deep link
+        run: node scripts/patch-android-manifest.js
+      - name: Build debug APK
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nivora-android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
