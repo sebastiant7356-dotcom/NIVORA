@@ -7,6 +7,21 @@ const VALUES = ["family", "kindness", "career", "faith", "communication", "lifes
 // Legacy field list retained for compatibility; customer profile edits now remain auto-approved.
 const REVIEW_FIELDS = ["full_name", "age", "gender", "district", "job_title", "bio"];
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const KERALA_DISTRICTS = [
+  "Thiruvananthapuram", "Kollam", "Pathanamthitta", "Alappuzha", "Kottayam",
+  "Idukki", "Ernakulam", "Thrissur", "Palakkad", "Malappuram",
+  "Kozhikode", "Wayanad", "Kannur", "Kasaragod"
+];
+const DISTRICT_ALIASES = {
+  trivandrum: "Thiruvananthapuram", alleppey: "Alappuzha",
+  kochi: "Ernakulam", cochin: "Ernakulam", calicut: "Kozhikode",
+  kasargod: "Kasaragod", kannanore: "Kannur"
+};
+function normalizeKeralaDistrict(value) {
+  const key = String(value || "").trim().toLowerCase();
+  return DISTRICT_ALIASES[key] || KERALA_DISTRICTS.find((d) => d.toLowerCase() === key) || null;
+}
+function isKeralaDistrict(value) { return Boolean(normalizeKeralaDistrict(value)); }
 
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 // eslint-disable-next-line no-control-regex
@@ -45,6 +60,11 @@ function parseProfileInput(body, { create }) {
     const r = str(body, key, rule);
     if (r.error) return fail(r.error);
     if (!r.skip) out[key] = r.value;
+  }
+  if (out.district) {
+    const district = normalizeKeralaDistrict(out.district);
+    if (!district) return fail("Choose a district in Kerala.");
+    out.district = district;
   }
 
   if (create || has(body, "age")) {
@@ -107,6 +127,6 @@ function firstName(fullName) {
 }
 
 module.exports = {
-  GENDERS, LOOKING_FOR, INTENTIONS, VALUES, REVIEW_FIELDS,
+  GENDERS, LOOKING_FOR, INTENTIONS, VALUES, REVIEW_FIELDS, KERALA_DISTRICTS, normalizeKeralaDistrict, isKeralaDistrict,
   parseProfileInput, needsReview, isUuid, firstName, clean
 };
