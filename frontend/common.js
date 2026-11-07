@@ -76,9 +76,9 @@
   function authPanel(container, { onCancel } = {}) {
     return new Promise((resolve, reject) => {
       container.innerHTML = `<h2 class="modal-title">${t("signInTitle")}</h2>
-        <p class="modal-description">${lang() === "ml" ? "Google അക്കൗണ്ട് ഉപയോഗിച്ച് സുരക്ഷിതമായി തുടരുക." : "Continue securely with your Google account."}</p>
+        <p class="modal-description">${lang() === "ml" ? "Continue securely with your Google account." : "Continue securely with your Google account."}</p>
         <div class="nv-msg" id="nvMsg" role="status"></div>
-        <div class="nv-row"><button class="primary-btn" id="nvGoogleAuth" type="button">Google ഉപയോഗിച്ച് തുടരുക / Continue with Google</button></div>
+        <div class="nv-row"><button class="primary-btn" id="nvGoogleAuth" type="button">Continue with Google</button></div>
         <div class="nv-row"><button class="back-btn" id="nvCancel" type="button">${t("cancel")}</button></div>`;
       container.querySelector("#nvGoogleAuth").onclick = async () => {
         const btn = container.querySelector("#nvGoogleAuth");
