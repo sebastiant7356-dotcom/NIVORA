@@ -84,7 +84,7 @@ function saveProfile(req, res, creating) {
   const age = Number(b.age);
   const district = clean(b.district || "").slice(0, 100);
   const values = Array.isArray(b.core_values) ? [...new Set(b.core_values.map(x => clean(x).slice(0, 40)).filter(Boolean))].slice(0, 5) : [];
-  if (b.consents?.terms !== true || b.consents?.privacy !== true) return fail(res, 400, "consent_required", "Accept the Terms and Privacy Notice to continue.");
+  if (creating && (b.consents?.terms !== true || b.consents?.privacy !== true)) return fail(res, 400, "consent_required", "Accept the Terms and Privacy Notice to continue.");
   if (name.length < 2 || !Number.isInteger(age) || age < 18 || age > 100 || !district || !values.length) {
     return fail(res, 400, "invalid_profile", "Enter a name, age 18 or older, location and at least one interest.");
   }
@@ -106,7 +106,7 @@ function saveProfile(req, res, creating) {
   put(key("profile", req.user.id), p);
   res.status(creating ? 201 : 200).json({ success: true, profile: p, message: "Profile is active for this session." });
 }
-router.put("/profile/visibility", (req, res) => {
+router.put("/profile/visibility", limited, (req, res) => {
   const p = requireProfile(req, res); if (!p) return;
   if (!["public", "hidden"].includes(req.body?.visibility)) return fail(res, 400, "invalid_visibility", "Choose public or hidden.");
   p.profile_visibility = req.body.visibility; put(key("profile", req.user.id), p);
@@ -125,7 +125,7 @@ router.post("/shake/location", limited, (req, res) => {
   put(key("location", req.user.id), { latitude, longitude, radius_km, updated_at: now() });
   res.json({ success: true, enabled: true, radius_km });
 });
-router.delete("/shake/location", (req, res) => {
+router.delete("/shake/location", limited, (req, res) => {
   state.delete(key("location", req.user.id));
   res.json({ success: true, enabled: false });
 });
@@ -163,8 +163,8 @@ router.post("/shake/interest", limited, (req, res) => {
   }
   res.json({ success: true, mutual: false });
 });
-router.post("/shake/:matchId/reveal", (req, res) => reveal(req, res, true));
-router.delete("/shake/:matchId/reveal", (req, res) => reveal(req, res, false));
+router.post("/shake/:matchId/reveal", limited, (req, res) => reveal(req, res, true));
+router.delete("/shake/:matchId/reveal", limited, (req, res) => reveal(req, res, false));
 function reveal(req, res, consent) {
   const m = liveMatch(req, res); if (!m) return;
   if (m.source !== "shake") return fail(res, 400, "invalid_match", "This is not a Shake & Chat connection.");
@@ -242,14 +242,14 @@ router.delete("/community/posts/:id", (req,res) => {
   if (!post) return fail(res,404,"post_not_found","Post not found.");
   put("community:posts", posts.filter(p => p.id !== post.id)); res.json({success:true});
 });
-router.post("/community/posts/:id/report", (req,res) => {
+router.post("/community/posts/:id/report", limited, (req,res) => {
   const post = list("community:posts").find(p => p.id === req.params.id);
   if (!post || post.author_id === req.user.id) return fail(res,404,"post_not_found","Post not found.");
   if (!REASONS.includes(req.body?.reason)) return fail(res,400,"invalid_reason","Choose a valid report reason.");
   const reports = list("safety:reports"); reports.push({ id:randomUUID(), reporter_id:req.user.id, reported_id:post.author_id, reason:req.body.reason, details:clean(req.body.details || "").slice(0,1000), created_at:now() }); put("safety:reports",reports.slice(-1000));
   res.status(201).json({success:true,message:"Report received for this active server session."});
 });
-router.post("/community/posts/:id/block", (req,res) => {
+router.post("/community/posts/:id/block", limited, (req,res) => {
   const post = list("community:posts").find(p => p.id === req.params.id);
   if (!post || post.author_id === req.user.id) return fail(res,404,"post_not_found","Post not found.");
   blockUser(req.user.id, post.author_id); res.json({success:true,message:"Member blocked for this active server session."});
@@ -263,7 +263,7 @@ router.get("/friends", (req,res) => {
   res.json({success:true,friends});
 });
 router.get("/friends/requests", (req,res) => res.json({success:true,incoming:list(key("friend-in",req.user.id)),outgoing:list(key("friend-out",req.user.id))}));
-router.post("/friends/request", (req,res) => {
+router.post("/friends/request", limited, (req,res) => {
   const m=matchOf(req.body?.match_id,req.user.id); if(!m) return fail(res,404,"match_not_found","Active chat required.");
   const partner=m.user_one===req.user.id?m.user_two:m.user_one;
   if(isBlocked(req.user.id,partner)) return fail(res,403,"blocked","This connection is unavailable.");
@@ -272,7 +272,7 @@ router.post("/friends/request", (req,res) => {
   const outgoing=list(key("friend-out",req.user.id)); outgoing.push(request); put(key("friend-out",req.user.id),outgoing);
   res.status(201).json({success:true,request_id:id});
 });
-router.post("/friends/requests/:id/respond", (req,res) => {
+router.post("/friends/requests/:id/respond", limited, (req,res) => {
   const incoming=list(key("friend-in",req.user.id)), request=incoming.find(x=>x.id===req.params.id);
   if(!request) return fail(res,404,"request_not_found","Friend request not found.");
   put(key("friend-in",req.user.id),incoming.filter(x=>x.id!==request.id));
@@ -291,12 +291,12 @@ function blockUser(userId, targetId) {
   for(const mid of list(key("matches",userId))) { const m=get(key("match",mid)); if(m && [m.user_one,m.user_two].includes(targetId)) { m.status="ended"; put(key("match",mid),m); state.delete(key("messages",mid)); } }
   for(const k of ["friend-in:"+userId,"friend-out:"+userId,"friend-in:"+targetId,"friend-out:"+targetId]) put(k,list(k).filter(r=>r.sender_id!==targetId && r.recipient_id!==targetId));
 }
-router.post("/safety/block", (req,res) => {
+router.post("/safety/block", limited, (req,res) => {
   const m=matchOf(req.body?.match_id,req.user.id); if(!m) return fail(res,404,"match_not_found","Match not found.");
   const partner=m.user_one===req.user.id?m.user_two:m.user_one; blockUser(req.user.id,partner);
   res.json({success:true,message:"Member blocked. The active conversation is closed."});
 });
-router.post("/safety/report", (req,res) => {
+router.post("/safety/report", limited, (req,res) => {
   const m=matchOf(req.body?.match_id,req.user.id); if(!m) return fail(res,404,"match_not_found","Match not found.");
   if(!REASONS.includes(req.body?.reason)) return fail(res,400,"invalid_reason","Choose a valid report reason.");
   const partner=m.user_one===req.user.id?m.user_two:m.user_one;
