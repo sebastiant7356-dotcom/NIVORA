@@ -9,6 +9,8 @@ The current app direction is Google OAuth only, Kerala-only Shake & Chat, anonym
 3. Add the exact Android redirect `in.nivora.social://auth/callback` to Supabase Authentication → URL Configuration → Redirect URLs. Keep the Google provider's authorised callback as the Supabase Auth callback URL.
 4. Test sign-in and sign-out using two separate customer Google accounts. Never share passwords or OTPs.
 
+Public legal URLs on the existing backend host: `/legal/privacy.html` and `/legal/terms.html`. Use the privacy URL in the Play Store listing; no separate public frontend website is needed.
+
 ## B. Two-customer end-to-end test
 
 Use two real test accounts and verify:
