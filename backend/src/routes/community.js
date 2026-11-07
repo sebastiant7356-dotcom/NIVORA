@@ -45,7 +45,7 @@ router.get("/feed", async (req, res) => {
 
 router.post("/posts", postLimit, async (req, res) => {
   const db = serviceClient();
-  if (!(await eligibleKeralaMember(db, req.user.id))) return res.status(403).json({ success: false, message: "NIVORA community is currently for members in Kerala only." });
+  if (!(await eligibleMember(db, req.user.id))) return res.status(403).json({ success: false, message: "This account is not eligible to use the community." });
   if (typeof req.body?.body !== "string") return res.status(400).json({ success: false, message: "Write a post first." });
   const body = clean(req.body.body);
   const audience = req.body?.audience === "radius" ? "radius" : "global";
