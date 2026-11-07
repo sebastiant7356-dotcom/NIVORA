@@ -6,6 +6,7 @@ const { createLimiter, byUser } = require("../lib/ratelimit");
 const { EphemeralStore } = require("../lib/ephemeral-store");
 const { serviceClient } = require("../lib/clients");
 const { clean, isUuid } = require("../lib/validation");
+const { persistReport } = require("./moderation-api");
 
 const router = express.Router();
 router.use(requireAuth);
@@ -248,8 +249,9 @@ router.post("/community/posts/:id/report", limited, (req,res) => {
   const post = list("community:posts").find(p => p.id === req.params.id);
   if (!post || post.author_id === req.user.id) return fail(res,404,"post_not_found","Post not found.");
   if (!REASONS.includes(req.body?.reason)) return fail(res,400,"invalid_reason","Choose a valid report reason.");
-  const reports = list("safety:reports"); reports.push({ id:randomUUID(), reporter_id:req.user.id, reported_id:post.author_id, reason:req.body.reason, details:clean(req.body.details || "").slice(0,1000), created_at:now() }); put("safety:reports",reports.slice(-1000));
-  res.status(201).json({success:true,message:"Report received for this active server session."});
+  persistReport({ reporterId:req.user.id, reportedId:post.author_id, reason:req.body.reason, details:req.body.details || "" })
+    .then(() => res.status(201).json({success:true,message:"Report received. Safety records are retained for moderation for up to 90 days."}))
+    .catch(err => fail(res, err.status || 503, "report_save_failed", err.status ? err.message : "Could not save the report. Please try again."));
 });
 router.post("/community/posts/:id/block", limited, (req,res) => {
   const post = list("community:posts").find(p => p.id === req.params.id);
@@ -302,8 +304,9 @@ router.post("/safety/report", limited, (req,res) => {
   const m=matchOf(req.body?.match_id,req.user.id); if(!m) return fail(res,404,"match_not_found","Match not found.");
   if(!REASONS.includes(req.body?.reason)) return fail(res,400,"invalid_reason","Choose a valid report reason.");
   const partner=m.user_one===req.user.id?m.user_two:m.user_one;
-  const reports=list("safety:reports"); reports.push({id:randomUUID(),reporter_id:req.user.id,reported_id:partner,reason:req.body.reason,details:clean(req.body.details||"").slice(0,1000),created_at:now()}); put("safety:reports",reports.slice(-1000));
-  res.status(201).json({success:true,message:"Report received for this active server session."});
+  persistReport({ reporterId:req.user.id, reportedId:partner, reason:req.body.reason, details:req.body.details || "" })
+    .then(() => res.status(201).json({success:true,message:"Report received. Safety records are retained for moderation for up to 90 days."}))
+    .catch(err => fail(res, err.status || 503, "report_save_failed", err.status ? err.message : "Could not save the report. Please try again."));
 });
 router.post("/feedback", (req,res) => {
   const feedback=clean(req.body?.feedback||req.body?.message||"");
