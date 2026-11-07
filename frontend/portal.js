@@ -373,20 +373,29 @@
     disable.onclick = disableShakeLocation;
   }
 
-  function enableShakeLocation() {
+  async function enableShakeLocation() {
     const status = body.querySelector("#shakeStatus");
-    if (!navigator.geolocation) { if (status) status.textContent = p("shakePermission"); return; }
     if (status) status.textContent = p("loading");
-    navigator.geolocation.getCurrentPosition(async (position) => {
+    const saveLocation = async (position) => {
       try {
         await api("/api/shake/location", { method: "POST", body: {
-          latitude: position.coords.latitude, longitude: position.coords.longitude, radius_km: Number(body.querySelector("#shakeRadius")?.value || 25)
+          latitude: position.coords.latitude, longitude: position.coords.longitude,
+          radius_km: Number(body.querySelector("#shakeRadius")?.value || 25)
         } });
         await loadShakePanel();
       } catch (e) { if (status) status.textContent = e.message || p("shakeError"); }
-    }, () => { if (status) status.textContent = p("shakePermission"); }, {
-      enableHighAccuracy: false, maximumAge: 300000, timeout: 15000
-    });
+    };
+    try {
+      if (window.NivoraNative?.isNative?.() && window.NivoraNative.getCurrentPosition) {
+        const position = await window.NivoraNative.getCurrentPosition();
+        await saveLocation(position);
+        return;
+      }
+      if (!navigator.geolocation) { if (status) status.textContent = p("shakePermission"); return; }
+      navigator.geolocation.getCurrentPosition(saveLocation, () => {
+        if (status) status.textContent = p("shakePermission");
+      }, { enableHighAccuracy: false, maximumAge: 300000, timeout: 15000 });
+    } catch (e) { if (status) status.textContent = e.message || p("shakePermission"); }
   }
 
   async function disableShakeLocation() {
