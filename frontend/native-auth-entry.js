@@ -16,7 +16,7 @@ async function finishOAuth(url) {
     const { error } = await window.NV.client().auth.exchangeCodeForSession(url);
     if (error) throw error;
     await Browser.close().catch(() => {});
-    window.location.replace("dashboard.html");
+    window.location.replace("index.html");
   } catch (error) {
     console.error("NIVORA Google sign-in callback failed:", error?.message || "unknown");
     document.dispatchEvent(new CustomEvent("nivora-auth-error", { detail: "Google sign-in could not be completed. Please try again." }));
