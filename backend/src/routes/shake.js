@@ -88,14 +88,14 @@ router.get("/discover", discoverLimit, async (req, res) => {
       db.from("blocks").select("blocker_id,blocked_id").or("blocker_id.eq." + req.user.id + ",blocked_id.eq." + req.user.id),
       db.from("shake_interests").select("to_user").eq("from_user", req.user.id),
       db.from("shake_interests").select("from_user").eq("to_user", req.user.id),
-      db.from("match_history").select("user_one,user_two,status,expires_at,proposal_expires_at").in("status", ["proposed", "active"]).or("user_one.eq." + req.user.id + ",user_two.eq." + req.user.id).limit(2000)
+      db.from("match_history").select("user_one,user_two,status,expires_at,proposal_expires_at,match_source").in("status", ["proposed", "active"]).or("user_one.eq." + req.user.id + ",user_two.eq." + req.user.id).limit(2000)
     ]);
     if (profileError || blockError || outgoingError || incomingError || activeError) return res.status(500).json({ success: false, message: "Nearby member privacy checks failed." });
     const hidden = new Set();
     for (const b of blocks || []) hidden.add(b.blocker_id === req.user.id ? b.blocked_id : b.blocker_id);
     const sent = new Set((outgoing || []).map((x) => x.to_user));
     const received = new Set((incoming || []).map((x) => x.from_user));
-    const alreadyMatched = new Set((activeMatches || []).filter((x) => { const expiry = x.status === "proposed" ? x.proposal_expires_at : x.expires_at; return expiry && new Date(expiry).getTime() > Date.now(); }).map((x) => x.user_one === req.user.id ? x.user_two : x.user_one));
+    const alreadyMatched = new Set((activeMatches || []).filter((x) => x.status === "active" && x.match_source === "shake" || (() => { const expiry = x.status === "proposed" ? x.proposal_expires_at : x.expires_at; return expiry && new Date(expiry).getTime() > Date.now(); })()).map((x) => x.user_one === req.user.id ? x.user_two : x.user_one));
     const byId = new Map((profiles || []).map((p) => [p.id, p]));
     const people = nearby.filter((n) => !hidden.has(n.id) && !alreadyMatched.has(n.id) && !sent.has(n.id))
       .map((n) => {
