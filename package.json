@@ -1,0 +1,20 @@
+{
+  "name": "nivora-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NIVORA Kerala social discovery Android app",
+  "scripts": {
+    "build:native": "esbuild frontend/native-auth-entry.js --bundle --format=iife --outfile=frontend/native-auth.js",
+    "cap:sync": "npm run build:native && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "latest",
+    "@capacitor/app": "latest",
+    "@capacitor/browser": "latest",
+    "@capacitor/core": "latest"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "latest",
+    "esbuild": "latest"
+  }
+}
