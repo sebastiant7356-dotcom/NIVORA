@@ -1,7 +1,7 @@
-/* NIVORA shared browser helpers: config, Google OAuth, Supabase client and API calls. */
+/* MELVO shared browser helpers: config, Google OAuth, Supabase client and API calls. */
 (function () {
   "use strict";
-  const cfg = window.NIVORA_CONFIG || {};
+  const cfg = window.MELVO_CONFIG || {};
   const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   const API = String(cfg.apiBase || (isLocal ? `${location.protocol}//${location.hostname}:4000` : "")).replace(/\/+$/, "");
 
