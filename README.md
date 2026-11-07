@@ -33,6 +33,21 @@ The app is deployed on Render and uses Supabase for Google OAuth, database and p
 - `capacitor.config.json`, `package.json`, `scripts/` — Capacitor Android wrapper and native OAuth/location bridge.
 - `docs/` — setup notes and historical project reports.
 
+## Android app build
+
+The Android app embeds the `frontend/` assets; a public frontend website is not required.
+
+1. Install Node.js 22+ and Java 21.
+2. Run `npm install` at the repository root.
+3. Run `npm run build:native`.
+4. Run `npx cap add android` once, then `npx cap sync android`.
+5. Run `node scripts/patch-android-manifest.js`.
+6. Build a local debug APK with `cd android && ./gradlew assembleDebug`.
+
+GitHub Actions also builds a debug APK and uploads it as the `nivora-android-debug` artifact. The native Google OAuth callback is `in.nivora.social://auth/callback`; add that exact URL to Supabase Authentication → URL Configuration → Redirect URLs before testing sign-in in the Android app. Google OAuth's provider callback remains the Supabase Auth callback URL.
+
+A debug APK is for testing only. Play Store release requires a signed Android App Bundle, a developer account, closed testing where applicable, and Google review.
+
 ## Local development
 
 1. Install Node.js 22 or newer.
